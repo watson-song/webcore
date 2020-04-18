@@ -34,7 +34,7 @@ public class DataSourceAspect implements Ordered {
         }
     }
 
-    @Pointcut("@annotation(com.chuanputech.taoanks.core.datasource.UseDatabase)")
+    @Pointcut("@annotation(cn.watsontech.core.web.spring.datasource.UseDatabase)")
     public void readPointcut() {}
 
 //    @Before("baseServicePointcut()")
@@ -48,10 +48,10 @@ public class DataSourceAspect implements Ordered {
     @Pointcut("bsInsertPointcut() || bsUpdatePointcut() || bsDeletePointcut()")
     public void baseServicePointcut() {}
 
-    @Pointcut("execution(public * com.chuanputech.taoanks.core.service.BaseService.insert*(..))")
+    @Pointcut("execution(public * cn.watsontech.core.service.intf.BaseService.insert*(..))")
     public void bsInsertPointcut() {}
-    @Pointcut("execution(public * com.chuanputech.taoanks.core.service.BaseService.update*(..))")
+    @Pointcut("execution(public * cn.watsontech.core.service.intf.BaseService.update*(..))")
     public void bsUpdatePointcut() {}
-    @Pointcut("execution(public * com.chuanputech.taoanks.core.service.BaseService.delete*(..))")
+    @Pointcut("execution(public * cn.watsontech.core.service.intf.BaseService.delete*(..))")
     public void bsDeletePointcut() {}
 }

@@ -66,7 +66,7 @@ public class AccessLogAspect {
     /**
      * Controller层切点 注解拦截
      */
-    @Pointcut("@annotation(com.chuanputech.taoanks.core.aop.annotation.AccessLog)")
+    @Pointcut("@annotation(cn.watsontech.core.web.spring.aop.annotation.Access)")
     public void accessLogPointCut() {
         log.info("+++++++++++++Controller层切点 注解拦截+++++++++++++");
     }
