@@ -75,4 +75,8 @@ public interface Service<T, PK> {
     List<T> selectByCondition(Condition condition);
 
     List<T> selectByConditionForStartPage(Condition condition, Integer pageNum, Integer pageSize);
+
+    List<T> selectByConditionForStartPage(Condition condition, Integer pageNum, Integer pageSize, Boolean count);
+
+    List<T> selectByConditionForOffsetAndLimit(Condition condition, Integer offset, Integer limit, Boolean count);
 }

@@ -2,6 +2,7 @@ package cn.watsontech.core.service.intf;
 
 import cn.watsontech.core.mybatis.mapper.BatchInsertModel;
 import cn.watsontech.core.mybatis.Mapper;
+import com.github.pagehelper.PageRowBounds;
 import org.apache.ibatis.session.RowBounds;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
@@ -167,6 +168,18 @@ public class BaseService<T, PK> implements Service<T, PK> {
 
     @Override
     public List<T> selectByConditionForStartPage(Condition condition, Integer pageNum, Integer pageSize) {
-        return this.mapper.selectByExampleAndRowBounds(condition, new RowBounds((pageNum-1)*pageSize, pageSize));
+        return selectByConditionForOffsetAndLimit(condition, (pageNum-1)*pageSize, pageSize, false);
+    }
+
+    @Override
+    public List<T> selectByConditionForStartPage(Condition condition, Integer pageNum, Integer pageSize, Boolean count) {
+        return selectByConditionForOffsetAndLimit(condition, (pageNum-1)*pageSize, pageSize, count);
+    }
+
+    @Override
+    public List<T> selectByConditionForOffsetAndLimit(Condition condition, Integer offset, Integer limit, Boolean count) {
+        PageRowBounds rowBounds = new PageRowBounds(offset, limit);
+        rowBounds.setCount(count);
+        return this.mapper.selectByExampleAndRowBounds(condition, rowBounds);
     }
 }
