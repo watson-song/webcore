@@ -1,5 +1,6 @@
 package cn.watsontech.core.web.result;
 
+import com.github.pagehelper.Page;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import org.springframework.validation.FieldError;
@@ -52,6 +53,14 @@ public class Result {
 
     public static <T> Result listResult(List<T> data) {
         return new Result(ResultCode.SUCCESS, new ResultList(data, 0, data.size(), new Long(data.size())));
+    }
+
+    public static <T> Result pageResult(List<T> data) {
+        if (data instanceof Page) {
+            return new Result(ResultCode.SUCCESS, new ResultList(((Page) data).getResult(), ((Page) data).getPageNum(), ((Page) data).getPageSize(), ((Page) data).getTotal()));
+        }
+
+        return listResult(data);
     }
 
     public static Result errorBadRequest(String error) {
