@@ -3,6 +3,7 @@ package cn.watsontech.core.web.spring.datasource;
 import cn.watsontech.core.mybatis.handler.MySqlJSONArrayTypeHandler;
 import cn.watsontech.core.mybatis.handler.MySqlJSONObjectTypeHandler;
 import cn.watsontech.core.mybatis.handler.MySqlJSONTypeHandler;
+import org.apache.ibatis.plugin.Interceptor;
 import org.apache.ibatis.session.SqlSessionFactory;
 import org.mybatis.spring.SqlSessionFactoryBean;
 import org.springframework.beans.factory.annotation.Value;
@@ -48,8 +49,13 @@ public class MyBatisConfig {
         sqlSessionFactoryBean.setDataSource(myRoutingDataSource);
         sqlSessionFactoryBean.setTypeAliasesPackage(entityTypeAliasesPackage);
         sqlSessionFactoryBean.setConfiguration(globalConfiguration());
-//        sqlSessionFactoryBean.setMapperLocations(new PathMatchingResourcePatternResolver().getResources("classpath:mapper/common/*.xml"));
+        sqlSessionFactoryBean.setPlugins(factoryPlugins());
         return sqlSessionFactoryBean.getObject();
+    }
+
+    private Interceptor[] factoryPlugins() {
+        Interceptor pageInterceptor = new com.github.pagehelper.PageInterceptor();
+        return new Interceptor[]{pageInterceptor};
     }
 
     @Bean

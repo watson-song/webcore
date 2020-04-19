@@ -1,7 +1,3 @@
-/*
- * Copyright (c) 2020. 串普网络科技有限公司版权所有.
- */
-
 package cn.watsontech.core.web.form;
 
 import io.swagger.annotations.ApiModelProperty;
