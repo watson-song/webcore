@@ -2,6 +2,8 @@ package cn.watsontech.core.web.spring.security.entity;
 
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
+import tk.mybatis.mapper.annotation.*;
+
 import java.util.Date;
 import javax.persistence.*;
 
@@ -41,6 +43,7 @@ public class AccessLog {
      * 版本号
      */
     @ApiModelProperty(value="version版本号")
+    @tk.mybatis.mapper.annotation.Version
     private Integer version;
 
     /**

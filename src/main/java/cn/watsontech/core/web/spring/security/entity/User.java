@@ -44,6 +44,7 @@ public class User extends LoginUser {
      * 版本号
      */
     @ApiModelProperty(value="version版本号")
+    @tk.mybatis.mapper.annotation.Version
     private Integer version;
 
     /**

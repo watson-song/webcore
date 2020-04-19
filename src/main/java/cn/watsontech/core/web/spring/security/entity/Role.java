@@ -46,6 +46,13 @@ public class Role {
     private Date createdTime;
 
     /**
+     * 版本号
+     */
+    @ApiModelProperty(value="version版本号")
+    @tk.mybatis.mapper.annotation.Version
+    private Integer version;
+
+    /**
      * @return id
      */
     public Long getId() {
@@ -174,6 +181,25 @@ public class Role {
      */
     public Role setCreatedTime(Date createdTime) {
         this.createdTime = createdTime;
+        return this;
+    }
+
+    /**
+     * 获取版本号
+     *
+     * @return version - 版本号
+     */
+    public Integer getVersion() {
+        return version;
+    }
+
+    /**
+     * 设置版本号
+     *
+     * @param version 版本号
+     */
+    public Role setVersion(Integer version) {
+        this.version = version;
         return this;
     }
 }
