@@ -23,6 +23,12 @@ public class PageParams {
     @NotNull(message = "ps参数(pageSize)不能为空")
     protected Integer ps = 20; //pageSize 默认每页10条
 
+    @ApiModelProperty(value = "分页码", example="1")
+    protected Integer offset;  //page 默认第一页
+
+    @ApiModelProperty(value = "页面大小，默认20", example="20")
+    protected Integer limit = 20; //默认每页10条
+
     @ApiModelProperty(value = "排序sortBy", example="createdTime")
     protected String sby;  //sortBy
 
@@ -68,17 +74,10 @@ public class PageParams {
 
         return null;
     }
-//
-//    public long getTotal(Long recordCount) {
-//        if (recordCount < 1) {
-//            return 0;
-//        }
-//        return (recordCount / ps) + 1;
-//    }
-//
-    public int getOffset() {
-        if (p>0) return (p-1)*ps;
 
-        return 0;
+    public int getOffset() {
+        if (offset!=null) return offset;
+
+        return p!=null?(p-1)*ps:0;
     }
 }
