@@ -1,5 +1,6 @@
 package cn.watsontech.core.mybatis.mapper;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -7,17 +8,16 @@ import java.util.List;
  * 批量插入参数
  * Created by Watson on 2020/2/5.
  */
-public class BatchInsertModel<T>{
+public class BatchInsertModel<T> extends ArrayList<T> {
     List<String> insertColumns; //插入列属性名
-    List<T> list;
 
     public BatchInsertModel(List<T> models) {
-        this.list = models;
+        super(models);
     }
 
     public BatchInsertModel(List<String> insertColumns, List<T> models) {
+        super(models);
         this.insertColumns = insertColumns;
-        this.list = models;
     }
 
     public List<String> getInsertColumns() {
@@ -28,11 +28,4 @@ public class BatchInsertModel<T>{
         this.insertColumns = insertColumns;
     }
 
-    public List<T> getList() {
-        return list;
-    }
-
-    public void setList(List<T> list) {
-        this.list = list;
-    }
 }

@@ -107,8 +107,8 @@ public class BatchInsertProvider extends MapperTemplate {
     public static String insertSelectiveColumns(Class<?> entityClass) {
         StringBuilder sql = new StringBuilder();
         sql.append("<choose>");
-        sql.append("<when test=\"@cn.watsontech.core.mybatis.mapper.BatchInsertOgnl@hasInsertSelectiveColumns(_parameter)\">");
-        sql.append("<foreach collection=\"_parameter.insertColumns\" item=\"insertColumn\" separator=\",\">");
+        sql.append("<when test=\"@cn.watsontech.core.mybatis.mapper.BatchInsertOgnl@hasInsertSelectiveColumns(_parameter.list)\">");
+        sql.append("<foreach collection=\"_parameter.list.insertColumns\" item=\"insertColumn\" separator=\",\">");
         sql.append("${insertColumn}");
         sql.append("</foreach>");
         sql.append("</when>");
@@ -138,7 +138,7 @@ public class BatchInsertProvider extends MapperTemplate {
 //        sql.append(column.getProperty()).append(" != null");
 
 //      sql.append(" and ");
-        sql.append(" @cn.watsontech.core.mybatis.mapper.BatchInsertOgnl@hasInsertSelectiveColumn(_parameter, '").append(column.getColumn()).append("')");
+        sql.append(" @cn.watsontech.core.mybatis.mapper.BatchInsertOgnl@hasInsertSelectiveColumn(_parameter.list, '").append(column.getColumn()).append("')");
 
 //        if (empty && column.getJavaType().equals(String.class)) {
 //            sql.append(" and ");
