@@ -29,10 +29,27 @@ public abstract class CreateForm<T extends CreatedEntity> {
     /**
      * 根据objectclass生成实体
      */
-    public T getObject(long createdBy, String createdByName) {
+    public T getObject(Object createdBy, String createdByName) {
         T object = getObject();
         object.setCreatedBy(createdBy);
         object.setCreatedByName(createdByName);
+        return object;
+    }
+
+    public T getUpdateObject(Object id, Object modifiedBy) {
+        return getUpdateObject(id, modifiedBy, null);
+    }
+
+    /**
+     * 根据objectclass生成实体
+     */
+    public T getUpdateObject(Object id, Object modifiedBy, Integer version) {
+        T object = getObject();
+        object.setId(id);
+        object.setModifiedBy(modifiedBy);
+        if (version!=null) {
+            object.setVersion(version+1);
+        }
         return object;
     }
 }
