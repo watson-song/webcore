@@ -1,8 +1,12 @@
 package cn.watsontech.core.service.intf;
 
+import org.springframework.dao.DataAccessException;
+import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.lang.Nullable;
 import tk.mybatis.mapper.entity.Condition;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * Copyright to watsontech
@@ -79,4 +83,34 @@ public interface Service<T, PK> {
     List<T> selectByConditionForStartPage(Condition condition, Integer pageNum, Integer pageSize, Boolean count);
 
     List<T> selectByConditionForOffsetAndLimit(Condition condition, Integer offset, Integer limit, Boolean count);
+
+    JdbcTemplate getJdbcTemplate();
+
+    <T> T queryForObject(String sql, Class<T> requiredType, @Nullable Object... args) throws DataAccessException;
+
+    Map<String, Object> queryForMap(String sql, @Nullable Object... args) throws DataAccessException;
+
+    <T> List<T> queryForList(String sql, Object[] args, Class<T> elementType) throws DataAccessException;
+
+    /**
+     * 保存单表多项数据
+     * @param tableName 表名称
+     * @param columns 列名
+     * @param datas 要插入的数据，每行数据不能少于列数，空值需要传
+     * @param ignoreConflict 是否忽略冲突
+     *
+     * 使用该方法请打开jdbc的批量驱动参数：rewriteBatchedStatements=true 批量操作batchInsert/update/delete
+     */
+    int[] batchInsertTable(String tableName, List<String> columns, List<Object[]> datas, boolean ignoreConflict);
+
+    /**
+     * 保存单表多项数据
+     * @param tableName 表名称
+     * @param columns 列名
+     * @param datas 要插入的数据，每行数据不能少于列数，空值需要传
+     * @param ignoreConflict 是否忽略冲突
+     *
+     * 使用该方法请打开jdbc的批量驱动参数：rewriteBatchedStatements=true 批量操作batchInsert/update/delete
+     */
+    int insertTable(String tableName, List<String> columns, List<Object> datas, boolean ignoreConflict);
 }

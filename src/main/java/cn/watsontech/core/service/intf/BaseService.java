@@ -1,18 +1,20 @@
 package cn.watsontech.core.service.intf;
 
-import cn.watsontech.core.mybatis.mapper.BatchInsertModel;
 import cn.watsontech.core.mybatis.Mapper;
+import cn.watsontech.core.mybatis.mapper.BatchInsertModel;
 import com.github.pagehelper.PageRowBounds;
 import org.apache.ibatis.session.RowBounds;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataAccessException;
+import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.lang.Nullable;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 import tk.mybatis.mapper.entity.Condition;
 import tk.mybatis.mapper.entity.EntityColumn;
 import tk.mybatis.mapper.mapperhelper.EntityHelper;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -22,6 +24,9 @@ import java.util.stream.Collectors;
 public class BaseService<T, PK> implements Service<T, PK> {
 
     Mapper<T> mapper;
+
+    @Autowired
+    JdbcTemplate jdbcTemplate;
 
     public BaseService(Mapper<T> mapper) {
         this.mapper = mapper;
@@ -181,5 +186,68 @@ public class BaseService<T, PK> implements Service<T, PK> {
         PageRowBounds rowBounds = new PageRowBounds(offset, limit);
         rowBounds.setCount(count);
         return this.mapper.selectByExampleAndRowBounds(condition, rowBounds);
+    }
+
+    @Override
+    public JdbcTemplate getJdbcTemplate() {
+        return jdbcTemplate;
+    }
+
+    /**
+     * 根据sql语句查询
+     */
+    @Override
+    public <T> T queryForObject(String sql, Class<T> requiredType, @Nullable Object... args) throws DataAccessException {
+        return jdbcTemplate.queryForObject(sql, requiredType, args);
+    }
+
+    /**
+     * 根据sql语句查询
+     */
+    @Override
+    public Map<String, Object> queryForMap(String sql, @Nullable Object... args) throws DataAccessException {
+        return jdbcTemplate.queryForMap(sql, args);
+    }
+
+    /**
+     * 根据sql语句查询
+     */
+    @Override
+    public <T> List<T> queryForList(String sql, Object[] args, Class<T> elementType) throws DataAccessException {
+        return jdbcTemplate.queryForList(sql, args, elementType);
+    }
+
+    /**
+     * 保存单表多项数据
+     * @param tableName 表名称
+     * @param columns 列名
+     * @param datas 要插入的数据，每行数据不能少于列数，空值需要传
+     * @param ignoreConflict 是否忽略冲突
+     *
+     * 使用该方法请打开jdbc的批量驱动参数：rewriteBatchedStatements=true 批量操作batchInsert/update/delete
+     */
+    @Override
+    public int[] batchInsertTable(String tableName, List<String> columns, List<Object[]> datas, boolean ignoreConflict) {
+        String[] paramMarks = new String[columns.size()];
+        Arrays.fill(paramMarks, ",");
+
+        return jdbcTemplate.batchUpdate(String.format("insert into `%s` (%s) values (%s)", ignoreConflict ? "ignore":"", tableName, StringUtils.collectionToDelimitedString(columns, ",", "`", "`"), StringUtils.arrayToCommaDelimitedString(paramMarks)), datas);
+    }
+
+    /**
+     * 保存单表多项数据
+     * @param tableName 表名称
+     * @param columns 列名
+     * @param datas 要插入的数据，每行数据不能少于列数，空值需要传
+     * @param ignoreConflict 是否忽略冲突
+     *
+     * 使用该方法请打开jdbc的批量驱动参数：rewriteBatchedStatements=true 批量操作batchInsert/update/delete
+     */
+    @Override
+    public int insertTable(String tableName, List<String> columns, List<Object> datas, boolean ignoreConflict) {
+        String[] paramMarks = new String[columns.size()];
+        Arrays.fill(paramMarks, ",");
+
+        return jdbcTemplate.update(String.format("insert %s into `%s` (%s) values (%s)", ignoreConflict ? "ignore":"", tableName, StringUtils.collectionToDelimitedString(columns, ",", "`", "`"), StringUtils.arrayToCommaDelimitedString(paramMarks)), datas);
     }
 }
