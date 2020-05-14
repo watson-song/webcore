@@ -114,7 +114,5 @@ public interface Service<T, PK> {
      */
     int insertTable(String tableName, List<String> columns, List<Object> datas, boolean ignoreConflict);
 
-    int update(String sql, Object... args);
-
     int updateTable(String sql, Object... args);
 }
