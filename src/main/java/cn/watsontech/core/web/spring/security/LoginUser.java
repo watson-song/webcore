@@ -30,7 +30,7 @@ public abstract class LoginUser implements UserDetails {
 
     //获取用户类型，admin或user
     @JsonIgnore
-    @ApiModelProperty(value = "用户类型，admin或user、worker")
+    @ApiModelProperty(value = "用户类型，admin或user")
     public abstract Type getUserType();
 
     //用户绑定的手机号码
@@ -52,41 +52,8 @@ public abstract class LoginUser implements UserDetails {
     @JsonIgnore
     public abstract String getPassword();
 
-//    @JsonIgnore
     @ApiModelProperty(value = "账户是否启用")
     public abstract boolean isEnabled();
-
-    /**
-     * 仅worker 有钱包信息
-     */
-    @ApiModelProperty(value = "仅worker有钱包id")
-    public Long getWalletId() {
-        return null;
-    }
-
-    /**
-     * 仅worker 有锁匠备案id
-     */
-    @ApiModelProperty(value = " 仅worker有锁匠备案id")
-    public Long getApplicationArchiveId() {
-        return null;
-    }
-
-    /**
-     * 仅worker 有账户编号
-     */
-    @ApiModelProperty(value = " 仅worker有账户编号")
-    public String getNo() {
-        return null;
-    }
-
-    /**
-     * 仅worker 有真实姓名
-     */
-    @ApiModelProperty(value = " 仅worker有真实姓名")
-    public String getRealName() {
-        return null;
-    }
 
     /**
      * 仅小程序用户 有openid
@@ -99,6 +66,9 @@ public abstract class LoginUser implements UserDetails {
      */
     @ApiModelProperty(value = "获取用户昵称")
     public abstract String getNickName();
+
+    @ApiModelProperty(value = "获取用户头像")
+    public String getAvatarUrl(){ return null;}
 
     /**
      * 是否已认证/备案

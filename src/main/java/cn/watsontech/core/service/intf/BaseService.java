@@ -250,4 +250,9 @@ public class BaseService<T, PK> implements Service<T, PK> {
 
         return jdbcTemplate.update(String.format("insert %s into `%s` (%s) values (%s)", ignoreConflict ? "ignore":"", tableName, StringUtils.collectionToDelimitedString(columns, ",", "`", "`"), StringUtils.arrayToCommaDelimitedString(paramMarks)), datas);
     }
+
+    @Override
+    public int updateTable(String sql, Object... args) {
+        return jdbcTemplate.update(sql, args);
+    }
 }

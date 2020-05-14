@@ -196,6 +196,13 @@ public class User extends LoginUser {
     private Boolean isWebloginActive;
 
     /**
+     * 是否为vip用户
+     */
+    @Column(name = "is_vip")
+    @ApiModelProperty(value="是否为vip用户")
+    private Boolean isVip;
+
+    /**
      * 经度
      */
     @ApiModelProperty(value="lat经度")
@@ -1124,6 +1131,15 @@ public class User extends LoginUser {
      */
     public User setExtraData(JSONObject extraData) {
         this.extraData = extraData;
+        return this;
+    }
+
+    public Boolean getVip() {
+        return isVip;
+    }
+
+    public User setVip(Boolean vip) {
+        isVip = vip;
         return this;
     }
 }

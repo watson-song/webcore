@@ -113,4 +113,8 @@ public interface Service<T, PK> {
      * 使用该方法请打开jdbc的批量驱动参数：rewriteBatchedStatements=true 批量操作batchInsert/update/delete
      */
     int insertTable(String tableName, List<String> columns, List<Object> datas, boolean ignoreConflict);
+
+    int update(String sql, Object... args);
+
+    int updateTable(String sql, Object... args);
 }

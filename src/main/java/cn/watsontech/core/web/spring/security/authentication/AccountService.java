@@ -289,7 +289,6 @@ public class AccountService {
 
         Admin admin = new Admin();
         admin.setType(form.getType());
-        admin.setNo(NoHelper.getInstance().nextNoWithPrefixCheck(LoginUser.Type.admin.name(), "A", null));
         admin.setUsername(form.getUsername());
         admin.setEnabled(true);
         admin.setMobile(form.getMobile());

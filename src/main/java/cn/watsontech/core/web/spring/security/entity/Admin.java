@@ -17,12 +17,6 @@ public class Admin extends LoginUser {
     private Long id;
 
     /**
-     * 管理员编号
-     */
-    @ApiModelProperty(value="管理员编号")
-    private String no;
-
-    /**
      * 用户名
      */
     @ApiModelProperty(value="username用户名")
@@ -674,15 +668,6 @@ public class Admin extends LoginUser {
     public Admin setExtraData(JSONObject extraData) {
         this.extraData = extraData;
         return this;
-    }
-
-    @Override
-    public String getNo() {
-        return no;
-    }
-
-    public void setNo(String no) {
-        this.no = no;
     }
 
     /**
