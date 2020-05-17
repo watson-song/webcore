@@ -2,6 +2,7 @@ package cn.watsontech.core.service.intf;
 
 import cn.watsontech.core.mybatis.Mapper;
 import cn.watsontech.core.mybatis.mapper.BatchInsertModel;
+import cn.watsontech.core.web.spring.util.Assert;
 import com.github.pagehelper.PageRowBounds;
 import org.apache.ibatis.session.RowBounds;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -229,7 +230,7 @@ public class BaseService<T, PK> implements Service<T, PK> {
     @Override
     public int[] batchInsertTable(String tableName, List<String> columns, List<Object[]> datas, boolean ignoreConflict) {
         String[] paramMarks = new String[columns.size()];
-        Arrays.fill(paramMarks, ",");
+        Arrays.fill(paramMarks, "?");
 
         return jdbcTemplate.batchUpdate(String.format("insert into `%s` (%s) values (%s)", ignoreConflict ? "ignore":"", tableName, StringUtils.collectionToDelimitedString(columns, ",", "`", "`"), StringUtils.arrayToCommaDelimitedString(paramMarks)), datas);
     }
@@ -246,9 +247,23 @@ public class BaseService<T, PK> implements Service<T, PK> {
     @Override
     public int insertTable(String tableName, List<String> columns, List<Object> datas, boolean ignoreConflict) {
         String[] paramMarks = new String[columns.size()];
-        Arrays.fill(paramMarks, ",");
+        Arrays.fill(paramMarks, "?");
 
         return jdbcTemplate.update(String.format("insert %s into `%s` (%s) values (%s)", ignoreConflict ? "ignore":"", tableName, StringUtils.collectionToDelimitedString(columns, ",", "`", "`"), StringUtils.arrayToCommaDelimitedString(paramMarks)), datas);
+    }
+
+    @Override
+    public int insertTable(String tableName, Map<String, Object> datas, boolean ignoreConflict) {
+        Assert.notNull(datas, "datas cannot be null");
+
+        Set<String> keys = datas.keySet();
+        List<String> columns = new ArrayList<>();
+        List<Object> values = new ArrayList<>();
+        for (String key:keys) {
+            columns.add(key);
+            values.add(datas.get(key));
+        }
+        return insertTable(tableName, columns, values, ignoreConflict);
     }
 
     @Override
