@@ -249,7 +249,7 @@ public class BaseService<T, PK> implements Service<T, PK> {
         String[] paramMarks = new String[columns.size()];
         Arrays.fill(paramMarks, "?");
 
-        return jdbcTemplate.update(String.format("insert %s into `%s` (%s) values (%s)", ignoreConflict ? "ignore":"", tableName, StringUtils.collectionToDelimitedString(columns, ",", "`", "`"), StringUtils.arrayToCommaDelimitedString(paramMarks)), datas);
+        return jdbcTemplate.update(String.format("insert %s into `%s` (%s) values (%s)", ignoreConflict ? "ignore":"", tableName, StringUtils.collectionToDelimitedString(columns, ",", "`", "`"), StringUtils.arrayToCommaDelimitedString(paramMarks)), datas.toArray());
     }
 
     @Override
