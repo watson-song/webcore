@@ -117,4 +117,19 @@ public interface Service<T, PK> {
     int insertTable(String tableName, Map<String, Object> datas, boolean ignoreConflict);
 
     int updateTable(String sql, Object... args);
+
+    /**
+     * 参见
+     * @see wrapCondition(claz, properties, withEnabledFilter=true)
+     */
+    Condition wrapCondition(Class claz, String[] properties);
+
+    /**
+     * 返回查询条件
+     * @param claz 类必填
+     * @param properties 若非空，则查询当前实体的参数列表，若为空，则查询当前实体除了（createdBy、createdByName、version、modifiedBy、modifiedTime）以外的所有属性
+     * @param withEnabledFilter 是否包含enabled=true的查询条件
+     * @return 查询条件
+     */
+    Condition wrapCondition(Class claz, String[] properties, boolean withEnabledFilter);
 }

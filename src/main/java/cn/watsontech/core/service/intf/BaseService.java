@@ -270,4 +270,54 @@ public class BaseService<T, PK> implements Service<T, PK> {
     public int updateTable(String sql, Object... args) {
         return jdbcTemplate.update(sql, args);
     }
+
+    protected Condition wrapCondition(Class claz) {
+        return wrapCondition(claz, null, true);
+    }
+
+    @Override
+    public Condition wrapCondition(Class claz, String[] properties) {
+        return wrapCondition(claz, properties, true);
+    }
+
+    @Override
+    public Condition wrapCondition(Class claz, String[] properties, boolean withEnabledFilter) {
+        Condition condition = new Condition(claz);
+        if (properties!=null) {
+            condition.selectProperties(properties);
+        }else {
+            condition.excludeProperties("createdBy", "createdByName", "version", "modifiedBy", "modifiedTime");
+        }
+
+        if (withEnabledFilter) {
+            condition.createCriteria().andEqualTo("enabled", true);
+        }
+        return condition;
+    }
+
+    /**
+     * 删除时候用到的条件
+     * @param claz 需要删除的实体类
+     * @param id 需要删除的实体id
+     * @param <PKI> 主键类型
+     */
+    protected <PKI> Condition wrapCondition(Class claz, PKI id) {
+        Condition condition = new Condition(claz);
+        condition.createCriteria().andEqualTo("id", id);
+        return condition;
+    }
+
+    /**
+     * 删除时候用到的条件
+     * @param claz 需要删除的实体类
+     * @param id 需要删除的实体id
+     * @param createdBy 创建人实体id
+     * @param <PKI> 主键类型
+     * @param <PKC> 创建人主键类型
+     */
+    protected <PKI, PKC> Condition wrapCondition(Class claz, PKI id, PKC createdBy) {
+        Condition condition = new Condition(claz);
+        condition.createCriteria().andEqualTo("id", id).andEqualTo("createdBy", createdBy);
+        return condition;
+    }
 }
