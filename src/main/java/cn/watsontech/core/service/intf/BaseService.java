@@ -271,6 +271,11 @@ public class BaseService<T, PK> implements Service<T, PK> {
         return jdbcTemplate.update(sql, args);
     }
 
+    @Override
+    public void executeSql(String sql) {
+        jdbcTemplate.execute(sql);
+    }
+
     protected Condition wrapCondition(Class claz) {
         return wrapCondition(claz, null, true);
     }

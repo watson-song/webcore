@@ -118,6 +118,8 @@ public interface Service<T, PK> {
 
     int updateTable(String sql, Object... args);
 
+    void executeSql(String sql);
+
     /**
      * 参见
      * @see wrapCondition(claz, properties, withEnabledFilter=true)
