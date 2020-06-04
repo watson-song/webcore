@@ -2,9 +2,7 @@ package cn.watsontech.core.web.spring.security.authentication;
 
 import cn.watsontech.core.service.AdminService;
 import cn.watsontech.core.service.UserService;
-import cn.watsontech.core.service.manually.AdminManualService;
 import cn.watsontech.core.service.manually.MessageManualService;
-import cn.watsontech.core.utils.NoHelper;
 import cn.watsontech.core.web.form.AdminRegisterForm;
 import cn.watsontech.core.web.spring.aop.annotation.Access;
 import cn.watsontech.core.web.spring.aop.annotation.AccessParam;
@@ -26,10 +24,13 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
+import org.springframework.util.CollectionUtils;
 import tk.mybatis.mapper.entity.Condition;
 import tk.mybatis.mapper.entity.Example;
 
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 /**
  * Created by Watson on 2020/02/20.
@@ -94,7 +95,7 @@ public class AccountService {
         String username = usernameAndType[0];
         LoginUser.Type userType = LoginUser.Type.valueOf(usernameAndType[1]);
 
-        LoginUser loadedUser = loadAccountInfo("username", username, userType, new String[]{"id", "username", "password", "nickName", "gender", "email", "avatarUrl", "mobile", "lastLoginDate", "enabled", "expired", "locked", "credentialsExpired", "extraData"}, false);
+        LoginUser loadedUser = loadAccountInfo("username", username, userType, new String[]{"id", "username", "password", "nickName", "gender", "email", "avatarUrl", "mobile", "lastLoginDate", "lastLoginIp", "enabled", "expired", "locked", "credentialsExpired", "extraData"}, false);
 
         //加载管理员角色/权限
         loadRolesAndPermissions(loadedUser);
@@ -104,13 +105,14 @@ public class AccountService {
         postAuthenticationChecks.check(loadedUser);
 
         //更新登录时间
-        String tableName = "tb_user";
         switch (userType) {
             case admin:
-                tableName = AdminManualService.tableName;
+                jdbcTemplate.update("update tb_admin set last_login_date=?, last_login_ip=?, login_ip=?, login_date=? where id = ?", ((Admin)loadedUser).getLastLoginDate(), ((Admin)loadedUser).getLastLoginIp(), loginIp, DateFormatUtils.format(new Date(), "yyyy-MM-dd HH:mm:ss"), loadedUser.getId());
+                break;
+            case user:
+                jdbcTemplate.update("update tb_user set last_login_date=?, last_login_ip=?, login_ip=?, login_date=? where id = ?", ((User)loadedUser).getLastLoginDate(), ((User)loadedUser).getLastLoginIp(), loginIp, DateFormatUtils.format(new Date(), "yyyy-MM-dd HH:mm:ss"), loadedUser.getId());
                 break;
         }
-        jdbcTemplate.execute(String.format("update %s set last_login_date=login_date, last_login_ip=login_ip, login_ip='%s', login_date='%s' where id = %s", tableName, loginIp, DateFormatUtils.format(new Date(), "yyyy-MM-dd HH:mm:ss"), loadedUser.getId()));
 
         return loadedUser;
     }
@@ -303,15 +305,23 @@ public class AccountService {
         int success = adminService.insertSelective(admin);
         Assert.isTrue(success>0, "添加管理员账号失败，请稍后再试");
 
-        long roleId = 5;//1管理员2运营3会计
-        if (admin.getType()!=null) {
-            if (0==admin.getType()) {
-                roleId = 0;
-            }else if (1==admin.getType()) {
-                roleId = 1;
+//        long roleId = 5;//1管理员2运营3会计
+//        if (admin.getType()!=null) {
+//            if (0==admin.getType()) {
+//                roleId = 0;
+//            }else if (1==admin.getType()) {
+//                roleId = 1;
+//            }
+//        }
+//        jdbcTemplate.update("INSERT ignore INTO ref_admin_role (role_id, admin_id, created_by) VALUES (?, ?, ?)", roleId, admin.getId(), user.getId());
+
+        if (CollectionUtils.isEmpty(form.getRoleIds())) {
+            List<Object[]> values = new ArrayList<>();
+            for(Long roleId:form.getRoleIds()) {
+                values.add(new Object[]{roleId, admin.getId(), user.getId()});
             }
+            jdbcTemplate.batchUpdate("INSERT ignore INTO ref_admin_role (role_id, admin_id, created_by) VALUES (?, ?, ?)", values);
         }
-        jdbcTemplate.update("INSERT ignore INTO ref_admin_role (role_id, admin_id, created_by) VALUES (?, ?, ?)", roleId, admin.getId(), user.getId());
 
         return admin;
     }
