@@ -47,7 +47,6 @@ public class RefreshToken {
      * 版本
      */
     @ApiModelProperty(value="version版本")
-    @tk.mybatis.mapper.annotation.Version
     private Integer version;
 
     /**

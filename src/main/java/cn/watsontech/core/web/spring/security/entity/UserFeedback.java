@@ -106,7 +106,6 @@ public class UserFeedback {
     private Date modifiedTime;
 
     @ApiModelProperty(value="version")
-    @tk.mybatis.mapper.annotation.Version
     private Integer version;
 
     /**

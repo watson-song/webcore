@@ -30,7 +30,6 @@ public class Permission {
     private Integer weight;
 
     @ApiModelProperty(value="version")
-    @tk.mybatis.mapper.annotation.Version
     private Integer version;
 
     @Column(name = "created_by")

@@ -30,6 +30,12 @@ public class Admin extends LoginUser {
     private String nickName;
 
     /**
+     * 职位
+     */
+    @ApiModelProperty(value="职位")
+    private String title;
+
+    /**
      * 性别，0未知，1男，2女
      */
     @ApiModelProperty(value="gender性别，0未知，1男，2女")
@@ -45,7 +51,6 @@ public class Admin extends LoginUser {
      * 版本号
      */
     @ApiModelProperty(value="version版本号")
-    @tk.mybatis.mapper.annotation.Version
     private Integer version;
 
     /**
@@ -235,6 +240,14 @@ public class Admin extends LoginUser {
     public Admin setNickName(String nickName) {
         this.nickName = nickName;
         return this;
+    }
+
+    public String getTitle() {
+        return title;
+    }
+
+    public void setTitle(String title) {
+        this.title = title;
     }
 
     /**

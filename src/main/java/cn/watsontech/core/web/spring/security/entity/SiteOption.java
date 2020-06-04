@@ -72,7 +72,6 @@ public class SiteOption {
      * 版本号
      */
     @ApiModelProperty(value="version版本号")
-    @tk.mybatis.mapper.annotation.Version
     private Integer version;
 
     /**
