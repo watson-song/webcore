@@ -217,7 +217,7 @@ public class AccountService {
             condition.selectProperties(selectProperties);
             switch (userType) {
                 case admin:
-                    condition.selectProperties("type");
+                    condition.selectProperties("type", "title");
                     break;
                 case user:
                     condition.selectProperties("openid", "email", "logged");
