@@ -1,14 +1,16 @@
 package cn.watsontech.core.web.spring.security.authentication;
 
-import cn.watsontech.core.web.spring.security.LoginUser;
 import cn.watsontech.core.service.AdminService;
 import cn.watsontech.core.service.UserService;
 import cn.watsontech.core.service.intf.Service;
+import cn.watsontech.core.web.spring.security.LoginUser;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import tk.mybatis.mapper.entity.Condition;
+
+import java.util.Map;
 
 /**
  * Created by Watson on 31/01/2018.
@@ -45,7 +47,7 @@ public class AccountAuthenticationService implements UserDetailsService {
 
         //加载管理员角色/权限
         if (userType== LoginUser.Type.admin) {
-            loadedUser.setRoles(jdbcTemplate.queryForList(String.format("select b.name from ref_admin_role a left join tb_role b on a.role_id=b.id where a.admin_id=%s", loadedUser.getId()), String.class));
+            loadedUser.setRoles(jdbcTemplate.queryForList(String.format("select b.name, b.description as title from ref_admin_role a left join tb_role b on a.role_id=b.id where a.admin_id=%s", loadedUser.getId()), Map.class));
         }
 
         return loadedUser;
