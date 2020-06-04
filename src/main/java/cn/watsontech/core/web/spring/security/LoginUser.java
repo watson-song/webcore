@@ -97,7 +97,6 @@ public abstract class LoginUser implements UserDetails {
     @Transient
     List<String> permissions = new ArrayList<>();
 
-    @JsonIgnore
     @ApiModelProperty(value = "用户角色")
     public List<String> getRoles() {
         return roles;
