@@ -2,16 +2,17 @@ package cn.watsontech.core.web.spring.security.entity;
 
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
-import tk.mybatis.mapper.annotation.*;
 
+import javax.persistence.Column;
+import javax.persistence.Id;
+import javax.persistence.Table;
 import java.util.Date;
-import javax.persistence.*;
 
 @ApiModel(value="cn.watsontech.core.security.entity.Access")
 @Table(name = "tb_access_log")
 public class AccessLog {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+//    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @ApiModelProperty(value="id")
     private Long id;
 

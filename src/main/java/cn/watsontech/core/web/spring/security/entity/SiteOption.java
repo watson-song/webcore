@@ -10,7 +10,7 @@ import java.util.Date;
 @Table(name = "tb_site_option")
 public class SiteOption {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+//    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @ApiModelProperty(value="id")
     private Long id;
 

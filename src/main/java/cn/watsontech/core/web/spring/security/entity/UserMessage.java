@@ -12,7 +12,7 @@ import java.util.Date;
 @Table(name = "tb_user_message")
 public class UserMessage implements Message {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+//    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @ApiModelProperty(value="id")
     private Long id;
 
