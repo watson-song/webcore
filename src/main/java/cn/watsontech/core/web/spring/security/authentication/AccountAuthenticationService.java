@@ -10,8 +10,6 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import tk.mybatis.mapper.entity.Condition;
 
-import java.util.Map;
-
 /**
  * Created by Watson on 31/01/2018.
  */
@@ -47,7 +45,7 @@ public class AccountAuthenticationService implements UserDetailsService {
 
         //加载管理员角色/权限
         if (userType== LoginUser.Type.admin) {
-            loadedUser.setRoles(jdbcTemplate.queryForList(String.format("select b.name, b.description as title from ref_admin_role a left join tb_role b on a.role_id=b.id where a.admin_id=%s", loadedUser.getId()), Map.class));
+            loadedUser.setRoles(jdbcTemplate.queryForList(String.format("select b.name, b.description as title from ref_admin_role a left join tb_role b on a.role_id=b.id where a.admin_id=%s", loadedUser.getId())));
         }
 
         return loadedUser;
