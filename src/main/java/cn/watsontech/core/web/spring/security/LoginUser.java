@@ -8,10 +8,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.util.CollectionUtils;
 
 import javax.persistence.Transient;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -92,18 +89,19 @@ public abstract class LoginUser implements UserDetails {
 
     //用户角色
     @Transient
-    List<String> roles = new ArrayList<>();
+    List<Map> roles = new ArrayList<>();
+
     //用户权限
     @Transient
     List<String> permissions = new ArrayList<>();
 
     @JsonIgnore
     @ApiModelProperty(value = "用户角色")
-    public List<String> getRoles() {
+    public List<Map> getRoles() {
         return roles;
     }
 
-    public void setRoles(List<String> roles) {
+    public void setRoles(List<Map> roles) {
         this.roles = roles;
     }
 
@@ -120,7 +118,7 @@ public abstract class LoginUser implements UserDetails {
     @JsonIgnore
     public Collection<? extends GrantedAuthority> getAuthorities() {
         if (!CollectionUtils.isEmpty(roles)) {
-            return roles.stream().filter(role -> role!=null&&role.length()>0).map(role -> new SimpleGrantedAuthority("ROLE_"+role)).collect(Collectors.toList());
+            return roles.stream().filter(role -> role!=null&&role.containsKey("name")).map(role -> new SimpleGrantedAuthority("ROLE_"+role.get("name"))).collect(Collectors.toList());
         }
 
         return Arrays.asList(new SimpleGrantedAuthority("ROLE_" + getUserType().name()));

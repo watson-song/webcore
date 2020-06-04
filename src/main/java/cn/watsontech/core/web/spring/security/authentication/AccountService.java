@@ -31,6 +31,7 @@ import tk.mybatis.mapper.entity.Example;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created by Watson on 2020/02/20.
@@ -125,7 +126,7 @@ public class AccountService {
         //加载管理员角色/权限
         if (loadedUser!=null) {
             if (loadedUser.getUserType() == LoginUser.Type.admin) {
-                loadedUser.setRoles(jdbcTemplate.queryForList(String.format("select b.name from ref_admin_role a left join tb_role b on a.role_id=b.id where a.admin_id=%s", loadedUser.getId()), String.class));
+                loadedUser.setRoles(jdbcTemplate.queryForList(String.format("select b.name, b.description as title from ref_admin_role a left join tb_role b on a.role_id=b.id where a.admin_id=%s", loadedUser.getId()), Map.class));
                 loadedUser.setPermissions(jdbcTemplate.queryForList(String.format("select distinct b.name from ref_role_permission a left join tb_permission b on a.permission_id=b.id left join ref_admin_role c on a.role_id=c.role_id where c.admin_id=%s", loadedUser.getId()), String.class));
             }
         }
