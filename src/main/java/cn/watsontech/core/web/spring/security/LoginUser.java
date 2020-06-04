@@ -89,18 +89,18 @@ public abstract class LoginUser implements UserDetails {
 
     //用户角色
     @Transient
-    List<Map> roles = new ArrayList<>();
+    List<Map<String, Object>> roles = new ArrayList<>();
 
     //用户权限
     @Transient
     List<String> permissions = new ArrayList<>();
 
     @ApiModelProperty(value = "用户角色")
-    public List<Map> getRoles() {
+    public List<Map<String, Object>> getRoles() {
         return roles;
     }
 
-    public void setRoles(List<Map> roles) {
+    public void setRoles(List<Map<String, Object>> roles) {
         this.roles = roles;
     }
 
