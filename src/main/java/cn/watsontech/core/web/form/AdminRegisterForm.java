@@ -6,6 +6,7 @@ import org.hibernate.validator.constraints.Length;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Pattern;
+import java.util.List;
 
 @Data
 public class AdminRegisterForm {
@@ -13,6 +14,9 @@ public class AdminRegisterForm {
     @ApiModelProperty(notes = "用户名")
     @NotBlank(message = "用户名不能为空")
     private String username;
+
+    @ApiModelProperty(notes = "职位")
+    private String title;
 
     /**
      * 头像
@@ -62,4 +66,10 @@ public class AdminRegisterForm {
      */
     @ApiModelProperty(value="address地址")
     private String address;
+
+    /**
+     * 角色id列表
+     */
+    @ApiModelProperty(name = "角色id")
+    private List<Long> roleIds;
 }
