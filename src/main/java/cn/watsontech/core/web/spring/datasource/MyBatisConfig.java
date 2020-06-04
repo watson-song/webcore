@@ -17,6 +17,7 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 
 import javax.annotation.Resource;
 import javax.sql.DataSource;
+import java.util.Properties;
 
 /**
  * Copyright to watsontech
@@ -31,6 +32,9 @@ public class MyBatisConfig {
     // sqlSessionFactoryBean.setTypeAliasesPackage(entityTypeAliasesPackage); com.***.entity
     @Value("${mybatis.configuration.entityTypeAliasesPackage}")
     private String entityTypeAliasesPackage;
+
+    @Value("${mybatis.configuration.pageHelper}")
+    private Properties pageHelperProperties;
 
     @Bean
     @ConfigurationProperties(prefix = "mybatis.configuration")
@@ -55,6 +59,7 @@ public class MyBatisConfig {
 
     private Interceptor[] factoryPlugins() {
         Interceptor pageInterceptor = new com.github.pagehelper.PageInterceptor();
+        pageInterceptor.setProperties(pageHelperProperties);
         return new Interceptor[]{pageInterceptor};
     }
 

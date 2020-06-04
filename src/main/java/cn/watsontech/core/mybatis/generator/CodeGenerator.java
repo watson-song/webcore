@@ -96,6 +96,7 @@ public class CodeGenerator {
 
         boolean withSwagger = true; //是否自带swagger注解
         boolean beanBuilderMode = true; //是否启用entity的builder模式
+        boolean isGeneratedKey = true; //是否为自增id
 
         List<ColumnOverride> columnOverrides;
         List<IgnoredColumn> ignoredColumns;
@@ -122,12 +123,29 @@ public class CodeGenerator {
             this.apiPrefix = apiPrefix;
         }
 
+        public TableModelParam(String tableName, String modelName, String primaryKeyType, String apiPrefix, boolean isGeneratedKey) {
+            this.tableName = tableName;
+            this.modelName = modelName;
+            this.primaryKeyType = primaryKeyType;
+            this.apiPrefix = apiPrefix;
+            this.isGeneratedKey = isGeneratedKey;
+        }
+
         public TableModelParam(String tableName, String modelName, String primaryKeyType, String apiPrefix, List<ColumnOverride> columnOverrides) {
             this.tableName = tableName;
             this.modelName = modelName;
             this.apiPrefix = apiPrefix;
             this.primaryKeyType = primaryKeyType;
             this.columnOverrides = columnOverrides;
+        }
+
+        public TableModelParam(String tableName, String modelName, String primaryKeyType, String apiPrefix, List<ColumnOverride> columnOverrides, boolean isGeneratedKey) {
+            this.tableName = tableName;
+            this.modelName = modelName;
+            this.apiPrefix = apiPrefix;
+            this.primaryKeyType = primaryKeyType;
+            this.columnOverrides = columnOverrides;
+            this.isGeneratedKey = isGeneratedKey;
         }
 
         public TableModelParam(String tableName, String modelName, String primaryKeyType, String apiPrefix, List<ColumnOverride> columnOverrides, List<IgnoredColumn> ignoredColumns) {
@@ -137,6 +155,16 @@ public class CodeGenerator {
             this.primaryKeyType = primaryKeyType;
             this.columnOverrides = columnOverrides;
             this.ignoredColumns = ignoredColumns;
+        }
+
+        public TableModelParam(String tableName, String modelName, String primaryKeyType, String apiPrefix, List<ColumnOverride> columnOverrides, List<IgnoredColumn> ignoredColumns, boolean isGeneratedKey) {
+            this.tableName = tableName;
+            this.modelName = modelName;
+            this.apiPrefix = apiPrefix;
+            this.primaryKeyType = primaryKeyType;
+            this.columnOverrides = columnOverrides;
+            this.ignoredColumns = ignoredColumns;
+            this.isGeneratedKey = isGeneratedKey;
         }
 
         public String getTableName() {
@@ -179,6 +207,10 @@ public class CodeGenerator {
 
         public boolean isBeanBuilderMode() {
             return beanBuilderMode;
+        }
+
+        public boolean isGeneratedKey() {
+            return isGeneratedKey;
         }
     }
 
@@ -255,14 +287,14 @@ public class CodeGenerator {
         String modelName = tableModelParam.getModelName();
         String primaryKeyType = tableModelParam.getPrimaryKeyType();
 
-        genModelAndMapper(tableName, modelName, tableModelParam.isWithSwagger(), tableModelParam.isBeanBuilderMode(), tableModelParam.getColumnOverrides(), tableModelParam.getIgnoredColumns(), jdbcConnectionConfiguration);
+        genModelAndMapper(tableName, modelName, tableModelParam.isWithSwagger(), tableModelParam.isBeanBuilderMode(), tableModelParam.getColumnOverrides(), tableModelParam.getIgnoredColumns(), tableModelParam.isGeneratedKey(), jdbcConnectionConfiguration);
 
 		genService(tableName, modelName, primaryKeyType);
 		genController(tableName, modelName, primaryKeyType, tableModelParam.getApiPrefix());
 
     }
 
-    public void genModelAndMapper(String tableName, String modelName, boolean withSwagger, boolean beanBuilderMode, List<ColumnOverride> columnOverrides, List<IgnoredColumn> ignoredColumns, JDBCConnectionConfiguration jdbcConnectionConfiguration) {
+    public void genModelAndMapper(String tableName, String modelName, boolean withSwagger, boolean beanBuilderMode, List<ColumnOverride> columnOverrides, List<IgnoredColumn> ignoredColumns, boolean isGeneratedKey, JDBCConnectionConfiguration jdbcConnectionConfiguration) {
         Context context = new Context(ModelType.FLAT);
         context.setId("mybatis");
         context.setTargetRuntime("MyBatis3Simple");
@@ -320,7 +352,10 @@ public class CodeGenerator {
             ignoredColumns.forEach(ignoredColumn -> tableConfiguration.addIgnoredColumn(ignoredColumn));
         }
         if (!StringUtils.isEmpty(modelName))tableConfiguration.setDomainObjectName(modelName);
-        tableConfiguration.setGeneratedKey(new GeneratedKey("id", "Mysql", true, null));
+
+        if (isGeneratedKey) {
+            tableConfiguration.setGeneratedKey(new GeneratedKey("id", "Mysql", true, null));
+        }
         context.addTableConfiguration(tableConfiguration);
 
         List<String> warnings;

@@ -91,7 +91,7 @@ public class Result {
         return new Result(ResultCode.SUCCESS, wrapMap("success", data));
     }
 
-    public static Result successCreateResult(long id) {
+    public static Result successCreateResult(Long id) {
         return new Result(ResultCode.SUCCESS, wrapMap("id", id));
     }
 

@@ -2,6 +2,7 @@ package cn.watsontech.core.service.intf;
 
 import cn.watsontech.core.mybatis.Mapper;
 import cn.watsontech.core.mybatis.mapper.BatchInsertModel;
+import cn.watsontech.core.mybatis.param.PageParams;
 import cn.watsontech.core.web.spring.util.Assert;
 import com.github.pagehelper.PageRowBounds;
 import org.apache.ibatis.session.RowBounds;
@@ -324,5 +325,19 @@ public class BaseService<T, PK> implements Service<T, PK> {
         Condition condition = new Condition(claz);
         condition.createCriteria().andEqualTo("id", id).andEqualTo("createdBy", createdBy);
         return condition;
+    }
+
+    public static PageRowBounds wrapPageRowBounds(PageParams params) {
+        return wrapPageRowBounds(params, true);
+    }
+
+    public static PageRowBounds wrapPageRowBounds(PageParams params, boolean count) {
+        PageRowBounds rowBounds = new PageRowBounds(getOffset(params), params.getPs());
+        rowBounds.setCount(count);
+        return rowBounds;
+    }
+
+    private static int getOffset(PageParams params) {
+        return params.getP()!=null?Math.max(0, (params.getP()-1)*params.getPs()):0;
     }
 }
