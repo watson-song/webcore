@@ -1,5 +1,6 @@
 package cn.watsontech.core.web.spring.security.entity;
 
+import cn.watsontech.core.mybatis.CreatedEntity;
 import com.alibaba.fastjson.JSONObject;
 import cn.watsontech.core.service.intf.Message;
 import io.swagger.annotations.ApiModel;
@@ -10,7 +11,7 @@ import java.util.Date;
 
 @ApiModel(value="cn.watsontech.core.security.entity.UserMessage")
 @Table(name = "tb_user_message")
-public class UserMessage implements Message {
+public class UserMessage implements Message, CreatedEntity<UserMessage, Long, Long> {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @ApiModelProperty(value="id")

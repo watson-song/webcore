@@ -110,6 +110,8 @@ CREATE TABLE `tb_admin` (
   `no` varchar(12) DEFAULT NULL COMMENT '编号',
   `username` varchar(65) NOT NULL COMMENT '用户名',
   `nick_name` varchar(65) DEFAULT NULL COMMENT '昵称',
+  `department` varchar(65) DEFAULT NULL COMMENT '部门',
+  `title` varchar(65) DEFAULT NULL COMMENT '职位',
   `gender` varchar(10) DEFAULT '0' COMMENT '性别，0未知，1男，2女',
   `type` int(11) NOT NULL DEFAULT '2' COMMENT '账号类型：1管理员，2运营，3财务',
   `avatar_url` varchar(255) DEFAULT '/images/user.png' COMMENT '头像',
@@ -198,7 +200,7 @@ DROP TABLE IF EXISTS `tb_permission`;
 
 CREATE TABLE `tb_permission` (
   `id` bigint(20) NOT NULL AUTO_INCREMENT,
-  `description` varchar(140) DEFAULT NULL,
+  `label` varchar(140) DEFAULT NULL,
   `name` varchar(32) NOT NULL,
   `parent_id` bigint(11) DEFAULT NULL,
   `weight` int(11) NOT NULL,
@@ -216,7 +218,7 @@ CREATE TABLE `tb_permission` (
 LOCK TABLES `tb_permission` WRITE;
 /*!40000 ALTER TABLE `tb_permission` DISABLE KEYS */;
 
-INSERT INTO `tb_permission` (`id`, `description`, `name`, `parent_id`, `weight`, `enabled`, `version`, `created_by`, `created_by_name`, `created_time`, `modified_by`, `modified_time`)
+INSERT INTO `tb_permission` (`id`, `label`, `name`, `parent_id`, `weight`, `enabled`, `version`, `created_by`, `created_by_name`, `created_time`, `modified_by`, `modified_time`)
 VALUES
 	(1,'所有菜单','*_menu',NULL,0,NULL,1,NULL,'watson','2020-04-14 13:03:42',NULL,NULL);
 
@@ -254,7 +256,7 @@ DROP TABLE IF EXISTS `tb_role`;
 
 CREATE TABLE `tb_role` (
   `id` bigint(20) NOT NULL AUTO_INCREMENT,
-  `description` varchar(140) DEFAULT NULL,
+  `label` varchar(140) DEFAULT NULL,
   `name` varchar(32) NOT NULL,
   `tag` varchar(20) DEFAULT NULL,
   `status` int(11) NOT NULL COMMENT '0禁用，1可以',
@@ -273,7 +275,7 @@ CREATE TABLE `tb_role` (
 LOCK TABLES `tb_role` WRITE;
 /*!40000 ALTER TABLE `tb_role` DISABLE KEYS */;
 
-INSERT INTO `tb_role` (`id`, `description`, `name`, `tag`, `status`, `type`, `enabled`, `version`, `created_by`, `created_by_name`, `created_time`, `modified_by`, `modified_time`)
+INSERT INTO `tb_role` (`id`, `label`, `name`, `tag`, `status`, `type`, `enabled`, `version`, `created_by`, `created_by_name`, `created_time`, `modified_by`, `modified_time`)
 VALUES
 	(1,'超级管理员','admin','backend',1,0,NULL,NULL,0,NULL,'2020-04-20 00:48:28',NULL,NULL),
 	(2,'运维人员','operator','backend',1,0,NULL,NULL,0,NULL,'2020-04-20 00:48:28',NULL,NULL),

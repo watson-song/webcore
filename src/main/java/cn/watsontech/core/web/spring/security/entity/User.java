@@ -1,7 +1,8 @@
 package cn.watsontech.core.web.spring.security.entity;
 
-import com.alibaba.fastjson.JSONObject;
+import cn.watsontech.core.mybatis.CreatedEntity;
 import cn.watsontech.core.web.spring.security.LoginUser;
+import com.alibaba.fastjson.JSONObject;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import java.util.Date;
@@ -9,7 +10,7 @@ import javax.persistence.*;
 
 @ApiModel(value="cn.watsontech.core.security.entity.User")
 @Table(name = "tb_user")
-public class User extends LoginUser {
+public class User extends LoginUser implements CreatedEntity<User, Long, Long> {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @ApiModelProperty(value="id")

@@ -1,5 +1,6 @@
 package cn.watsontech.core.web.spring.security.entity;
 
+import cn.watsontech.core.mybatis.CreatedEntity;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import java.util.Date;
@@ -7,7 +8,7 @@ import javax.persistence.*;
 
 @ApiModel(value="cn.watsontech.core.security.entity.RefreshToken")
 @Table(name = "tb_refreshtoken")
-public class RefreshToken {
+public class RefreshToken implements CreatedEntity<RefreshToken, Long, Long> {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @ApiModelProperty(value="id")

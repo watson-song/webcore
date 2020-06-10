@@ -2,6 +2,7 @@ package cn.watsontech.core.web.spring.security.authentication;
 
 import cn.watsontech.core.service.AdminService;
 import cn.watsontech.core.service.UserService;
+import cn.watsontech.core.service.manually.AdminManualService;
 import cn.watsontech.core.service.manually.MessageManualService;
 import cn.watsontech.core.web.form.AdminRegisterForm;
 import cn.watsontech.core.web.spring.aop.annotation.Access;
@@ -80,6 +81,8 @@ public class AccountService {
     @Autowired
     MessageManualService messageManualService;
     @Autowired
+    AdminManualService adminManualService;
+    @Autowired
     JdbcTemplate jdbcTemplate;
     @Autowired
     PasswordEncoder passwordEncoder;
@@ -125,8 +128,8 @@ public class AccountService {
         //加载管理员角色/权限
         if (loadedUser!=null) {
             if (loadedUser.getUserType() == LoginUser.Type.admin) {
-                loadedUser.setRoles(jdbcTemplate.queryForList(String.format("select b.name, b.description as title from ref_admin_role a left join tb_role b on a.role_id=b.id where a.admin_id=%s", loadedUser.getId())));
-                loadedUser.setPermissions(jdbcTemplate.queryForList(String.format("select distinct b.name from ref_role_permission a left join tb_permission b on a.permission_id=b.id left join ref_admin_role c on a.role_id=c.role_id where c.admin_id=%s", loadedUser.getId()), String.class));
+                loadedUser.setRoles(adminManualService.getAllRoles(loadedUser.getId()));
+                loadedUser.setPermissions(adminManualService.getAllPermissions(loadedUser.getId()));
             }
         }
     }
@@ -217,7 +220,7 @@ public class AccountService {
             condition.selectProperties(selectProperties);
             switch (userType) {
                 case admin:
-                    condition.selectProperties("type", "title");
+                    condition.selectProperties("type", "department", "title");
                     break;
                 case user:
                     condition.selectProperties("openid", "email", "logged");
@@ -298,6 +301,9 @@ public class AccountService {
         admin.setNickName(form.getNickName());
         admin.setEmail(form.getEmail());
         admin.setAddress(form.getAddress());
+        admin.setTitle(form.getTitle());
+        admin.setDepartment(form.getDepartment());
+        admin.setAddress(form.getAddress());
         admin.setPassword(passwordEncoder.encode(form.getPassword()));
 
         admin.setCreatedBy(user.getId());//默认0 创建
@@ -305,17 +311,7 @@ public class AccountService {
         int success = adminService.insertSelective(admin);
         Assert.isTrue(success>0, "添加管理员账号失败，请稍后再试");
 
-//        long roleId = 5;//1管理员2运营3会计
-//        if (admin.getType()!=null) {
-//            if (0==admin.getType()) {
-//                roleId = 0;
-//            }else if (1==admin.getType()) {
-//                roleId = 1;
-//            }
-//        }
-//        jdbcTemplate.update("INSERT ignore INTO ref_admin_role (role_id, admin_id, created_by) VALUES (?, ?, ?)", roleId, admin.getId(), user.getId());
-
-        if (CollectionUtils.isEmpty(form.getRoleIds())) {
+        if (!CollectionUtils.isEmpty(form.getRoleIds())) {
             List<Object[]> values = new ArrayList<>();
             for(Long roleId:form.getRoleIds()) {
                 values.add(new Object[]{roleId, admin.getId(), user.getId()});

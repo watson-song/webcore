@@ -1,5 +1,6 @@
 package cn.watsontech.core.web.spring.security.entity;
 
+import cn.watsontech.core.mybatis.CreatedEntity;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import tk.mybatis.mapper.annotation.*;
@@ -9,7 +10,7 @@ import javax.persistence.*;
 
 @ApiModel(value="cn.watsontech.core.security.entity.Access")
 @Table(name = "tb_access_log")
-public class AccessLog {
+public class AccessLog implements CreatedEntity<AccessLog, Long, Long> {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @ApiModelProperty(value="id")
