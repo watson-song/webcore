@@ -45,7 +45,7 @@ public class AccountAuthenticationService implements UserDetailsService {
 
         //加载管理员角色/权限
         if (userType== LoginUser.Type.admin) {
-            loadedUser.setRoles(jdbcTemplate.queryForList(String.format("select b.name, b.description as title from ref_admin_role a left join tb_role b on a.role_id=b.id where a.admin_id=%s", loadedUser.getId())));
+            loadedUser.setRoles(jdbcTemplate.queryForList(String.format("select b.name, b.label as title from ref_admin_role a left join tb_role b on a.role_id=b.id where a.admin_id=%s and b.enabled = 1", loadedUser.getId())));
         }
 
         return loadedUser;

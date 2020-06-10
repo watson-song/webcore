@@ -1,5 +1,6 @@
 package cn.watsontech.core.web.spring.security.entity;
 
+import cn.watsontech.core.mybatis.CreatedEntity;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 
@@ -8,7 +9,7 @@ import java.util.Date;
 
 @ApiModel(value="cn.watsontech.core.security.entity.SiteOption")
 @Table(name = "tb_site_option")
-public class SiteOption {
+public class SiteOption implements CreatedEntity<SiteOption, Long, Long> {
     @Id
 //    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @ApiModelProperty(value="id")
@@ -59,7 +60,11 @@ public class SiteOption {
 
     @Column(name = "created_by")
     @ApiModelProperty(value="createdBy")
-    private String createdBy;
+    private Long createdBy;
+
+    @Column(name = "created_by_name")
+    @ApiModelProperty(value="createdByName")
+    private String createdByName;
 
     /**
      * 创建时间
@@ -87,6 +92,11 @@ public class SiteOption {
     public SiteOption setId(Long id) {
         this.id = id;
         return this;
+    }
+
+    @Override
+    public Long getCreatedBy() {
+        return this.createdBy;
     }
 
     /**
@@ -200,17 +210,22 @@ public class SiteOption {
         this.nameEditable = nameEditable;
     }
 
-    /**
-     * @return created_by
-     */
-    public String getCreatedBy() {
-        return createdBy;
+
+    @Override
+    public String getCreatedByName() {
+        return this.createdByName;
+    }
+
+    @Override
+    public SiteOption setCreatedByName(String createdByName) {
+        this.createdByName = createdByName;
+        return this;
     }
 
     /**
      * @param createdBy
      */
-    public SiteOption setCreatedBy(String createdBy) {
+    public SiteOption setCreatedBy(Long createdBy) {
         this.createdBy = createdBy;
         return this;
     }

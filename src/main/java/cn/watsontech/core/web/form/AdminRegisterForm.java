@@ -15,6 +15,9 @@ public class AdminRegisterForm {
     @NotBlank(message = "用户名不能为空")
     private String username;
 
+    @ApiModelProperty(notes = "部门")
+    private String department;
+
     @ApiModelProperty(notes = "职位")
     private String title;
 

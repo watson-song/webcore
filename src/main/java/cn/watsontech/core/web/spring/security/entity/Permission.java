@@ -1,5 +1,6 @@
 package cn.watsontech.core.web.spring.security.entity;
 
+import cn.watsontech.core.mybatis.CreatedEntity;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 
@@ -10,14 +11,14 @@ import java.util.Date;
 
 @ApiModel(value="cn.watsontech.core.security.entity.Permission")
 @Table(name = "tb_permission")
-public class Permission {
+public class Permission implements CreatedEntity<Permission, Long, Long> {
     @Id
 //    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @ApiModelProperty(value="id")
     private Long id;
 
-    @ApiModelProperty(value="description")
-    private String description;
+    @ApiModelProperty(value="label")
+    private String label;
 
     @ApiModelProperty(value="name")
     private String name;
@@ -29,12 +30,19 @@ public class Permission {
     @ApiModelProperty(value="weight")
     private Integer weight;
 
+    @ApiModelProperty(value="是否启用")
+    private Boolean enabled;
+
     @ApiModelProperty(value="version")
     private Integer version;
 
     @Column(name = "created_by")
     @ApiModelProperty(value="createdBy")
-    private String createdBy;
+    private Long createdBy;
+
+    @Column(name = "created_by_name")
+    @ApiModelProperty(value="createdByName")
+    private String createdByName;
 
     /**
      * 创建时间
@@ -59,17 +67,17 @@ public class Permission {
     }
 
     /**
-     * @return description
+     * @return label
      */
-    public String getDescription() {
-        return description;
+    public String getLabel() {
+        return label;
     }
 
     /**
-     * @param description
+     * @param label
      */
-    public Permission setDescription(String description) {
-        this.description = description;
+    public Permission setLabel(String label) {
+        this.label = label;
         return this;
     }
 
@@ -133,17 +141,37 @@ public class Permission {
         return this;
     }
 
+    public Boolean getEnabled() {
+        return enabled;
+    }
+
+    public void setEnabled(Boolean enabled) {
+        this.enabled = enabled;
+    }
+
     /**
      * @return created_by
      */
-    public String getCreatedBy() {
+    public Long getCreatedBy() {
         return createdBy;
+    }
+
+    @Override
+    public String getCreatedByName() {
+        return this.createdByName;
+    }
+
+    @Override
+    public Permission setCreatedByName(String createdByName) {
+        this.createdByName = createdByName;
+        return this;
     }
 
     /**
      * @param createdBy
      */
-    public Permission setCreatedBy(String createdBy) {
+    @Override
+    public Permission setCreatedBy(Long createdBy) {
         this.createdBy = createdBy;
         return this;
     }

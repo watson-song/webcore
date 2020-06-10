@@ -1,5 +1,6 @@
 package cn.watsontech.core.web.spring.security.entity;
 
+import cn.watsontech.core.mybatis.CreatedEntity;
 import com.alibaba.fastjson.JSONObject;
 import cn.watsontech.core.web.spring.security.LoginUser;
 import io.swagger.annotations.ApiModel;
@@ -10,7 +11,7 @@ import java.util.Date;
 
 @ApiModel(value="cn.watsontech.core.security.entity.Admin")
 @Table(name = "tb_admin")
-public class Admin extends LoginUser {
+public class Admin extends LoginUser implements CreatedEntity<Admin, Long, Long> {
     @Id
 //    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @ApiModelProperty(value="id")
@@ -28,6 +29,12 @@ public class Admin extends LoginUser {
     @Column(name = "nick_name")
     @ApiModelProperty(value="nickName昵称")
     private String nickName;
+
+    /**
+     * 部门
+     */
+    @ApiModelProperty(value="部门")
+    private String department;
 
     /**
      * 职位
@@ -248,6 +255,14 @@ public class Admin extends LoginUser {
 
     public void setTitle(String title) {
         this.title = title;
+    }
+
+    public String getDepartment() {
+        return department;
+    }
+
+    public void setDepartment(String department) {
+        this.department = department;
     }
 
     /**

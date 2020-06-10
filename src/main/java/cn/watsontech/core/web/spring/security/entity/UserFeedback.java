@@ -1,5 +1,6 @@
 package cn.watsontech.core.web.spring.security.entity;
 
+import cn.watsontech.core.mybatis.CreatedEntity;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 
@@ -10,7 +11,7 @@ import java.util.Date;
 
 @ApiModel(value="cn.watsontech.core.security.entity.UserFeedback")
 @Table(name = "tb_user_feedback")
-public class UserFeedback {
+public class UserFeedback implements CreatedEntity<UserFeedback, Long, Long> {
     @Id
 //    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @ApiModelProperty(value="id")
@@ -75,7 +76,7 @@ public class UserFeedback {
      */
     @Column(name = "created_by")
     @ApiModelProperty(value="createdBy创建人")
-    private String createdBy;
+    private Long createdBy;
 
     /**
      * 创建人名称
@@ -309,7 +310,7 @@ public class UserFeedback {
      *
      * @return created_by - 创建人
      */
-    public String getCreatedBy() {
+    public Long getCreatedBy() {
         return createdBy;
     }
 
@@ -318,7 +319,8 @@ public class UserFeedback {
      *
      * @param createdBy 创建人
      */
-    public UserFeedback setCreatedBy(String createdBy) {
+    @Override
+    public UserFeedback setCreatedBy(Long createdBy) {
         this.createdBy = createdBy;
         return this;
     }

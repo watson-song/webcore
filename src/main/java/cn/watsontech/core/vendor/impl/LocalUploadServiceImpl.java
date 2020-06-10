@@ -69,7 +69,7 @@ public class LocalUploadServiceImpl extends UploadService {
     @Override
     public URL generatePresignedUrl(String bucketName, String key, Date expiration) {
         try {
-            return new URL(key);
+            return new URL("file:"+properties.getLocalPath()+key);
         } catch (MalformedURLException e) {
             e.printStackTrace();
             return null;
@@ -108,11 +108,17 @@ public class LocalUploadServiceImpl extends UploadService {
                     case local:
                         // 判断路径是否存在，不存在则新创建一个
                         File filepath = new File(uploadProperties.getLocalPath() + remoteFileDirectory, realFileName);
+                        String targetLocalPath = uploadProperties.getLocalPath();
+                        if (!filepath.isAbsolute()) {
+                            targetLocalPath = getClass().getClassLoader().getResource("").getPath() + targetLocalPath;
+                            filepath = new File(targetLocalPath + remoteFileDirectory, realFileName);
+                        }
+
                         if (!filepath.getParentFile().exists()) {
                             filepath.getParentFile().mkdirs();
                         }
 
-                        file.transferTo(new File(uploadProperties.getLocalPath() + remoteFileDirectory + realFileName));
+                        file.transferTo(new File(targetLocalPath + remoteFileDirectory + realFileName));
                         break;
                     default:
                         throw new IllegalArgumentException("尚不支持的文件存储类型：" + uploadProperties.getVendor());

@@ -93,7 +93,7 @@ public abstract class LoginUser implements UserDetails {
 
     //用户权限
     @Transient
-    List<String> permissions = new ArrayList<>();
+    List<Map<String, Object>> permissions = new ArrayList<>();
 
     @ApiModelProperty(value = "用户角色")
     public List<Map<String, Object>> getRoles() {
@@ -105,11 +105,11 @@ public abstract class LoginUser implements UserDetails {
     }
 
     @ApiModelProperty(value = "用户权限集合")
-    public List<String> getPermissions() {
+    public List<Map<String, Object>> getPermissions() {
         return permissions;
     }
 
-    public void setPermissions(List<String> permissions) {
+    public void setPermissions(List<Map<String, Object>> permissions) {
         this.permissions = permissions;
     }
 

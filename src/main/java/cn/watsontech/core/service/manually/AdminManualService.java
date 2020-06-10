@@ -1,11 +1,41 @@
 package cn.watsontech.core.service.manually;
 
+import cn.watsontech.core.service.mapper.manually.AdminManuallyMapper;
+import cn.watsontech.core.web.spring.security.entity.Admin;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
+import java.util.Map;
 
 /**
  * Created by Watson on 2020/2/26.
  */
 @Service
 public class AdminManualService {
-    public static final String tableName = "tb_admin";
+
+    @Autowired
+    AdminManuallyMapper manuallyMapper;
+
+    /**
+     * 获取管理员信息
+     * @param id 管理员id
+     */
+    public Admin getAdminInfo(long id) {
+        return manuallyMapper.selectAdminInfoById(id);
+    }
+
+    /**
+     * 获取所有当前管理员权限
+     */
+    public List<Map<String, Object>> getAllPermissions(long adminId) {
+        return manuallyMapper.selectAllPermissionsByAdminId(adminId);
+    }
+
+    /**
+     * 获取所有当前管理员角色
+     */
+    public List<Map<String, Object>> getAllRoles(long adminId) {
+        return manuallyMapper.selectAllRolesByAdminId(adminId);
+    }
 }
