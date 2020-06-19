@@ -51,12 +51,12 @@ public class BaseService<T, PK> implements Service<T, PK> {
 
     @Override
     public int insert(T model) {
-        return this.mapper.insert(model);
+        return this.mapper.useGenerateKeyInsert(model);
     }
 
     @Override
     public int insertSelective(T model) {
-        return this.mapper.insertSelective(model);
+        return this.mapper.useGenerateKeyInsertSelective(model);
     }
 
     @Override
@@ -233,7 +233,7 @@ public class BaseService<T, PK> implements Service<T, PK> {
         String[] paramMarks = new String[columns.size()];
         Arrays.fill(paramMarks, "?");
 
-        return jdbcTemplate.batchUpdate(String.format("insert into `%s` (%s) values (%s)", ignoreConflict ? "ignore":"", tableName, StringUtils.collectionToDelimitedString(columns, ",", "`", "`"), StringUtils.arrayToCommaDelimitedString(paramMarks)), datas);
+        return jdbcTemplate.batchUpdate(String.format("insert %s into `%s` (%s) values (%s)", ignoreConflict ? "ignore":"", tableName, StringUtils.collectionToDelimitedString(columns, ",", "`", "`"), StringUtils.arrayToCommaDelimitedString(paramMarks)), datas);
     }
 
     /**

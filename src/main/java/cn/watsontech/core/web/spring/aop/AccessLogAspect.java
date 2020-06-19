@@ -1,14 +1,14 @@
 package cn.watsontech.core.web.spring.aop;
 
+import cn.watsontech.core.service.AccessLogService;
+import cn.watsontech.core.utils.HttpUtils;
+import cn.watsontech.core.utils.MapBuilder;
 import cn.watsontech.core.web.spring.aop.annotation.Access;
 import cn.watsontech.core.web.spring.aop.annotation.AccessParam;
 import cn.watsontech.core.web.spring.security.LoginUser;
 import cn.watsontech.core.web.spring.security.entity.AccessLog;
 import cn.watsontech.core.web.spring.security.entity.Admin;
-import cn.watsontech.core.service.AccessLogService;
 import cn.watsontech.core.web.spring.util.StringUtils;
-import cn.watsontech.core.utils.HttpUtils;
-import cn.watsontech.core.utils.MapBuilder;
 import lombok.extern.log4j.Log4j2;
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.annotation.*;
@@ -21,9 +21,10 @@ import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
+import org.springframework.web.context.request.RequestAttributes;
+import org.springframework.web.context.request.RequestContextHolder;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpSession;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
@@ -102,16 +103,17 @@ public class AccessLogAspect {
 
         LoginUser user = getCurrentLoginUser();
         AccessLog testLog = getThreadLocalObject(joinPoint, "info", request, user);
+        if (testLog!=null) {
+            // 1.直接执行保存操作
+            // this.logService.createSystemLog(log);
 
-        // 1.直接执行保存操作
-        // this.logService.createSystemLog(log);
+            // 2.优化:异步保存日志
+            // new SaveLogThread(log, logService).start();
 
-        // 2.优化:异步保存日志
-        // new SaveLogThread(log, logService).start();
-
-        // 3.再优化:通过线程池来执行日志保存
-        threadPoolTaskExecutor.execute(new SaveLogThread(testLog));
-        putIntoThreadLocal(logThreadLocal, joinPoint, testLog);
+            // 3.再优化:通过线程池来执行日志保存
+            threadPoolTaskExecutor.execute(new SaveLogThread(testLog));
+            putIntoThreadLocal(logThreadLocal, joinPoint, testLog);
+        }
     }
 
     private void putIntoThreadLocal(ThreadLocal<Map<JoinPoint, AccessLog>> logThreadLocal, JoinPoint joinPoint, AccessLog log) {
@@ -125,9 +127,10 @@ public class AccessLogAspect {
 
     // 读取session中的用户
     private LoginUser getCurrentLoginUser() {
-        HttpSession session = request.getSession();
-        LoginUser user = (LoginUser) session.getAttribute("logged_user");
-        if (user==null) {
+        LoginUser user = null;
+//        HttpSession session = request.getSession();
+//        LoginUser user = (LoginUser) session.getAttribute("logged_user");
+//        if (user==null) {
             Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
             if (authentication!=null) {
                 Object principal = authentication.getPrincipal();
@@ -137,7 +140,7 @@ public class AccessLogAspect {
                     }
                 }
             }
-        }
+//        }
 
         // 登入login操作 前置通知时用户未校验 所以session中不存在用户信息
         if (user == null) {
@@ -153,22 +156,32 @@ public class AccessLogAspect {
         }
 
         AccessLog testLog = testLogMap.get(joinPoint);
-        long beginTime = testLog.getCreatedTime().getTime();
-        testLog.setTotalTimes(System.currentTimeMillis() - beginTime);
+        if (testLog!=null) {
+            long beginTime = testLog.getCreatedTime().getTime();
+            testLog.setTotalTimes(System.currentTimeMillis() - beginTime);
 
-        if (testLog.getCreatedBy()==null&&user!=null) {
-            testLog.setCreatedBy(user.getId());
-            testLog.setCreatedByName(user.getUsername());
+            if (testLog.getCreatedBy()==null&&user!=null) {
+                testLog.setCreatedBy(user.getId());
+                testLog.setCreatedByName(user.getUsername());
+            }
         }
 
         return testLog;
     }
 
     private AccessLog wrapAccessLog(JoinPoint joinPoint, String levelType, HttpServletRequest request, LoginUser user) {
-        String remoteAddr = HttpUtils.getRealIp(request);// 请求的IP
-        String requestUri = request.getRequestURI();// 请求的Uri
-        String method = request.getMethod(); // 请求的方法类型(post/get)
-        Map<String, String[]> params = request.getParameterMap(); // 请求提交的参数
+        RequestAttributes requestAttributes = RequestContextHolder.getRequestAttributes();
+        Map<String, String[]> params = new HashMap<>();
+        String method = "GET";
+        String requestUri = "/未知路径";
+        String remoteAddr = "未知ip地址";
+        if (requestAttributes!=null) {
+
+            remoteAddr = HttpUtils.getRealIp(request);// 请求的IP
+            requestUri = request.getRequestURI();// 请求的Uri
+            method = request.getMethod(); // 请求的方法类型(post/get)
+            params = request.getParameterMap(); // 请求提交的参数
+        }
 
         String title = "info";
         try {
