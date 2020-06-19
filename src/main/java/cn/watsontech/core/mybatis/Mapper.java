@@ -1,6 +1,7 @@
 package cn.watsontech.core.mybatis;
 
 import cn.watsontech.core.mybatis.mapper.BatchInsertMapper;
+import cn.watsontech.core.mybatis.mapper.UseGenerateKeyInsertMapper;
 import tk.mybatis.mapper.common.ConditionMapper;
 import tk.mybatis.mapper.common.IdsMapper;
 import tk.mybatis.mapper.common.MySqlMapper;
@@ -13,6 +14,7 @@ import tk.mybatis.mapper.common.MySqlMapper;
 public interface Mapper<T> extends
         tk.mybatis.mapper.common.Mapper<T>,
         BatchInsertMapper<T>,
+        UseGenerateKeyInsertMapper<T>,
         ConditionMapper<T>,
         IdsMapper<T>,
         MySqlMapper<T> {

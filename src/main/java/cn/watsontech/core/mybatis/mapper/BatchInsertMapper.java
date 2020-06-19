@@ -2,6 +2,7 @@ package cn.watsontech.core.mybatis.mapper;
 
 import org.apache.ibatis.annotations.InsertProvider;
 import org.apache.ibatis.annotations.Options;
+import tk.mybatis.mapper.annotation.RegisterMapper;
 
 import java.util.List;
 
@@ -9,6 +10,7 @@ import java.util.List;
  * Copyright to watsontech
  * Created by Watson on 2019/12/27.
  */
+@RegisterMapper
 public interface BatchInsertMapper<T> {
 
     /**
