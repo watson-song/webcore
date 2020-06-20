@@ -17,6 +17,7 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 
 import javax.annotation.Resource;
 import javax.sql.DataSource;
+import java.util.Map;
 import java.util.Properties;
 
 /**
@@ -25,19 +26,34 @@ import java.util.Properties;
  */
 @EnableTransactionManagement(order = 2)
 @Configuration
+@ConfigurationProperties(prefix = "mybatis.configuration")
 public class MyBatisConfig {
 
     @Resource(name = "myRoutingDataSource")
     private DataSource myRoutingDataSource;
-    // sqlSessionFactoryBean.setTypeAliasesPackage(entityTypeAliasesPackage); com.***.entity
-    @Value("${mybatis.configuration.entityTypeAliasesPackage}")
+
     private String entityTypeAliasesPackage;
 
-    @Value("${mybatis.configuration.pageHelper}")
-    private Properties pageHelperProperties;
+    private Map<String, String> pageHelper;
+
+    public String getEntityTypeAliasesPackage() {
+        return entityTypeAliasesPackage;
+    }
+
+    public void setEntityTypeAliasesPackage(String entityTypeAliasesPackage) {
+        this.entityTypeAliasesPackage = entityTypeAliasesPackage;
+    }
+
+    public Map<String, String> getPageHelper() {
+        return pageHelper;
+    }
+
+    public void setPageHelper(Map<String, String> pageHelper) {
+        this.pageHelper = pageHelper;
+    }
 
     @Bean
-    @ConfigurationProperties(prefix = "mybatis.configuration")
+//    @ConfigurationProperties(prefix = "mybatis.configuration")
     public org.apache.ibatis.session.Configuration globalConfiguration() {
         org.apache.ibatis.session.Configuration sessionConfiguration =  new org.apache.ibatis.session.Configuration();
         sessionConfiguration.getTypeHandlerRegistry().register(MySqlJSONArrayTypeHandler.class);
@@ -59,7 +75,13 @@ public class MyBatisConfig {
 
     private Interceptor[] factoryPlugins() {
         Interceptor pageInterceptor = new com.github.pagehelper.PageInterceptor();
-        pageInterceptor.setProperties(pageHelperProperties);
+        Properties properties = new Properties();
+        if (pageHelper!=null) {
+            for (String key:pageHelper.keySet()) {
+                properties.put(key, pageHelper.get(key));
+            }
+        }
+        pageInterceptor.setProperties(properties);
         return new Interceptor[]{pageInterceptor};
     }
 
