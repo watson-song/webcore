@@ -196,6 +196,7 @@ public class AccessLogAspect {
         testLog.setIp(remoteAddr);
         testLog.setUrl(requestUri);
         testLog.setMethod(method);
+        testLog.setVersion(1);
         testLog.setParams(StringUtils.getMapToParams(params));
         if (user!=null) {
             testLog.setCreatedBy(user.getId());

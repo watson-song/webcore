@@ -92,6 +92,8 @@ public interface Service<T, PK> {
 
     <T> List<T> queryForList(String sql, Object[] args, Class<T> elementType) throws DataAccessException;
 
+    List<Map<String, Object>> queryForList(String sql, Object[] args) throws DataAccessException;
+
     /**
      * 保存单表多项数据
      * @param tableName 表名称

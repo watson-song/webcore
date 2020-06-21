@@ -7,7 +7,7 @@ import cn.watsontech.core.web.spring.util.Assert;
 import com.github.pagehelper.PageRowBounds;
 import org.apache.ibatis.session.RowBounds;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.dao.DataAccessException;
+import org.springframework.dao.IncorrectResultSizeDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.lang.Nullable;
 import org.springframework.util.CollectionUtils;
@@ -199,7 +199,7 @@ public class BaseService<T, PK> implements Service<T, PK> {
      * 根据sql语句查询
      */
     @Override
-    public <T> T queryForObject(String sql, Class<T> requiredType, @Nullable Object... args) throws DataAccessException {
+    public <T> T queryForObject(String sql, Class<T> requiredType, @Nullable Object... args) {
         return jdbcTemplate.queryForObject(sql, requiredType, args);
     }
 
@@ -207,16 +207,32 @@ public class BaseService<T, PK> implements Service<T, PK> {
      * 根据sql语句查询
      */
     @Override
-    public Map<String, Object> queryForMap(String sql, @Nullable Object... args) throws DataAccessException {
-        return jdbcTemplate.queryForMap(sql, args);
+    public Map<String, Object> queryForMap(String sql, @Nullable Object... args) {
+        List<Map<String, Object>> results = queryForList(sql, args);
+        if (CollectionUtils.isEmpty(results)) {
+            return null;
+        }
+
+        if (results.size() > 1) {
+            throw new IncorrectResultSizeDataAccessException(1, results.size());
+        }
+        return results.iterator().next();
     }
 
     /**
      * 根据sql语句查询
      */
     @Override
-    public <T> List<T> queryForList(String sql, Object[] args, Class<T> elementType) throws DataAccessException {
+    public <T> List<T> queryForList(String sql, Object[] args, Class<T> elementType) {
         return jdbcTemplate.queryForList(sql, args, elementType);
+    }
+
+    /**
+     * 根据sql语句查询
+     */
+    @Override
+    public List<Map<String, Object>> queryForList(String sql, Object[] args) {
+        return jdbcTemplate.queryForList(sql, args);
     }
 
     /**

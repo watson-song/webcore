@@ -14,25 +14,27 @@ import java.util.stream.Collectors;
  * Created by Watson on 2019/12/18.
  */
 @Data
-public class Result {
+public class Result<T> {
 
     @ApiModelProperty(notes = "返回码， 200（成功）")
     int code;
     @ApiModelProperty(notes = "成功返回数据")
-    Object data;
+    T data;
 
     @ApiModelProperty(notes = "错误内容")
     Object error;
     @ApiModelProperty(notes = "仅当有多条错误提示时有此值")
     List errors;
 
-    public Result(int code, Object data, Object error) {
+    public Result() {}
+
+    public Result(int code, T data, Object error) {
         this.code = code;
         this.data = data;
         this.error = error;
     }
 
-    public Result(int code, Object data) {
+    public Result(int code, T data) {
         this.code = code;
         this.data = data;
     }
