@@ -13,8 +13,6 @@ import java.util.HashMap;
 
 
 /**
- * @author wlx
- * @version 创建时间 2018年7月3日 下午16:37:26
  * <p>
  * 类描述：获取和判断文件头信息
  * |--文件头是位于文件开头的一段承担一定任务的数据，一般都在开头的部分。
@@ -96,7 +94,6 @@ public class CheckFileFormatUtil {
     /**
      * @param filePath 文件路径
      * @return 文件头信息
-     * @author wlx
      * <p>
      * 方法描述：根据文件路径获取文件头信息
      */
@@ -111,7 +108,6 @@ public class CheckFileFormatUtil {
     /**
      * @param filePath 文件路径
      * @return 文件头信息
-     * @author wlx
      * <p>
      * 方法描述：根据文件路径获取文件头信息
      */
@@ -145,7 +141,6 @@ public class CheckFileFormatUtil {
     /**
      * @param src 要读取文件头信息的文件的byte数组
      * @return 文件头信息
-     * @author wlx
      * <p>
      * 方法描述：将要读取文件头信息的文件的byte数组转换成string类型表示
      */
@@ -164,18 +159,5 @@ public class CheckFileFormatUtil {
             builder.append(hv);
         }
         return builder.toString();
-    }
-
-    /**
-     * @param args
-     * @throws Exception
-     * @author wlx
-     * <p>
-     * 方法描述：测试
-     */
-    public static void main(String[] args) throws Exception {
-        final FileType fileType = getFileType("/Users/watson/tmp/2019-10-08/e23cd09cd0384707901b79821e4fa150.png");
-        System.out.println(fileType);
-        System.out.println(getFileHeader("/Users/watson/tmp/2019-10-08/e23cd09cd0384707901b79821e4fa150.png"));
     }
 }

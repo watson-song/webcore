@@ -1,5 +1,6 @@
 package cn.watsontech.core.mybatis.util;
 
+import lombok.extern.log4j.Log4j2;
 import org.apache.ibatis.executor.statement.StatementHandler;
 import org.apache.ibatis.plugin.*;
 import org.apache.ibatis.session.ResultHandler;
@@ -12,6 +13,7 @@ import java.util.Properties;
  *
  * Created by Watson on 2019/12/16.
  */
+@Log4j2
 @Intercepts({
         @Signature(type = StatementHandler.class, method = "query", args = { Statement.class, ResultHandler.class }),
         @Signature(type = StatementHandler.class, method = "update", args = { Statement.class }),
@@ -26,9 +28,7 @@ public class SqlCostInterceptor implements Interceptor {
         try {
             return invocation.proceed();
         } finally {
-            long endTime = System.currentTimeMillis();
-            long sqlCost = endTime - startTime;
-            System.out.println("执行SQL耗时 : [" + sqlCost + "ms ] ");
+            log.debug("执行SQL耗时 : [{}ms ]", System.currentTimeMillis() - startTime);
         }
     }
 

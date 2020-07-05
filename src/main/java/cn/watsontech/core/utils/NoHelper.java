@@ -2,10 +2,9 @@ package cn.watsontech.core.utils;
 
 import cn.watsontech.core.web.spring.util.Assert;
 
-import java.util.*;
+import java.util.Map;
+import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicLong;
 
 /**
@@ -240,7 +239,6 @@ public class NoHelper {
                         long nextIndex = poolLoadAdapter.loadNextIndex(type, checkPrefix, noGenerator.size);
 
                         noGenerator = registerGenerator(type, noGenerator.length, checkPrefix, nextIndex, noGenerator.size, noGenerator.indexFormat);
-//                        System.out.println(String.format("nextNoWithPrefixCheck(%s) 生成器前缀已更改：checkPrefix=%s，type=%s,extraPrefix=%s, 新Index=%s，新generator=%s", uuid, checkPrefix, type, extraPrefix, nextIndex, noGenerator));
                     }
                 }
             }
@@ -255,7 +253,6 @@ public class NoHelper {
                     long nextIndex = poolLoadAdapter.loadNextIndex(type, noGenerator.prefix, noGenerator.size);
 
                     noGenerator = registerGenerator(type, noGenerator.length, noGenerator.prefix, nextIndex, noGenerator.size, noGenerator.indexFormat);
-    //                System.out.println(String.format("nextNoWithPrefixCheck(%s) 生成器编号耗尽，生成新编号池：type=%s,prefix=%s, 新Index=%s，新generator=%s", uuid, type, noGenerator.prefix, nextIndex, noGenerator));
                 }
             }
 
@@ -353,10 +350,8 @@ public class NoHelper {
             nextIndex = currentIndex.getAndIncrement();
 
             if (extraPrefix==null) {
-//                return String.format(noFormat, nextIndex)+"|"+uuid+"|"+this.startIndex;
                 return String.format(noFormat, nextIndex);
             }else {
-//                return String.format(newNoFormat(extraPrefix), nextIndex)+"|"+uuid+"|"+this.startIndex;
                 return String.format(newNoFormat(extraPrefix), nextIndex);
             }
         }
@@ -380,113 +375,95 @@ public class NoHelper {
 //        }
     }
 
-    static String[] noTypes = new String[]{"order","worker","withdraw"};
-    static String[] typeShorts = new String[]{"O","W","A"};
-    static String[] typePrefixes = new String[]{"20200416","20200417","20200418","20200419","20200430","20200501","20200502","20200503","20200504","20200505","20200506","20200507","20200508","20200509","20200510"};
+//    static String[] noTypes = new String[]{"order","worker","withdraw"};
+//    static String[] typeShorts = new String[]{"O","W","A"};
+//    static String[] typePrefixes = new String[]{"20200416","20200417","20200418","20200419","20200430","20200501","20200502","20200503","20200504","20200505","20200506","20200507","20200508","20200509","20200510"};
 
-    public static void main(String[] args) throws InterruptedException {
-        NoHelper noHelper = NoHelper.getInstance();
-        SimpleNoPoolLoadAdapter simpleNoPoolLoadAdapter = noHelper.new SimpleNoPoolLoadAdapter();
-        noHelper.setPoolLoadAdapter(simpleNoPoolLoadAdapter);
-
-        final Map<String, Map<String, String>> nos = new ConcurrentHashMap<>();
-
-        int limit = 10;
-        final AtomicLong[] totalLongs = new AtomicLong[noTypes.length];
-
-        final AtomicLong[] noCrashTotalLongs = new AtomicLong[noTypes.length];
-
-        for (int i = 0; i < noTypes.length; i++) {
-            String prefix = typePrefixes[0];
-            String type = noTypes[i];
-            totalLongs[i] = new AtomicLong(0);
-            noCrashTotalLongs[i] = new AtomicLong(0);
-
-            noHelper.registerGenerator(type, 15, prefix, simpleNoPoolLoadAdapter.loadNextIndex(type, prefix, limit), limit, NoGeneratorIndexFormat.X);
-            nos.put(type, new HashMap<String, String>());
-        }
-
-        ExecutorService executorService = Executors.newFixedThreadPool(10);
-
-        int timeGap = 10000;
-        long times = typePrefixes.length*timeGap;
-        final long startTimestamp = System.currentTimeMillis();
-
-        for (long i = 0; i < times; i++) {
-            final long j = i;
-            executorService.submit(new Runnable() {
-                @Override
-                public void run() {
-                    try{
-                        int typeIndex = RandomUtils.nextInt(0, noTypes.length);
-                        String type = noTypes[typeIndex];
-                        //计数+1
-                        totalLongs[typeIndex].incrementAndGet();
-
-                        String prefix = typePrefixes[RandomUtils.nextInt(0, typePrefixes.length)];
-                        String nextNoString = noHelper.nextNoWithPrefixCheck(type, typeShorts[typeIndex], prefix);
-                        String nextNo = nextNoString.split("\\|")[0];
-
-
-//                        System.out.println(String.format("%4d %s|%s%s %s, threadid=%s", (j+1), " 下一个编号：", type, prefix, nextNoString, Thread.currentThread().getId()));
-                        Map<String, String> noMap = nos.get(type);
-                        Set<String> nosSet = noMap.keySet();
-                        if (nosSet.contains(nextNo)) {
-                            System.err.println(String.format("发现编号冲突：type=%s，prefix=%s, no=%s, originalNo=%s, threadid=%s", type, prefix, nextNoString, noMap.get(nextNo), Thread.currentThread().getId()));
-                        }else {
-                            noMap.put(nextNo, nextNoString);
-                            noCrashTotalLongs[typeIndex].incrementAndGet();
-                        }
-                    }catch (Exception e) {
-                        e.printStackTrace();
-                    }
-                }
-            });
-        }
-        executorService.shutdown();
-
-        Runtime.getRuntime().addShutdownHook(new Thread(){
-            @Override
-            public void run() {
-                long usedMillseconds = System.currentTimeMillis()-startTimestamp;
-                System.out.println(times+"个编号，用时："+(usedMillseconds)+"ms，"+(usedMillseconds/1000.00)+"s");
-
-                long totalSize = 0l;
-                Object[] keys = nos.keySet().toArray();
-                for (int i = 0; i < keys.length; i++) {
-                    Map<String, String> values = nos.get(keys[i]);
-                    String key = keys[i].toString();
-                    int typeIndex = -1;
-                    if (noTypes[0].equals(key)) {
-                        typeIndex = 0;
-                    }else if (noTypes[1].equals(key)) {
-                        typeIndex = 1;
-                    }else if (noTypes[2].equals(key)) {
-                        typeIndex = 2;
-                    }
-
-                    if (values.size()==totalLongs[typeIndex].longValue()) {
-                        System.out.println(String.format("%s编号 %s个，应该%s个 ", key, values.size(), totalLongs[typeIndex]));
-                    }else {
-                        System.err.println(String.format("%s编号 %s个，应该%s个，少%s个 ", key, values.size(), totalLongs[typeIndex], totalLongs[typeIndex].longValue()-values.size()));
-                    }
-                    totalSize = totalSize + values.size();
-                }
-
-                long shouldTotalSize = totalLongs[0].longValue()+totalLongs[1].longValue()+totalLongs[2].longValue();
-
-                long noCrashTotalSize = noCrashTotalLongs[0].longValue()+noCrashTotalLongs[1].longValue()+noCrashTotalLongs[2].longValue();
-
-                if (shouldTotalSize==totalSize) {
-                    System.out.println(String.format("合计：%s个, noCrashTotalSize=%s", totalSize, noCrashTotalSize));
-                }else {
-                    System.err.println(String.format("合计：%s个, 少%s个, noCrashTotalSize=%s", totalSize, shouldTotalSize-totalSize, noCrashTotalSize));
-                }
-
-                //100000 用时：1702ms，1.702
-                //1000000个编号，用时：11030ms，11.03s  1000000个编号，用时：11161ms，11.161s 1000000个编号，用时：11201ms，11.201s
-                //checkPrefix 没有 synchronize 1000000个编号，用时：11074ms，11.074s 1000000个编号，用时：11334ms，11.334s 1000000个编号，用时：10951ms，10.951s
-            }
-        });
-    }
+//    public static void main(String[] args) throws InterruptedException {
+//        NoHelper noHelper = NoHelper.getInstance();
+//        SimpleNoPoolLoadAdapter simpleNoPoolLoadAdapter = noHelper.new SimpleNoPoolLoadAdapter();
+//        noHelper.setPoolLoadAdapter(simpleNoPoolLoadAdapter);
+//
+//        final Map<String, Map<String, String>> nos = new ConcurrentHashMap<>();
+//
+//        int limit = 10;
+//        final AtomicLong[] totalLongs = new AtomicLong[noTypes.length];
+//
+//        final AtomicLong[] noCrashTotalLongs = new AtomicLong[noTypes.length];
+//
+//        for (int i = 0; i < noTypes.length; i++) {
+//            String prefix = typePrefixes[0];
+//            String type = noTypes[i];
+//            totalLongs[i] = new AtomicLong(0);
+//            noCrashTotalLongs[i] = new AtomicLong(0);
+//
+//            noHelper.registerGenerator(type, 15, prefix, simpleNoPoolLoadAdapter.loadNextIndex(type, prefix, limit), limit, NoGeneratorIndexFormat.X);
+//            nos.put(type, new HashMap<String, String>());
+//        }
+//
+//        ExecutorService executorService = Executors.newFixedThreadPool(10);
+//
+//        int timeGap = 10000;
+//        long times = typePrefixes.length*timeGap;
+//        final long startTimestamp = System.currentTimeMillis();
+//
+//        for (long i = 0; i < times; i++) {
+//            final long j = i;
+//            executorService.submit(new Runnable() {
+//                @Override
+//                public void run() {
+//                    try{
+//                        int typeIndex = RandomUtils.nextInt(0, noTypes.length);
+//                        String type = noTypes[typeIndex];
+//                        //计数+1
+//                        totalLongs[typeIndex].incrementAndGet();
+//
+//                        String prefix = typePrefixes[RandomUtils.nextInt(0, typePrefixes.length)];
+//                        String nextNoString = noHelper.nextNoWithPrefixCheck(type, typeShorts[typeIndex], prefix);
+//                        String nextNo = nextNoString.split("\\|")[0];
+//
+//
+////                        System.out.println(String.format("%4d %s|%s%s %s, threadid=%s", (j+1), " 下一个编号：", type, prefix, nextNoString, Thread.currentThread().getId()));
+//                        Map<String, String> noMap = nos.get(type);
+//                        Set<String> nosSet = noMap.keySet();
+//                        if (nosSet.contains(nextNo)) {
+//                            System.err.println(String.format("发现编号冲突：type=%s，prefix=%s, no=%s, originalNo=%s, threadid=%s", type, prefix, nextNoString, noMap.get(nextNo), Thread.currentThread().getId()));
+//                        }else {
+//                            noMap.put(nextNo, nextNoString);
+//                            noCrashTotalLongs[typeIndex].incrementAndGet();
+//                        }
+//                    }catch (Exception e) {
+//                        e.printStackTrace();
+//                    }
+//                }
+//            });
+//        }
+//        executorService.shutdown();
+//
+//        Runtime.getRuntime().addShutdownHook(new Thread(){
+//            @Override
+//            public void run() {
+//                long totalSize = 0l;
+//                Object[] keys = nos.keySet().toArray();
+//                for (int i = 0; i < keys.length; i++) {
+//                    Map<String, String> values = nos.get(keys[i]);
+//                    totalSize = totalSize + values.size();
+//                }
+//
+//                long shouldTotalSize = totalLongs[0].longValue()+totalLongs[1].longValue()+totalLongs[2].longValue();
+//
+//                long noCrashTotalSize = noCrashTotalLongs[0].longValue()+noCrashTotalLongs[1].longValue()+noCrashTotalLongs[2].longValue();
+//
+//                if (shouldTotalSize==totalSize) {
+//                    System.out.println(String.format("合计：%s个, noCrashTotalSize=%s", totalSize, noCrashTotalSize));
+//                }else {
+//                    System.err.println(String.format("合计：%s个, 少%s个, noCrashTotalSize=%s", totalSize, shouldTotalSize-totalSize, noCrashTotalSize));
+//                }
+//
+//                //100000 用时：1702ms，1.702
+//                //1000000个编号，用时：11030ms，11.03s  1000000个编号，用时：11161ms，11.161s 1000000个编号，用时：11201ms，11.201s
+//                //checkPrefix 没有 synchronize 1000000个编号，用时：11074ms，11.074s 1000000个编号，用时：11334ms，11.334s 1000000个编号，用时：10951ms，10.951s
+//            }
+//        });
+//    }
 }

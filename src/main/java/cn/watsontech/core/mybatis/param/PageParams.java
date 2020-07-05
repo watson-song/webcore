@@ -35,6 +35,19 @@ public class PageParams {
     @ApiModelProperty(value = "升降序", example="desc")
     protected String ord; //order
 
+    public PageParams() {}
+    public PageParams(@NotNull(message = "p参数(page)不能为空") Integer p, @NotNull(message = "ps参数(pageSize)不能为空") Integer ps) {
+        this.p = p;
+        this.ps = ps;
+    }
+
+    public PageParams(@NotNull(message = "p参数(page)不能为空") Integer p, @NotNull(message = "ps参数(pageSize)不能为空") Integer ps, String sby, String ord) {
+        this.p = p;
+        this.ps = ps;
+        this.sby = sby;
+        this.ord = ord;
+    }
+
     /**
      * @deprecated("使用getOrderByClause(Class entityClass)方法")
      */

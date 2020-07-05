@@ -32,8 +32,4 @@ public class MapBuilder<K,V> extends HashMap<K,V> {
         super.put(key, value);
         return this;
     }
-
-    public static void main(String[] args) {
-        System.out.println(MapBuilder.builder().putNext("key", 1).putNext("value", 2));
-    }
 }

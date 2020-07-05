@@ -62,7 +62,7 @@ public class SiteOptionProperties {
             keyValues.putAll(newSiteOptions);
         }
 
-        System.out.println(String.format("本地已加载站点参数：%s, 数据库加载参数：%s", keyValues, siteOptions));
+        log.debug("本地已加载站点参数：{}, 数据库加载参数：{}", keyValues, siteOptions);
     }
 
     /**

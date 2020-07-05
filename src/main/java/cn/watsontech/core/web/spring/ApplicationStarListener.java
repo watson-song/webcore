@@ -2,6 +2,9 @@ package cn.watsontech.core.web.spring;
 
 import cn.watsontech.core.utils.MysqlNoPoolLoadAdapter;
 import cn.watsontech.core.utils.NoHelper;
+import lombok.extern.log4j.Log4j2;
+import org.springframework.boot.context.event.ApplicationReadyEvent;
+import org.springframework.context.ApplicationListener;
 import org.springframework.jdbc.core.JdbcTemplate;
 
 import java.util.List;
@@ -10,18 +13,12 @@ import java.util.List;
  * Created by Watson on 2020/4/17.
  */
 //@Component
-//@Log4j2
-public class ApplicationStarListener /*implements ApplicationListener<ApplicationReadyEvent>*/ {
+@Log4j2
+public class ApplicationStarListener implements ApplicationListener<ApplicationReadyEvent> {
 
     final int limit;
     final JdbcTemplate jdbcTemplate;
     final List<NoGeneratorType> types;
-
-    public ApplicationStarListener(List<NoGeneratorType> types, int noLimit, JdbcTemplate jdbcTemplate) {
-        this.types = types;
-        this.limit = noLimit;
-        this.jdbcTemplate = jdbcTemplate;
-    }
 
     public class NoGeneratorType {
         int length;
@@ -47,8 +44,14 @@ public class ApplicationStarListener /*implements ApplicationListener<Applicatio
         }
     }
 
-//    @Override
-    public void onApplicationEvent() {
+    public ApplicationStarListener(List<NoGeneratorType> types, int noLimit, JdbcTemplate jdbcTemplate) {
+        this.types = types;
+        this.limit = noLimit;
+        this.jdbcTemplate = jdbcTemplate;
+    }
+
+    @Override
+    public void onApplicationEvent(ApplicationReadyEvent event) {
         //启动编号生成器
         NoHelper noHelper = NoHelper.getInstance();
         NoHelper.NoPoolLoadAdapter noPoolLoadAdapter = new MysqlNoPoolLoadAdapter(jdbcTemplate);
@@ -61,7 +64,7 @@ public class ApplicationStarListener /*implements ApplicationListener<Applicatio
             }
         }
 
-        System.out.println("编号生成器初始化完毕：" + noHelper.stringGenerators());
+        log.debug("编号生成器初始化完毕：" + noHelper.stringGenerators());
     }
 
 }

@@ -257,10 +257,4 @@ public class ObjectId implements Comparable<ObjectId>, java.io.Serializable {
         return Objects.hashCode(serialVersionUID, LOGGER, _time, _machine, _inc, _new,
                 _nextInc, _genmachine);
     }
-
-    public static void main(String[] args) {
-        for (int i = 0; i < 1000; i++) {
-            System.out.println(new ObjectId().toHexString());
-        }
-    }
 }

@@ -1,5 +1,7 @@
 package cn.watsontech.core.utils;
 
+import lombok.extern.log4j.Log4j2;
+
 import java.io.*;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
@@ -7,7 +9,7 @@ import java.util.zip.ZipOutputStream;
 /**
  * Created by Watson on 2020/3/25.
  */
-
+@Log4j2
 public class ZipCompress {
     private String zipFileName;      // 目的地Zip文件
     private String sourceFileName;   //源文件（带压缩的文件或文件夹）
@@ -19,7 +21,7 @@ public class ZipCompress {
 
     public void zip() throws Exception {
         //File zipFile = new File(zipFileName);
-        System.out.println("压缩中...");
+        log.debug("压缩中...");
         //创建zip输出流
         ZipOutputStream out = new ZipOutputStream(new FileOutputStream(zipFileName));
         //创建缓冲输出流
@@ -39,7 +41,7 @@ public class ZipCompress {
             }
         }
         bos.close();
-        System.out.println("压缩完成");
+        log.info("压缩完成");
     }
 
     public void compress(ZipOutputStream out, BufferedOutputStream bos, File sourceFile, String base) throws IOException {
@@ -49,7 +51,6 @@ public class ZipCompress {
             File[] flist = sourceFile.listFiles();
             if (flist.length == 0)//如果文件夹为空，则只需在目的地zip文件中写入一个目录进入点
             {
-                System.out.println(base + "/");
                 out.putNextEntry(new ZipEntry(base + "/"));
             } else//如果文件夹不为空，则递归调用compress，文件夹中的每一个文件（或文件夹）进行压缩
             {
@@ -63,7 +64,6 @@ public class ZipCompress {
             FileInputStream fos = new FileInputStream(sourceFile);
             BufferedInputStream bis = new BufferedInputStream(fos);
             int tag;
-            System.out.println(base);
 
             //将源文件写入到zip文件中
             while ((tag = bis.read()) != -1) {
