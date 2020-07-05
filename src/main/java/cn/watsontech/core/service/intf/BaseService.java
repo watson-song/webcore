@@ -348,12 +348,9 @@ public class BaseService<T, PK> implements Service<T, PK> {
     }
 
     public static PageRowBounds wrapPageRowBounds(PageParams params, boolean count) {
-        PageRowBounds rowBounds = new PageRowBounds(getOffset(params), params.getPs());
+        PageRowBounds rowBounds = new PageRowBounds(params.getOffset(), params.getLimit());
         rowBounds.setCount(count);
         return rowBounds;
     }
 
-    private static int getOffset(PageParams params) {
-        return params.getP()!=null?Math.max(0, (params.getP()-1)*params.getPs()):0;
-    }
 }

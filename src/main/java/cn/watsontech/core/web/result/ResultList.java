@@ -20,21 +20,17 @@ public class ResultList<T> {
         this.total = this.list!=null?this.list.size():0l;
     }
 
-    public ResultList(List<T> list, Integer page, Integer limit) {
-        this.page = page;
-        if (page!=null&&limit!=null) {
-            this.offset = Math.max(0, (page-1)*limit);
-        }
+    public ResultList(List<T> list, Integer offset, Integer limit) {
+        this.offset = offset;
         this.limit = limit;
         this.list = list;
         this.total = list!=null?list.size():0l;
+        this.page = offset/limit;
     }
 
-    public ResultList(List<T> list, Integer page, Integer limit, Long total) {
-        this.page = page;
-        if (page!=null&&limit!=null) {
-            this.offset = Math.max(0, (page-1)*limit);
-        }
+    public ResultList(List<T> list, Integer offset, Integer limit, Long total) {
+        this.page = offset/limit;
+        this.offset = offset;
         this.limit = limit;
         this.total = total;
         this.list = list;
