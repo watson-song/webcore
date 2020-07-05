@@ -59,7 +59,7 @@ public class Result<T> {
 
     public static <T> Result pageResult(List<T> data) {
         if (data instanceof Page) {
-            return new Result(ResultCode.SUCCESS, new ResultList(((Page) data).getResult(), ((Page) data).getPageNum(), ((Page) data).getPageSize(), ((Page) data).getTotal()));
+            return new Result(ResultCode.SUCCESS, new ResultList(((Page) data).getResult(), ((Page) data).getStartRow(), ((Page) data).getPageSize(), ((Page) data).getTotal()));
         }
 
         return listResult(data);
