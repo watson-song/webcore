@@ -5,6 +5,7 @@ import cn.watsontech.core.mybatis.handler.MySqlJSONObjectTypeHandler;
 import cn.watsontech.core.mybatis.handler.MySqlJSONTypeHandler;
 import org.apache.ibatis.plugin.Interceptor;
 import org.apache.ibatis.session.SqlSessionFactory;
+import org.apache.ibatis.type.JdbcType;
 import org.mybatis.spring.SqlSessionFactoryBean;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.context.properties.ConfigurationProperties;
@@ -59,6 +60,9 @@ public class MyBatisConfig {
         sessionConfiguration.getTypeHandlerRegistry().register(MySqlJSONArrayTypeHandler.class);
         sessionConfiguration.getTypeHandlerRegistry().register(MySqlJSONTypeHandler.class);
         sessionConfiguration.getTypeHandlerRegistry().register(MySqlJSONObjectTypeHandler.class);
+        sessionConfiguration.setMapUnderscoreToCamelCase(true);
+        sessionConfiguration.setCallSettersOnNulls(true);
+        sessionConfiguration.setJdbcTypeForNull(JdbcType.NULL);
         return sessionConfiguration;
     }
 
