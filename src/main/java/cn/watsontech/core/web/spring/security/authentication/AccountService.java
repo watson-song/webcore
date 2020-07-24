@@ -26,6 +26,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
 import org.springframework.util.CollectionUtils;
+import org.springframework.util.StringUtils;
 import tk.mybatis.mapper.entity.Condition;
 import tk.mybatis.mapper.entity.Example;
 
@@ -299,13 +300,17 @@ public class AccountService {
         admin.setMobile(form.getMobile());
         admin.setGender(form.getGender());
         admin.setNickName(form.getNickName());
+        admin.setAvatarUrl(form.getAvatarUrl());
         admin.setEmail(form.getEmail());
         admin.setAddress(form.getAddress());
         admin.setTitle(form.getTitle());
         admin.setDepartment(form.getDepartment());
         admin.setAddress(form.getAddress());
-        admin.setPassword(passwordEncoder.encode(form.getPassword()));
+        if (!StringUtils.isEmpty(form.getPassword())) {
+            admin.setPassword(passwordEncoder.encode(form.getPassword()));
+        }
 
+        admin.setExtraData(form.getExtraData());
         admin.setCreatedBy(user.getId());//默认0 创建
         admin.setCreatedByName(user.getUsername());
         int success = adminService.insertSelective(admin);
