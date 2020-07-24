@@ -1,5 +1,6 @@
 package cn.watsontech.core.web.form;
 
+import com.alibaba.fastjson.JSONObject;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import org.hibernate.validator.constraints.Length;
@@ -75,4 +76,7 @@ public class AdminRegisterForm {
      */
     @ApiModelProperty(name = "角色id")
     private List<Long> roleIds;
+
+    @ApiModelProperty(name = "额外数据字段")
+    private JSONObject extraData;
 }
