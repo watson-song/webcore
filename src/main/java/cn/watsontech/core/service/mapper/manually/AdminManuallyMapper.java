@@ -2,14 +2,27 @@
 package cn.watsontech.core.service.mapper.manually;
 
 
+import cn.watsontech.core.vo.AdminListVo;
 import cn.watsontech.core.web.spring.security.entity.Admin;
 import org.apache.ibatis.annotations.*;
+import org.apache.ibatis.session.RowBounds;
 
 import java.util.List;
 import java.util.Map;
 
 @Mapper
 public interface AdminManuallyMapper {
+
+	/**
+	 * 获取管理员列表
+	 */
+	@Select("<script>select id, no, username, nick_name nickName, title, department, gender, type, avatar_url avatarUrl, mobile, email, enabled, created_by createdBy, created_by_name createdByName, created_time createdTime, last_login_date lastLoginDate from tb_admin " +
+			"where 1=1 <if test='keywords!=null'> and username like #{keywords}</if> </script>")
+	@Results({
+			@Result(property = "roles", javaType=List.class, column="id", many = @Many(select = "selectAllRolesByAdminId")),
+			@Result(property = "permissions", javaType=List.class, column="id", many = @Many(select = "selectAllPermissionsByAdminId")),
+	})
+	List<AdminListVo> listAdminInfos(String keywords, RowBounds rowBounds);
 
 	/**
 	 * 获取管理员的详细信息
