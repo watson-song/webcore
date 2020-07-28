@@ -33,10 +33,7 @@ public class AdminManualService {
      * @param keywords 仅搜索用户名username
      */
     public List<AdminListVo> listAdminInfos(String keywords, PageParams pageParams) {
-        Integer pageSize = pageParams.getPs();
-        Integer pageNum = pageParams.getP();
-
-        PageRowBounds rowBounds = new PageRowBounds((pageNum-1)*pageSize, pageSize);
+        PageRowBounds rowBounds = new PageRowBounds(pageParams.getOffset(), pageParams.getLimit());
         rowBounds.setCount(true);
         return manuallyMapper.listAdminInfos(keywords!=null?("%"+keywords+"%"):keywords, rowBounds);
     }
