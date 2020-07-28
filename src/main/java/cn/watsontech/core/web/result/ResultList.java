@@ -10,7 +10,7 @@ import java.util.List;
 @Data
 public class ResultList<T> {
     Integer page;
-    Integer offset;
+    Long offset;
     Integer limit;
     Long total;
     List<T> list;
@@ -20,16 +20,16 @@ public class ResultList<T> {
         this.total = this.list!=null?this.list.size():0l;
     }
 
-    public ResultList(List<T> list, Integer offset, Integer limit) {
+    public ResultList(List<T> list, Long offset, Integer limit) {
         this.offset = offset;
         this.limit = limit;
         this.list = list;
         this.total = list!=null?list.size():0l;
-        this.page = offset/limit;
+        this.page = limit!=null?(int)(offset/limit):0;
     }
 
-    public ResultList(List<T> list, Integer offset, Integer limit, Long total) {
-        this.page = offset/limit;
+    public ResultList(List<T> list, Long offset, Integer limit, Long total) {
+        this.page = limit!=null?(int)(offset/limit):0;
         this.offset = offset;
         this.limit = limit;
         this.total = total;

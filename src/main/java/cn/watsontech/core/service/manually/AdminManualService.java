@@ -1,7 +1,10 @@
 package cn.watsontech.core.service.manually;
 
+import cn.watsontech.core.mybatis.param.PageParams;
 import cn.watsontech.core.service.mapper.manually.AdminManuallyMapper;
+import cn.watsontech.core.vo.AdminListVo;
 import cn.watsontech.core.web.spring.security.entity.Admin;
+import com.github.pagehelper.PageRowBounds;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -23,6 +26,14 @@ public class AdminManualService {
      */
     public Admin getAdminInfo(long id) {
         return manuallyMapper.selectAdminInfoById(id);
+    }
+
+    /**
+     * 获取管理员信息列表
+     * @param keywords 仅搜索用户名username
+     */
+    public List<AdminListVo> listAdminInfos(String keywords, PageParams pageParams) {
+        return manuallyMapper.listAdminInfos(keywords!=null?("%"+keywords+"%"):keywords, new PageRowBounds(pageParams.getOffset(), pageParams.getLimit()));
     }
 
     /**

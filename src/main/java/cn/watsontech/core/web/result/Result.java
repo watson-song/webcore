@@ -50,11 +50,11 @@ public class Result<T> {
     }
 
     public static <T> Result listResult(List<T> data, Integer page, Integer pageSize, Long total) {
-        return new Result(ResultCode.SUCCESS, new ResultList(data, page, pageSize, total));
+        return new Result(ResultCode.SUCCESS, new ResultList(data, Long.valueOf(page), pageSize, total));
     }
 
     public static <T> Result listResult(List<T> data) {
-        return new Result(ResultCode.SUCCESS, new ResultList(data, 0, data.size(), new Long(data.size())));
+        return new Result(ResultCode.SUCCESS, new ResultList(data, 0l, data.size(), new Long(data.size())));
     }
 
     public static <T> Result pageResult(List<T> data) {
