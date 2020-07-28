@@ -19,6 +19,7 @@ public interface AdminManuallyMapper {
 	@Select("<script>select id, no, username, nick_name nickName, title, department, gender, type, avatar_url avatarUrl, mobile, email, enabled, created_by createdBy, created_by_name createdByName, created_time createdTime, last_login_date lastLoginDate from tb_admin " +
 			"where 1=1 <if test='keywords!=null'> and username like #{keywords}</if> </script>")
 	@Results({
+			@Result(property = "id", column = "id"),
 			@Result(property = "roles", javaType=List.class, column="id", many = @Many(select = "selectAllRolesByAdminId")),
 			@Result(property = "permissions", javaType=List.class, column="id", many = @Many(select = "selectAllPermissionsByAdminId")),
 	})
@@ -31,6 +32,7 @@ public interface AdminManuallyMapper {
 	 */
 	@Select(" select id, no, username, nick_name nickName, title, department, gender, type, avatar_url avatarUrl, mobile, email, enabled, created_by createdBy, created_by_name createdByName, created_time createdTime from tb_admin where id=#{adminId}")
 	@Results({
+		@Result(property = "id", column = "id"),
 		@Result(property = "roles", javaType=List.class, column="id", many = @Many(select = "selectAllRolesByAdminId")),
 		@Result(property = "permissions", javaType=List.class, column="id", many = @Many(select = "selectAllPermissionsByAdminId")),
 	})
