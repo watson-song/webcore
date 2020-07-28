@@ -17,7 +17,18 @@ import java.util.stream.Collectors;
  * Created by Watson on 2019/12/26.
  */
 public abstract class LoginUser implements UserDetails {
-    public enum Type {admin/*管理员 or 运营人员*/, user/*顾客*/}
+    public enum Type {
+        admin("管理员")/*管理员 or 运营人员*/, user("用户")/*顾客*/, unknow("未知");
+
+        String label;
+        Type(String label) {
+            this.label = label;
+        }
+
+        public String label() {
+            return this.label;
+        }
+    }
 
     /**
      * 用户ID
@@ -116,11 +127,14 @@ public abstract class LoginUser implements UserDetails {
     @Override
     @JsonIgnore
     public Collection<? extends GrantedAuthority> getAuthorities() {
+        List<SimpleGrantedAuthority> authorities = new ArrayList<>();
+        authorities.add(new SimpleGrantedAuthority("ROLE_" + getUserType().name()));
+
         if (!CollectionUtils.isEmpty(roles)) {
-            return roles.stream().filter(role -> role!=null&&role.containsKey("name")).map(role -> new SimpleGrantedAuthority("ROLE_"+role.get("name"))).collect(Collectors.toList());
+            authorities.addAll(roles.stream().filter(role -> role!=null&&role.containsKey("name")).map(role -> new SimpleGrantedAuthority("ROLE_"+role)).collect(Collectors.toList()));
         }
 
-        return Arrays.asList(new SimpleGrantedAuthority("ROLE_" + getUserType().name()));
+        return authorities;
     }
 
     @Override
