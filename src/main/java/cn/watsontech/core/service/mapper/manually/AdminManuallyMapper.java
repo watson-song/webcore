@@ -16,7 +16,7 @@ public interface AdminManuallyMapper {
 	/**
 	 * 获取管理员列表
 	 */
-	@Select("<script>select id, no, username, nick_name nickName, title, department, gender, type, avatar_url avatarUrl, mobile, email, enabled, created_by createdBy, created_by_name createdByName, created_time createdTime, last_login_date lastLoginDate from tb_admin " +
+	@Select("<script>select id, no, username, nick_name nickNameAccess, title, department, gender, type, avatar_url avatarUrl, mobile, email, enabled, created_by createdBy, created_by_name createdByName, created_time createdTime, last_login_date lastLoginDate from tb_admin " +
 			"where 1=1 <if test='keywords!=null'> and username like #{keywords}</if> </script>")
 	@Results({
 			@Result(property = "id", column = "id"),
