@@ -9,7 +9,7 @@ import java.util.List;
  */
 @Data
 public class ResultList<T> {
-    Integer page;
+    Boolean hasNext;
     Long offset;
     Integer limit;
     Long total;
@@ -18,6 +18,7 @@ public class ResultList<T> {
     public ResultList(List<T> list) {
         this.list = list;
         this.total = this.list!=null?this.list.size():0l;
+        this.hasNext = hasNext();
     }
 
     public ResultList(List<T> list, Long offset, Integer limit) {
@@ -25,14 +26,22 @@ public class ResultList<T> {
         this.limit = limit;
         this.list = list;
         this.total = list!=null?list.size():0l;
-        this.page = limit!=null?(int)(offset/limit):0;
+        this.hasNext = hasNext();
     }
 
     public ResultList(List<T> list, Long offset, Integer limit, Long total) {
-        this.page = limit!=null?(int)(offset/limit):0;
         this.offset = offset;
         this.limit = limit;
         this.total = total;
         this.list = list;
+        this.hasNext = hasNext();
+    }
+
+    private boolean hasNext() {
+        if (list!=null&&offset!=null&&total!=null) {
+            return offset+list.size()<total;
+        }
+
+        return false;
     }
 }
