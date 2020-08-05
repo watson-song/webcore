@@ -18,6 +18,7 @@ public interface BatchInsertMapper<T> {
      * 支持批量插入的数据库可以使用，例如MySQL,H2等，另外该接口限制实体包含`id`属性并且必须为自增列
      *
      * 注意！！！：该方法当前存在bug，不能返回所有批量插入实体主键，仅能返回第一个实体主键，请谨慎使用
+     * 问题大致为：<insertt paramType='java.util.List'></insertt> paramType未设置，尚未找到设置方法
      * @param recordList
      * @return 成功条目数量
      */
@@ -31,6 +32,7 @@ public interface BatchInsertMapper<T> {
      * 支持批量插入的数据库可以使用，例如MySQL,H2等，另外该接口限制实体包含`id`属性并且必须为自增列
      *
      * 注意！！！：该方法当前存在bug，不能返回所有批量插入实体主键，仅能返回第一个实体主键，请谨慎使用
+     * 问题大致为：<insertt paramType='java.util.List'></insertt> paramType未设置，尚未找到设置方法
      * @param batchInsertModel 要插入的实体数据
      * @return 成功条目数量
      */
