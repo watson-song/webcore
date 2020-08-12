@@ -97,6 +97,7 @@ public class CodeGenerator {
         boolean withSwagger = true; //是否自带swagger注解
         boolean beanBuilderMode = true; //是否启用entity的builder模式
         boolean isGeneratedKey = true; //是否为自增id
+        String implementationPackages; //实现的接口，逗号隔开
 
         List<ColumnOverride> columnOverrides;
         List<IgnoredColumn> ignoredColumns;
@@ -137,6 +138,15 @@ public class CodeGenerator {
             this.apiPrefix = apiPrefix;
             this.primaryKeyType = primaryKeyType;
             this.columnOverrides = columnOverrides;
+        }
+
+        public TableModelParam(String tableName, String modelName, String primaryKeyType, String apiPrefix, List<ColumnOverride> columnOverrides, String implementationPackages) {
+            this.tableName = tableName;
+            this.modelName = modelName;
+            this.apiPrefix = apiPrefix;
+            this.primaryKeyType = primaryKeyType;
+            this.columnOverrides = columnOverrides;
+            this.implementationPackages = implementationPackages;
         }
 
         public TableModelParam(String tableName, String modelName, String primaryKeyType, String apiPrefix, List<ColumnOverride> columnOverrides, boolean isGeneratedKey) {
@@ -181,6 +191,10 @@ public class CodeGenerator {
 
         public String getApiPrefix() {
             return apiPrefix;
+        }
+
+        public String getImplementationPackages() {
+            return implementationPackages;
         }
 
         public List<ColumnOverride> getColumnOverrides() {
@@ -287,7 +301,7 @@ public class CodeGenerator {
         String modelName = tableModelParam.getModelName();
         String primaryKeyType = tableModelParam.getPrimaryKeyType();
 
-        genModelAndMapper(tableName, modelName, tableModelParam.isWithSwagger(), tableModelParam.isBeanBuilderMode(), tableModelParam.getColumnOverrides(), tableModelParam.getIgnoredColumns(), tableModelParam.isGeneratedKey(), jdbcConnectionConfiguration);
+        genModelAndMapper(tableName, modelName, tableModelParam.isWithSwagger(), tableModelParam.isBeanBuilderMode(), tableModelParam.getColumnOverrides(), tableModelParam.getIgnoredColumns(), tableModelParam.isGeneratedKey(), jdbcConnectionConfiguration, tableModelParam.getImplementationPackages());
 
 		genService(tableName, modelName, primaryKeyType);
 		genController(tableName, modelName, primaryKeyType, tableModelParam.getApiPrefix());
@@ -298,7 +312,7 @@ public class CodeGenerator {
         genModelAndMapper(tableName, modelName, withSwagger, beanBuilderMode, columnOverrides, ignoredColumns, isGeneratedKey, jdbcConnectionConfiguration, null);
     }
 
-    public void genModelAndMapper(String tableName, String modelName, boolean withSwagger, boolean beanBuilderMode, List<ColumnOverride> columnOverrides, List<IgnoredColumn> ignoredColumns, boolean isGeneratedKey, JDBCConnectionConfiguration jdbcConnectionConfiguration, String implementationPackage) {
+    public void genModelAndMapper(String tableName, String modelName, boolean withSwagger, boolean beanBuilderMode, List<ColumnOverride> columnOverrides, List<IgnoredColumn> ignoredColumns, boolean isGeneratedKey, JDBCConnectionConfiguration jdbcConnectionConfiguration, String implementationPackages) {
         Context context = new Context(ModelType.FLAT);
         context.setId("mybatis");
         context.setTargetRuntime("MyBatis3Simple");
@@ -329,6 +343,16 @@ public class CodeGenerator {
             context.addPluginConfiguration(pluginConfiguration);
         }
 
+        //添加 CreatedEntity 接口继承
+        pluginConfiguration = new PluginConfiguration();
+        pluginConfiguration.setConfigurationType("cn.watsontech.core.mybatis.generator.plugin.ExtendEntityInterfacePlugin");
+        String finalImplementationPackages = "cn.watsontech.core.mybatis.CreatedEntity<"+modelName+", Long, Long>;";//多个接口用分号隔开
+        if (implementationPackages!=null) {
+            finalImplementationPackages += implementationPackages;
+        }
+        pluginConfiguration.addProperty("extraInterfacePackages", finalImplementationPackages);
+        context.addPluginConfiguration(pluginConfiguration);
+
         JavaModelGeneratorConfiguration javaModelGeneratorConfiguration = new JavaModelGeneratorConfiguration();
         javaModelGeneratorConfiguration.setTargetProject(PROJECT_PATH + TARGET_JAVA_PATH);
         javaModelGeneratorConfiguration.setTargetPackage(MODEL_PACKAGE);
@@ -343,7 +367,6 @@ public class CodeGenerator {
         javaClientGeneratorConfiguration.setTargetProject(PROJECT_PATH + TARGET_JAVA_PATH);
         javaClientGeneratorConfiguration.setTargetPackage(MAPPER_PACKAGE);
         javaClientGeneratorConfiguration.setConfigurationType("XMLMAPPER");
-        javaClientGeneratorConfiguration.setImplementationPackage(implementationPackage);
         context.setJavaClientGeneratorConfiguration(javaClientGeneratorConfiguration);
 
         TableConfiguration tableConfiguration = new TableConfiguration(context);
