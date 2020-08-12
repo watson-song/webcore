@@ -2,16 +2,16 @@ package cn.watsontech.core.web.spring.security.authentication;
 
 import cn.watsontech.core.service.AdminService;
 import cn.watsontech.core.service.UserService;
-import cn.watsontech.core.service.manually.AdminManualService;
-import cn.watsontech.core.service.manually.MessageManualService;
 import cn.watsontech.core.web.form.AdminRegisterForm;
 import cn.watsontech.core.web.spring.aop.annotation.Access;
 import cn.watsontech.core.web.spring.aop.annotation.AccessParam;
+import cn.watsontech.core.web.spring.security.IUserLoginService;
+import cn.watsontech.core.web.spring.security.IUserType;
 import cn.watsontech.core.web.spring.security.LoginUser;
+import cn.watsontech.core.web.spring.security.LoginUser.Type;
+import cn.watsontech.core.web.spring.security.UserTypeFactory;
 import cn.watsontech.core.web.spring.security.entity.Admin;
-import cn.watsontech.core.web.spring.security.entity.User;
 import lombok.extern.log4j.Log4j2;
-import org.apache.commons.lang3.time.DateFormatUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.security.authentication.AccountExpiredException;
@@ -22,22 +22,17 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsChecker;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 import tk.mybatis.mapper.entity.Condition;
-import tk.mybatis.mapper.entity.Example;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 /**
  * Created by Watson on 2020/02/20.
  */
-@Service
 @Log4j2
 public class AccountService {
     UserDetailsChecker preAuthenticationChecks = new DefaultPreAuthenticationChecks();
@@ -77,16 +72,30 @@ public class AccountService {
 
     @Autowired
     AdminService adminService;
-    @Autowired
-    UserService userService;
-    @Autowired
-    MessageManualService messageManualService;
-    @Autowired
-    AdminManualService adminManualService;
+//    @Autowired
+//    MessageManualService messageManualService;
+//    @Autowired
+//    AdminManualService adminManualService;
     @Autowired
     JdbcTemplate jdbcTemplate;
     @Autowired
     PasswordEncoder passwordEncoder;
+    @Autowired
+    UserTypeFactory userTypeFactory;
+    //登录用户服务
+    Map<IUserType, IUserLoginService> loginUserServiceList = new HashMap<>();
+
+    public AccountService(Map<IUserType, IUserLoginService> loginUserServiceList) {
+        if (!CollectionUtils.isEmpty(loginUserServiceList)) {
+            this.loginUserServiceList.putAll(loginUserServiceList);
+        }
+    }
+
+    @Autowired
+    public void afterPropertiesSet(UserService userService, AdminService adminService) {
+        loginUserServiceList.put(LoginUser.Type.admin, adminService);
+        loginUserServiceList.put(LoginUser.Type.user, userService);
+    }
 
     /**
      * 根据用户名加载授权认证信息
@@ -97,26 +106,30 @@ public class AccountService {
     public LoginUser loginByUsername(@AccessParam String userInfo, String password, @AccessParam String loginIp) throws UsernameNotFoundException {
         String[] usernameAndType = splitUsernameAndType(userInfo);
         String username = usernameAndType[0];
-        LoginUser.Type userType = LoginUser.Type.valueOf(usernameAndType[1]);
+        IUserType userType = userTypeFactory.valueOf(usernameAndType[1]);
 
-        LoginUser loadedUser = loadAccountInfo("username", username, userType, new String[]{"id", "username", "password", "nickName", "gender", "email", "avatarUrl", "mobile", "lastLoginDate", "lastLoginIp", "enabled", "expired", "locked", "credentialsExpired", "extraData"}, false);
+        LoginUser loadedUser = loadAccountInfo("username", username, userType, Arrays.asList("id", "username", "password", "nickName", "gender", "email", "avatarUrl", "mobile", "lastLoginDate", "lastLoginIp", "enabled", "expired", "locked", "credentialsExpired", "extraData"), false);
 
         //加载管理员角色/权限
-        loadRolesAndPermissions(loadedUser);
+//        loadRolesAndPermissions(loadedUser);
 
         preAuthenticationChecks.check(loadedUser);
         Assert.isTrue(passwordEncoder.matches(password, loadedUser.getPassword()), "密码不正确");
         postAuthenticationChecks.check(loadedUser);
 
         //更新登录时间
-        switch (userType) {
-            case admin:
-                jdbcTemplate.update("update tb_admin set last_login_date=?, last_login_ip=?, login_ip=?, login_date=? where id = ?", ((Admin)loadedUser).getLastLoginDate(), ((Admin)loadedUser).getLastLoginIp(), loginIp, DateFormatUtils.format(new Date(), "yyyy-MM-dd HH:mm:ss"), loadedUser.getId());
-                break;
-            case user:
-                jdbcTemplate.update("update tb_user set last_login_date=?, last_login_ip=?, login_ip=?, login_date=? where id = ?", ((User)loadedUser).getLastLoginDate(), ((User)loadedUser).getLastLoginIp(), loginIp, DateFormatUtils.format(new Date(), "yyyy-MM-dd HH:mm:ss"), loadedUser.getId());
-                break;
-        }
+        IUserLoginService service = loginUserServiceList.get(userType);
+        Assert.notNull(service, "未找到用户登录服务类，用户类型："+userType);
+
+        service.updateLastLoginData(loginIp);
+//        switch (userType) {
+//            case admin:
+//                jdbcTemplate.update("update tb_admin set last_login_date=?, last_login_ip=?, login_ip=?, login_date=? where id = ?", ((Admin)loadedUser).getLastLoginDate(), ((Admin)loadedUser).getLastLoginIp(), loginIp, DateFormatUtils.format(new Date(), "yyyy-MM-dd HH:mm:ss"), loadedUser.getId());
+//                break;
+//            case user:
+//                jdbcTemplate.update("update tb_user set last_login_date=?, last_login_ip=?, login_ip=?, login_date=? where id = ?", ((User)loadedUser).getLastLoginDate(), ((User)loadedUser).getLastLoginIp(), loginIp, DateFormatUtils.format(new Date(), "yyyy-MM-dd HH:mm:ss"), loadedUser.getId());
+//                break;
+//        }
 
         return loadedUser;
     }
@@ -125,15 +138,15 @@ public class AccountService {
      * 加载用户的权限和角色
      * @param loadedUser
      */
-    private void loadRolesAndPermissions(LoginUser loadedUser) {
-        //加载管理员角色/权限
-        if (loadedUser!=null) {
-            if (loadedUser.getUserType() == LoginUser.Type.admin) {
-                loadedUser.setRoles(adminManualService.getAllRoles(loadedUser.getId()));
-                loadedUser.setPermissions(adminManualService.getAllPermissions(loadedUser.getId()));
-            }
-        }
-    }
+//    private void loadRolesAndPermissions(LoginUser loadedUser) {
+//        //加载管理员角色/权限
+//        if (loadedUser!=null) {
+//            if (loadedUser.getUserType() == admin) {
+//                loadedUser.setRoles(adminManualService.getAllRoles(loadedUser.getId()));
+//                loadedUser.setPermissions(adminManualService.getAllPermissions(loadedUser.getId()));
+//            }
+//        }
+//    }
 
     /**
      * 根据用户openId获取用户详情
@@ -142,9 +155,9 @@ public class AccountService {
      */
     @Access("小程序用户(%s)自动登录")
     public LoginUser loginByOpenId(@AccessParam String openId) throws UsernameNotFoundException {
-        LoginUser.Type userType = LoginUser.Type.user;
+        Type userType = Type.user;
 
-        LoginUser loadedUser = loadAccountInfo("openid", openId, userType, new String[]{"id", "username", "nickName", "gender", "avatarUrl", "mobile", "lastLoginDate", "enabled", "expired", "locked", "credentialsExpired", "createdTime"}, false, false);
+        LoginUser loadedUser = loadAccountInfo("openid", openId, userType, Arrays.asList("id", "username", "nickName", "gender", "avatarUrl", "mobile", "lastLoginDate", "enabled", "expired", "locked", "credentialsExpired", "createdTime"), false, false);
 
         if (loadedUser!=null) {
             preAuthenticationChecks.check(loadedUser);
@@ -169,15 +182,14 @@ public class AccountService {
             ex.printStackTrace();
         }
 
-        LoginUser.Type userType = LoginUser.Type.valueOf(usernameAndType[1]);
-
-        LoginUser loadedUser = loadAccountInfo("id", accountId, userType, new String[]{"id", "username", "nickName", "gender", "avatarUrl", "mobile", "lastLoginDate", "extraData", "createdTime", "enabled", "expired", "locked", "credentialsExpired"}, false);
+        IUserType userType = userTypeFactory.valueOf(usernameAndType[1]);
+        LoginUser loadedUser = loadAccountInfo("id", accountId, userType, Arrays.asList("id", "username", "nickName", "gender", "avatarUrl", "mobile", "lastLoginDate", "extraData", "createdTime", "enabled", "expired", "locked", "credentialsExpired"), false);
 
         preAuthenticationChecks.check(loadedUser);
         postAuthenticationChecks.check(loadedUser);
 
         //加载管理员角色/权限
-        loadRolesAndPermissions(loadedUser);
+//        loadRolesAndPermissions(loadedUser);
 
         return loadedUser;
     }
@@ -187,14 +199,14 @@ public class AccountService {
      * @param accountId 账号id
      * @param userType 账号类型，admin/user/worker
      */
-    public LoginUser loadLoginAccount(Long accountId, LoginUser.Type userType) {
-        LoginUser loadedUser = loadAccountInfo("id", accountId, userType, new String[]{"id", "username", "nickName", "gender", "avatarUrl", "mobile", "lastLoginDate", "extraData", "createdTime", "enabled", "expired", "locked", "credentialsExpired"}, false);
+    public LoginUser loadLoginAccount(Long accountId, IUserType userType) {
+        LoginUser loadedUser = loadAccountInfo("id", accountId, userType, Arrays.asList("id", "username", "nickName", "gender", "avatarUrl", "mobile", "lastLoginDate", "extraData", "createdTime", "enabled", "expired", "locked", "credentialsExpired"), false);
 
         preAuthenticationChecks.check(loadedUser);
         postAuthenticationChecks.check(loadedUser);
 
         //加载管理员角色/权限
-        loadRolesAndPermissions(loadedUser);
+//        loadRolesAndPermissions(loadedUser);
 
         return loadedUser;
     }
@@ -204,39 +216,44 @@ public class AccountService {
      * @param accountId 账号id
      * @param userType 账号类型，admin/user/worker
      */
-    private LoginUser loadLoginAccountInternal(Long accountId, LoginUser.Type userType) {
-        return loadAccountInfo("id", accountId, userType, new String[]{"id", "username", "nickName", "gender", "avatarUrl", "mobile", "lastLoginDate", "extraData", "createdTime"}, true);
+    private LoginUser loadLoginAccountInternal(Long accountId, IUserType userType) {
+        return loadAccountInfo("id", accountId, userType, Arrays.asList("id", "username", "nickName", "gender", "avatarUrl", "mobile", "lastLoginDate", "extraData", "createdTime"), true);
     }
 
-    private LoginUser loadAccountInfo(String conditionKey, Object conditionValue, LoginUser.Type userType, String[] selectProperties, boolean checkEnabled) {
+    private LoginUser loadAccountInfo(String conditionKey, Object conditionValue, IUserType userType, List<String> selectProperties, boolean checkEnabled) {
         return loadAccountInfo(conditionKey, conditionValue, userType, selectProperties, checkEnabled, true);
     }
 
-    private LoginUser loadAccountInfo(String conditionKey, Object conditionValue, LoginUser.Type userType, String[] selectProperties, boolean checkEnabled, boolean notFoundCheck) {
+    private LoginUser loadAccountInfo(String conditionKey, Object conditionValue, IUserType userType, List<String> selectProperties, boolean checkEnabled, boolean notFoundCheck) {
         LoginUser loadedUser = null;
-        if (conditionKey!=null&&conditionValue!=null) {
-
-            Condition condition = getUserCondition(userType);
-            cn.watsontech.core.service.intf.Service<? extends LoginUser, Long> service = getUserService(userType);
-            condition.selectProperties(selectProperties);
-            switch (userType) {
-                case admin:
-                    condition.selectProperties("type", "department", "title");
-                    break;
-                case user:
-                    condition.selectProperties("openid", "email", "logged");
-                    break;
-            }
-
-            Example.Criteria criteria = condition.createCriteria().andEqualTo(conditionKey, conditionValue);
-            if (checkEnabled) {
-                criteria.andEqualTo("enabled", true).andEqualTo("locked", false);
-            }
-            loadedUser = service.selectFirstByCondition(condition);
+        if (conditionKey==null||conditionValue==null) {
+            return null;
         }
 
+//            condition.selectProperties(selectProperties);
+//            switch (userType) {
+//                case admin:
+//                    condition.selectProperties("type", "department", "title");
+//                    break;
+//                case user:
+//                    condition.selectProperties("openid", "email", "logged");
+//                    break;
+//            }
+//
+//            Example.Criteria criteria = condition.createCriteria().andEqualTo(conditionKey, conditionValue);
+//            if (checkEnabled) {
+//                criteria.andEqualTo("enabled", true).andEqualTo("locked", false);
+//            }
+//            loadedUser = service.selectFirstByCondition(condition);
+
+        IUserLoginService service = loginUserServiceList.get(userType);
+        Assert.notNull(service, "未找到用户登录服务类，用户类型："+userType);
+
+        loadedUser = service.loadUserByUserIdentity(conditionKey, conditionValue, selectProperties, checkEnabled);
+
         if (loadedUser!=null) {
-            loadedUser.setUnreadMessages(messageManualService.countUnreadMessages(userType, loadedUser.getId()));
+//            loadedUser.setUnreadMessages(messageManualService.countUnreadMessages(userType, loadedUser.getId()));
+            loadedUser.setUnreadMessages(service.countUnreadMessages(loadedUser.getId()));
         }else if (notFoundCheck) {
             throw new UsernameNotFoundException("数据库中未找到用户("+conditionValue+"@"+userType+")");
         }
@@ -246,13 +263,13 @@ public class AccountService {
 
     public static String[] splitUsernameAndType(String usernameAndType) {
         int atIndex = usernameAndType.lastIndexOf("@");
-        LoginUser.Type userType = LoginUser.Type.user;
+        Type userType = Type.user;
 
         String username = usernameAndType;
         if(atIndex>0) {
             String userTypeString = usernameAndType.substring(atIndex+1);
             try {
-                userType = LoginUser.Type.valueOf(userTypeString);
+                userType = Type.valueOf(userTypeString);
                 //如果 @后为admin/user/worker (userType)则截取用户名，否则用户名为全称
                 username = usernameAndType.substring(0, atIndex);
             }catch (Exception e) {
@@ -261,25 +278,6 @@ public class AccountService {
         }
         return new String[]{username, userType.name()};
     }
-
-    private cn.watsontech.core.service.intf.Service<? extends LoginUser, Long> getUserService(LoginUser.Type userType) {
-        switch (userType) {
-            case admin:
-                return adminService;
-            default:
-                return userService;
-        }
-    }
-
-    public static Condition getUserCondition(LoginUser.Type userType) {
-        switch (userType) {
-            case admin:
-                return new Condition(Admin.class);
-            default:
-                return new Condition(User.class);
-        }
-    }
-
 
     /**************************************账号注册服务****************************************************/
 

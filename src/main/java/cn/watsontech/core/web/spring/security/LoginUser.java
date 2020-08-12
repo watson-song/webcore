@@ -1,5 +1,7 @@
 package cn.watsontech.core.web.spring.security;
 
+import cn.watsontech.core.web.spring.security.entity.Admin;
+import cn.watsontech.core.web.spring.security.entity.User;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import io.swagger.annotations.ApiModelProperty;
 import org.springframework.security.core.GrantedAuthority;
@@ -8,7 +10,10 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.util.CollectionUtils;
 
 import javax.persistence.Transient;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 /**
@@ -17,16 +22,35 @@ import java.util.stream.Collectors;
  * Created by Watson on 2019/12/26.
  */
 public abstract class LoginUser implements UserDetails {
-    public enum Type {
-        admin("管理员")/*管理员 or 运营人员*/, user("用户")/*顾客*/, unknow("未知");
+    public enum Type implements IUserType {
+        admin("管理员", Admin.class)/*管理员 or 运营人员*/, user("用户", User.class)/*顾客*/, unknow("未知", null);
 
         String label;
-        Type(String label) {
+        Class userClaz;
+
+        Type(String label, Class claz) {
             this.label = label;
+            this.userClaz = claz;
         }
 
+        @Override
         public String label() {
             return this.label;
+        }
+
+        @Override
+        public Type valueFor(String name) {
+            return valueOf(name);
+        }
+//
+//        @Override
+//        public Class getUserClass() {
+//            return userClaz;
+//        }
+
+        @Override
+        public String toString() {
+            return name();
         }
     }
 
@@ -39,7 +63,7 @@ public abstract class LoginUser implements UserDetails {
     //获取用户类型，admin或user
     @JsonIgnore
     @ApiModelProperty(value = "用户类型，admin或user")
-    public abstract Type getUserType();
+    public abstract IUserType getUserType();
 
     //用户绑定的手机号码
     @ApiModelProperty(value = "用户绑定的手机号码")

@@ -1,6 +1,5 @@
 package cn.watsontech.core.service.manually;
 
-import cn.watsontech.core.web.spring.security.LoginUser;
 import cn.watsontech.core.service.mapper.manually.MessageManualMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -17,13 +16,12 @@ public class MessageManualService {
     /**
      * 加载所有 未读消息
      */
-    public int countUnreadMessages(LoginUser.Type userType, long userId) {
-        switch (userType) {
-            case admin:
-                return manualMapper.countAdminUnreadMessage(userId);
-            default:
-                return manualMapper.countUserUnreadMessage(userId);
-        }
+    public int countAdminUnreadMessages(long userId) {
+        return manualMapper.countAdminUnreadMessage(userId);
+    }
+
+    public int countUserUnreadMessages(long userId) {
+        return manualMapper.countUserUnreadMessage(userId);
     }
 
 }
