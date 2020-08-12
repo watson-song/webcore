@@ -295,6 +295,10 @@ public class CodeGenerator {
     }
 
     public void genModelAndMapper(String tableName, String modelName, boolean withSwagger, boolean beanBuilderMode, List<ColumnOverride> columnOverrides, List<IgnoredColumn> ignoredColumns, boolean isGeneratedKey, JDBCConnectionConfiguration jdbcConnectionConfiguration) {
+        genModelAndMapper(tableName, modelName, withSwagger, beanBuilderMode, columnOverrides, ignoredColumns, isGeneratedKey, jdbcConnectionConfiguration, null);
+    }
+
+    public void genModelAndMapper(String tableName, String modelName, boolean withSwagger, boolean beanBuilderMode, List<ColumnOverride> columnOverrides, List<IgnoredColumn> ignoredColumns, boolean isGeneratedKey, JDBCConnectionConfiguration jdbcConnectionConfiguration, String implementationPackage) {
         Context context = new Context(ModelType.FLAT);
         context.setId("mybatis");
         context.setTargetRuntime("MyBatis3Simple");
@@ -339,6 +343,7 @@ public class CodeGenerator {
         javaClientGeneratorConfiguration.setTargetProject(PROJECT_PATH + TARGET_JAVA_PATH);
         javaClientGeneratorConfiguration.setTargetPackage(MAPPER_PACKAGE);
         javaClientGeneratorConfiguration.setConfigurationType("XMLMAPPER");
+        javaClientGeneratorConfiguration.setImplementationPackage(implementationPackage);
         context.setJavaClientGeneratorConfiguration(javaClientGeneratorConfiguration);
 
         TableConfiguration tableConfiguration = new TableConfiguration(context);
