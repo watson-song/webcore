@@ -21,7 +21,6 @@ public interface PermissionManuallyMapper {
 	})
     List<PermissionVo> selectAll();
 
-
 	/**
 	 * 获取所有某角色的权限列表
 	 * @return

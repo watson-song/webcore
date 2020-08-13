@@ -8,6 +8,6 @@ import cn.watsontech.core.service.intf.Service;
 /**
 * Created by Watson Song on 2020/03/06.
 */
-public interface UserService extends Service<User, Long>, IUserLoginService {
+public interface UserService extends Service<User, Long>, IUserLoginService<Long> {
 
 }

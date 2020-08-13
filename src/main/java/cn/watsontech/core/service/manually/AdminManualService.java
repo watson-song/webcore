@@ -51,4 +51,12 @@ public class AdminManualService {
     public List<Map<String, Object>> getAllRoles(long adminId) {
         return manuallyMapper.selectAllRolesByAdminId(adminId);
     }
+
+    public int updateLastLoginData(String ip, long userId) {
+        return manuallyMapper.updateLastLoginDate(userId, ip);
+    }
+
+    public int countUnreadMessages(long userId) {
+        return manuallyMapper.countUnreadMessage(userId);
+    }
 }

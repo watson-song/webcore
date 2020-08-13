@@ -6,7 +6,7 @@ import java.util.Map;
 /**
  * Created by Watson on 2020/8/12.
  */
-public interface IUserLoginService {
+public interface IUserLoginService<T> {
 
     /**
      * 根据用户名查询用户
@@ -20,7 +20,7 @@ public interface IUserLoginService {
      * @param checkEnabled 是否检查启用和禁用状态
      * 注意：需加载用户roles和permissions
      */
-    LoginUser loadUserByUsername(String username, List<String> selectProperties, boolean checkEnabled);
+    LoginUser loadUserByUsername(String username, String[] selectProperties, boolean checkEnabled);
 
     /**
      * 根据用户唯一标识查询用户
@@ -30,27 +30,27 @@ public interface IUserLoginService {
      * @param checkEnabled 是否检查启用和禁用状态
      * 注意：需加载用户roles和permissions
      */
-    LoginUser loadUserByUserIdentity(String identity, Object identityValue, List<String> selectProperties, boolean checkEnabled);
+    LoginUser loadUserByUserIdentity(String identity, Object identityValue, String[] selectProperties, boolean checkEnabled);
 
     /**
      * 查询用户未读消息数量
      * @param userId
      */
-    int countUnreadMessages(Object userId);
+    int countUnreadMessages(T userId);
 
     /**
      * 加载用户角色
      */
-    List<Map<String, Object>> loadUserRoles();
+    List<Map<String, Object>> loadUserRoles(T userId);
 
     /**
      * 加载用户权限
      */
-    List<Map<String, Object>> loadUserPermissions();
+    List<Map<String, Object>> loadUserPermissions(T userId);
 
     /**
      * 更新最后登录时间
      * @param loginIp 登录ip地址
      */
-    int updateLastLoginData(String loginIp);
+    int updateLastLoginData(String loginIp, T userId);
 }

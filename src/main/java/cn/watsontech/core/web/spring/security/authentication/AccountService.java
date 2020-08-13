@@ -72,10 +72,6 @@ public class AccountService {
 
     @Autowired
     AdminService adminService;
-//    @Autowired
-//    MessageManualService messageManualService;
-//    @Autowired
-//    AdminManualService adminManualService;
     @Autowired
     JdbcTemplate jdbcTemplate;
     @Autowired
@@ -108,10 +104,7 @@ public class AccountService {
         String username = usernameAndType[0];
         IUserType userType = userTypeFactory.valueOf(usernameAndType[1]);
 
-        LoginUser loadedUser = loadAccountInfo("username", username, userType, Arrays.asList("id", "username", "password", "nickName", "gender", "email", "avatarUrl", "mobile", "lastLoginDate", "lastLoginIp", "enabled", "expired", "locked", "credentialsExpired", "extraData"), false);
-
-        //加载管理员角色/权限
-//        loadRolesAndPermissions(loadedUser);
+        LoginUser loadedUser = loadAccountInfo("username", username, userType, new String[]{"id", "username", "password", "nickName", "gender", "email", "avatarUrl", "mobile", "lastLoginDate", "lastLoginIp", "enabled", "expired", "locked", "credentialsExpired", "extraData"}, false);
 
         preAuthenticationChecks.check(loadedUser);
         Assert.isTrue(passwordEncoder.matches(password, loadedUser.getPassword()), "密码不正确");
@@ -121,32 +114,9 @@ public class AccountService {
         IUserLoginService service = loginUserServiceList.get(userType);
         Assert.notNull(service, "未找到用户登录服务类，用户类型："+userType);
 
-        service.updateLastLoginData(loginIp);
-//        switch (userType) {
-//            case admin:
-//                jdbcTemplate.update("update tb_admin set last_login_date=?, last_login_ip=?, login_ip=?, login_date=? where id = ?", ((Admin)loadedUser).getLastLoginDate(), ((Admin)loadedUser).getLastLoginIp(), loginIp, DateFormatUtils.format(new Date(), "yyyy-MM-dd HH:mm:ss"), loadedUser.getId());
-//                break;
-//            case user:
-//                jdbcTemplate.update("update tb_user set last_login_date=?, last_login_ip=?, login_ip=?, login_date=? where id = ?", ((User)loadedUser).getLastLoginDate(), ((User)loadedUser).getLastLoginIp(), loginIp, DateFormatUtils.format(new Date(), "yyyy-MM-dd HH:mm:ss"), loadedUser.getId());
-//                break;
-//        }
-
+        service.updateLastLoginData(loginIp, loadedUser.getId());
         return loadedUser;
     }
-
-    /**
-     * 加载用户的权限和角色
-     * @param loadedUser
-     */
-//    private void loadRolesAndPermissions(LoginUser loadedUser) {
-//        //加载管理员角色/权限
-//        if (loadedUser!=null) {
-//            if (loadedUser.getUserType() == admin) {
-//                loadedUser.setRoles(adminManualService.getAllRoles(loadedUser.getId()));
-//                loadedUser.setPermissions(adminManualService.getAllPermissions(loadedUser.getId()));
-//            }
-//        }
-//    }
 
     /**
      * 根据用户openId获取用户详情
@@ -157,7 +127,7 @@ public class AccountService {
     public LoginUser loginByOpenId(@AccessParam String openId) throws UsernameNotFoundException {
         Type userType = Type.user;
 
-        LoginUser loadedUser = loadAccountInfo("openid", openId, userType, Arrays.asList("id", "username", "nickName", "gender", "avatarUrl", "mobile", "lastLoginDate", "enabled", "expired", "locked", "credentialsExpired", "createdTime"), false, false);
+        LoginUser loadedUser = loadAccountInfo("openid", openId, userType, new String[]{"id", "username", "nickName", "gender", "avatarUrl", "mobile", "lastLoginDate", "enabled", "expired", "locked", "credentialsExpired", "createdTime"}, false, false);
 
         if (loadedUser!=null) {
             preAuthenticationChecks.check(loadedUser);
@@ -175,21 +145,13 @@ public class AccountService {
     @Access("用户(%s)使用令牌登录")
     public LoginUser loginByUserId(@AccessParam String userInfo) throws UsernameNotFoundException {
         String[] usernameAndType = splitUsernameAndType(userInfo);
-        Long accountId = null;
-        try {
-            accountId = Long.parseLong(usernameAndType[0]);
-        }catch (NumberFormatException ex) {
-            ex.printStackTrace();
-        }
+        Long accountId = Long.parseLong(usernameAndType[0]);
 
         IUserType userType = userTypeFactory.valueOf(usernameAndType[1]);
-        LoginUser loadedUser = loadAccountInfo("id", accountId, userType, Arrays.asList("id", "username", "nickName", "gender", "avatarUrl", "mobile", "lastLoginDate", "extraData", "createdTime", "enabled", "expired", "locked", "credentialsExpired"), false);
+        LoginUser loadedUser = loadAccountInfo("id", accountId, userType, new String[]{"id", "username", "nickName", "gender", "avatarUrl", "mobile", "lastLoginDate", "extraData", "createdTime", "enabled", "expired", "locked", "credentialsExpired"}, false);
 
         preAuthenticationChecks.check(loadedUser);
         postAuthenticationChecks.check(loadedUser);
-
-        //加载管理员角色/权限
-//        loadRolesAndPermissions(loadedUser);
 
         return loadedUser;
     }
@@ -200,13 +162,10 @@ public class AccountService {
      * @param userType 账号类型，admin/user/worker
      */
     public LoginUser loadLoginAccount(Long accountId, IUserType userType) {
-        LoginUser loadedUser = loadAccountInfo("id", accountId, userType, Arrays.asList("id", "username", "nickName", "gender", "avatarUrl", "mobile", "lastLoginDate", "extraData", "createdTime", "enabled", "expired", "locked", "credentialsExpired"), false);
+        LoginUser loadedUser = loadAccountInfo("id", accountId, userType, new String[]{"id", "username", "nickName", "gender", "avatarUrl", "mobile", "lastLoginDate", "extraData", "createdTime", "enabled", "expired", "locked", "credentialsExpired"}, false);
 
         preAuthenticationChecks.check(loadedUser);
         postAuthenticationChecks.check(loadedUser);
-
-        //加载管理员角色/权限
-//        loadRolesAndPermissions(loadedUser);
 
         return loadedUser;
     }
@@ -217,45 +176,28 @@ public class AccountService {
      * @param userType 账号类型，admin/user/worker
      */
     private LoginUser loadLoginAccountInternal(Long accountId, IUserType userType) {
-        return loadAccountInfo("id", accountId, userType, Arrays.asList("id", "username", "nickName", "gender", "avatarUrl", "mobile", "lastLoginDate", "extraData", "createdTime"), true);
+        return loadAccountInfo("id", accountId, userType, new String[]{"id", "username", "nickName", "gender", "avatarUrl", "mobile", "lastLoginDate", "extraData", "createdTime"}, true);
     }
 
-    private LoginUser loadAccountInfo(String conditionKey, Object conditionValue, IUserType userType, List<String> selectProperties, boolean checkEnabled) {
+    private LoginUser loadAccountInfo(String conditionKey, Object conditionValue, IUserType userType, String[] selectProperties, boolean checkEnabled) {
         return loadAccountInfo(conditionKey, conditionValue, userType, selectProperties, checkEnabled, true);
     }
 
-    private LoginUser loadAccountInfo(String conditionKey, Object conditionValue, IUserType userType, List<String> selectProperties, boolean checkEnabled, boolean notFoundCheck) {
+    private LoginUser loadAccountInfo(String conditionKey, Object conditionValue, IUserType userType, String[] selectProperties, boolean checkEnabled, boolean notFoundCheck) {
         LoginUser loadedUser = null;
         if (conditionKey==null||conditionValue==null) {
             return null;
         }
-
-//            condition.selectProperties(selectProperties);
-//            switch (userType) {
-//                case admin:
-//                    condition.selectProperties("type", "department", "title");
-//                    break;
-//                case user:
-//                    condition.selectProperties("openid", "email", "logged");
-//                    break;
-//            }
-//
-//            Example.Criteria criteria = condition.createCriteria().andEqualTo(conditionKey, conditionValue);
-//            if (checkEnabled) {
-//                criteria.andEqualTo("enabled", true).andEqualTo("locked", false);
-//            }
-//            loadedUser = service.selectFirstByCondition(condition);
 
         IUserLoginService service = loginUserServiceList.get(userType);
         Assert.notNull(service, "未找到用户登录服务类，用户类型："+userType);
 
         loadedUser = service.loadUserByUserIdentity(conditionKey, conditionValue, selectProperties, checkEnabled);
 
-        if (loadedUser!=null) {
-//            loadedUser.setUnreadMessages(messageManualService.countUnreadMessages(userType, loadedUser.getId()));
-            loadedUser.setUnreadMessages(service.countUnreadMessages(loadedUser.getId()));
-        }else if (notFoundCheck) {
-            throw new UsernameNotFoundException("数据库中未找到用户("+conditionValue+"@"+userType+")");
+        if (notFoundCheck) {
+            if (loadedUser==null) {
+                throw new UsernameNotFoundException("数据库中未找到用户("+conditionValue+"@"+userType+")");
+            }
         }
 
         return loadedUser;

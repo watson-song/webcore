@@ -56,4 +56,17 @@ public interface AdminManuallyMapper {
 	})
 	List<Map<String, Object>> selectAllPermissionsByAdminId(@Param("adminId") Long adminId);
 
+	/**
+	 * 更新最后登录时间
+	 */
+	@Update("update tb_admin set last_login_date=login_date, last_login_ip=login_ip, login_ip=#{ip}, login_date=now() where id = #{userId}")
+	int updateLastLoginDate(@Param("userId") long userId, @Param("ip") String ip);
+
+	/**
+	 * 查询未读消息数量
+	 * @param userId 用户id
+	 */
+	@Select("select count(*) from tb_admin_message where user_id = #{userId} and state = 'unread'")
+	int countUnreadMessage(@Param("userId") Long userId);
+
 }
