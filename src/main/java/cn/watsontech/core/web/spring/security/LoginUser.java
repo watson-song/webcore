@@ -156,7 +156,7 @@ public abstract class LoginUser implements UserDetails {
             roleList.addAll(roles.stream().filter(role -> role!=null&&role.containsKey("name")).map(role -> String.valueOf(role.getOrDefault("name", "NOBODY"))).collect(Collectors.toSet()));
         }
 
-        return roleList.stream().map(role -> new SimpleGrantedAuthority(role)).collect(Collectors.toList());
+        return roleList.stream().map(role -> new SimpleGrantedAuthority("ROLE_"+role)).collect(Collectors.toList());
     }
 
     @Override
