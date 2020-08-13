@@ -127,14 +127,14 @@ public abstract class LoginUser implements UserDetails {
     @Override
     @JsonIgnore
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        List<SimpleGrantedAuthority> authorities = new ArrayList<>();
-        authorities.add(new SimpleGrantedAuthority("ROLE_" + getUserType().name()));
+        Set<String> roleList = new HashSet<>();
+        roleList.add(getUserType().name());
 
         if (!CollectionUtils.isEmpty(roles)) {
-            authorities.addAll(roles.stream().filter(role -> role!=null&&role.containsKey("name")).map(role -> new SimpleGrantedAuthority("ROLE_"+role.getOrDefault("name", "NOBODY"))).collect(Collectors.toList()));
+            roleList.addAll(roles.stream().filter(role -> role!=null&&role.containsKey("name")).map(role -> String.valueOf(role.getOrDefault("name", "NOBODY"))).collect(Collectors.toSet()));
         }
 
-        return authorities;
+        return roleList.stream().map(role -> new SimpleGrantedAuthority(role)).collect(Collectors.toList());
     }
 
     @Override
