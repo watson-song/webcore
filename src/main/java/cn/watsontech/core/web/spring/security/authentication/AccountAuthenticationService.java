@@ -51,7 +51,7 @@ public class AccountAuthenticationService implements UserDetailsService {
     public LoginUser loadUserByUsername(String userInfo) throws UsernameNotFoundException {
         Assert.notNull(userTypeFactory, "用户类型工厂方法未配置");
 
-        String[] usernameAndType = AccountService.splitUsernameAndType(userInfo);
+        String[] usernameAndType = AccountService.splitUsernameAndType(userInfo, userTypeFactory);
         String username = usernameAndType[0];
 
         IUserType userType = userTypeFactory.valueOf(usernameAndType[1]);

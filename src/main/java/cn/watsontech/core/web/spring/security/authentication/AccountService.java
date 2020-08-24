@@ -100,7 +100,7 @@ public class AccountService {
      **/
     @Access("用户(%s)使用密码登录(ip地址:%s)")
     public LoginUser loginByUsername(@AccessParam String userInfo, String password, @AccessParam String loginIp) throws UsernameNotFoundException {
-        String[] usernameAndType = splitUsernameAndType(userInfo);
+        String[] usernameAndType = splitUsernameAndType(userInfo, userTypeFactory);
         String username = usernameAndType[0];
         IUserType userType = userTypeFactory.valueOf(usernameAndType[1]);
 
@@ -144,7 +144,7 @@ public class AccountService {
      */
     @Access("用户(%s)使用令牌登录")
     public LoginUser loginByUserId(@AccessParam String userInfo) throws UsernameNotFoundException {
-        String[] usernameAndType = splitUsernameAndType(userInfo);
+        String[] usernameAndType = splitUsernameAndType(userInfo, userTypeFactory);
         Long accountId = Long.parseLong(usernameAndType[0]);
 
         IUserType userType = userTypeFactory.valueOf(usernameAndType[1]);
@@ -203,15 +203,15 @@ public class AccountService {
         return loadedUser;
     }
 
-    public static String[] splitUsernameAndType(String usernameAndType) {
+    public static String[] splitUsernameAndType(String usernameAndType, UserTypeFactory userTypeFactory) {
         int atIndex = usernameAndType.lastIndexOf("@");
-        Type userType = Type.user;
+        IUserType userType = Type.user;
 
         String username = usernameAndType;
         if(atIndex>0) {
             String userTypeString = usernameAndType.substring(atIndex+1);
             try {
-                userType = Type.valueOf(userTypeString);
+                userType = userTypeFactory.valueOf(userTypeString);
                 //如果 @后为admin/user/worker (userType)则截取用户名，否则用户名为全称
                 username = usernameAndType.substring(0, atIndex);
             }catch (Exception e) {
