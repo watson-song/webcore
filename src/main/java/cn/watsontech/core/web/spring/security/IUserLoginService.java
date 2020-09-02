@@ -53,4 +53,9 @@ public interface IUserLoginService<T> {
      * @param loginIp 登录ip地址
      */
     int updateLastLoginData(String loginIp, T userId);
+
+    /**
+     * 登录查询属性列表 默认登录查询参数：id,username,nickName,gender,avatarUrl,mobile,lastLoginDate,lastLoginIp,enabled,expired,locked,credentialsExpired,extraData,createdTime
+     */
+    String[] defaultLoginSelectProperties();
 }

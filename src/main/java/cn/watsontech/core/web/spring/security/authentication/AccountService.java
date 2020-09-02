@@ -11,6 +11,7 @@ import cn.watsontech.core.web.spring.security.LoginUser.Type;
 import cn.watsontech.core.web.spring.security.UserTypeFactory;
 import cn.watsontech.core.web.spring.security.entity.Admin;
 import lombok.extern.log4j.Log4j2;
+import org.apache.commons.lang3.ArrayUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.security.authentication.AccountExpiredException;
@@ -81,6 +82,8 @@ public class AccountService {
     @Autowired
     UserTypeFactory userTypeFactory;
 
+    //默认系统预设登录查询属性
+    final String[] defaultLoginSelectProperties = new String[]{"id", "username", "nickName", "gender", "avatarUrl", "mobile", "lastLoginDate", "lastLoginIp", "enabled", "expired", "locked", "credentialsExpired", "extraData", "createdTime"};
 
     /**
      * 根据用户名加载授权认证信息
@@ -89,20 +92,39 @@ public class AccountService {
      **/
     @Access("用户(%s)使用密码登录(ip地址:%s)")
     public LoginUser loginByUsername(@AccessParam String userInfo, String password, @AccessParam String loginIp) throws UsernameNotFoundException {
+        return loginByUsername(userInfo, password, null, loginIp);
+    }
+    /**
+     * 根据用户名加载授权认证信息
+     * @param userInfo 用户名@用户类型  watson@admin, watson@worker, watson@user
+     * @param selectProperties 登录自定义查询属性，若未定义，则默认使用系统预设值 {"id", "username", "nickName", "gender", "avatarUrl", "mobile", "lastLoginDate", "lastLoginIp", "enabled", "expired", "locked", "credentialsExpired", "extraData"};
+     * @必要方法
+     **/
+    @Access("用户(%s)使用密码登录(ip地址:%s)")
+    public LoginUser loginByUsername(@AccessParam String userInfo, String password, String[] selectProperties, @AccessParam String loginIp) throws UsernameNotFoundException {
         String[] usernameAndType = splitUsernameAndType(userInfo, userTypeFactory);
         String username = usernameAndType[0];
         IUserType userType = userTypeFactory.valueOf(usernameAndType[1]);
 
-        LoginUser loadedUser = loadAccountInfo("username", username, userType, new String[]{"id", "username", "password", "nickName", "gender", "email", "avatarUrl", "mobile", "lastLoginDate", "lastLoginIp", "enabled", "expired", "locked", "credentialsExpired", "extraData"}, false);
+        IUserLoginService service = userTypeFactory.getLoginUserService(userType);
+        Assert.notNull(service, "未找到用户登录服务类，用户类型："+userType);
+
+        if (selectProperties==null||selectProperties.length==0) {
+            //若未提供selectProperties，则使用loginUserService提供参数
+            selectProperties = service.defaultLoginSelectProperties();
+        }
+        if (selectProperties==null||selectProperties.length==0) {
+            selectProperties = defaultLoginSelectProperties;
+        }
+
+        String[] withPasswordProperties = ArrayUtils.add(selectProperties, "password");//添加密码字段
+        LoginUser loadedUser = loadAccountInfo("username", username, userType, withPasswordProperties, false);
 
         preAuthenticationChecks.check(loadedUser);
         Assert.isTrue(passwordEncoder.matches(password, loadedUser.getPassword()), "密码不正确");
         postAuthenticationChecks.check(loadedUser);
 
         //更新登录时间
-        IUserLoginService service = userTypeFactory.getLoginUserService(userType);
-        Assert.notNull(service, "未找到用户登录服务类，用户类型："+userType);
-
         service.updateLastLoginData(loginIp, loadedUser.getId());
         return loadedUser;
     }
@@ -114,9 +136,16 @@ public class AccountService {
      */
     @Access("小程序用户(%s)自动登录")
     public LoginUser loginByOpenId(@AccessParam String openId) throws UsernameNotFoundException {
+        return loginByOpenId(openId, null);
+    }
+    @Access("小程序用户(%s)自动登录")
+    public LoginUser loginByOpenId(@AccessParam String openId, String[] selectProperties) throws UsernameNotFoundException {
         Type userType = Type.user;
 
-        LoginUser loadedUser = loadAccountInfo("openid", openId, userType, new String[]{"id", "username", "nickName", "gender", "avatarUrl", "mobile", "lastLoginDate", "enabled", "expired", "locked", "credentialsExpired", "createdTime"}, false, false);
+        IUserLoginService service = userTypeFactory.getLoginUserService(userType);
+        Assert.notNull(service, "未找到用户登录服务类，用户类型："+userType);
+
+        LoginUser loadedUser = loadAccountInfo("openid", openId, userType, selectProperties, false, false);
 
         if (loadedUser!=null) {
             preAuthenticationChecks.check(loadedUser);
@@ -133,11 +162,21 @@ public class AccountService {
      */
     @Access("用户(%s)使用令牌登录")
     public LoginUser loginByUserId(@AccessParam String userInfo) throws UsernameNotFoundException {
+        return loginByUserId(userInfo, null);
+    }
+
+    /**
+     * 根据token中包含的信息获取用户详情
+     * @param userInfo userId@userType, ex. 0@admin
+     * @throws UsernameNotFoundException
+     */
+    @Access("用户(%s)使用令牌登录")
+    public LoginUser loginByUserId(@AccessParam String userInfo, String[] selectProperties) throws UsernameNotFoundException {
         String[] usernameAndType = splitUsernameAndType(userInfo, userTypeFactory);
         Long accountId = Long.parseLong(usernameAndType[0]);
-
         IUserType userType = userTypeFactory.valueOf(usernameAndType[1]);
-        LoginUser loadedUser = loadAccountInfo("id", accountId, userType, new String[]{"id", "username", "nickName", "gender", "avatarUrl", "mobile", "lastLoginDate", "extraData", "createdTime", "enabled", "expired", "locked", "credentialsExpired"}, false);
+
+        LoginUser loadedUser = loadAccountInfo("id", accountId, userType, selectProperties, false);
 
         preAuthenticationChecks.check(loadedUser);
         postAuthenticationChecks.check(loadedUser);
@@ -151,7 +190,18 @@ public class AccountService {
      * @param userType 账号类型，admin/user/worker
      */
     public LoginUser loadLoginAccount(Long accountId, IUserType userType) {
-        LoginUser loadedUser = loadAccountInfo("id", accountId, userType, new String[]{"id", "username", "nickName", "gender", "avatarUrl", "mobile", "lastLoginDate", "extraData", "createdTime", "enabled", "expired", "locked", "credentialsExpired"}, false);
+        return loadLoginAccount(accountId, userType, null);
+    }
+    /**
+     * 从数据库加载用户信息
+     * @param accountId 账号id
+     * @param userType 账号类型，admin/user/worker
+     */
+    public LoginUser loadLoginAccount(Long accountId, IUserType userType, String[] selectProperties) {
+        IUserLoginService service = userTypeFactory.getLoginUserService(userType);
+        Assert.notNull(service, "未找到用户登录服务类，用户类型："+userType);
+
+        LoginUser loadedUser = loadAccountInfo("id", accountId, userType, selectProperties, false);
 
         preAuthenticationChecks.check(loadedUser);
         postAuthenticationChecks.check(loadedUser);
@@ -180,6 +230,14 @@ public class AccountService {
 
         IUserLoginService service = userTypeFactory.getLoginUserService(userType);
         Assert.notNull(service, "未找到用户登录服务类，用户类型："+userType);
+
+        if (selectProperties==null||selectProperties.length==0) {
+            //若未提供selectProperties，则使用loginUserService提供参数
+            selectProperties = service.defaultLoginSelectProperties();
+        }
+        if (selectProperties==null||selectProperties.length==0) {
+            selectProperties = defaultLoginSelectProperties;
+        }
 
         loadedUser = service.loadUserByUserIdentity(conditionKey, conditionValue, selectProperties, checkEnabled);
 

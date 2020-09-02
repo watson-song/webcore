@@ -2,6 +2,7 @@ package cn.watsontech.core.web.spring.security.authentication;
 
 import cn.watsontech.core.web.spring.security.LoginUser;
 import cn.watsontech.core.web.spring.security.TokenService;
+import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -12,10 +13,11 @@ import org.springframework.security.web.authentication.preauth.PreAuthenticatedA
 
 import java.util.Optional;
 
+@Log4j2
 public class TokenAuthenticationProvider implements AuthenticationProvider {
+
     @Autowired
     private TokenService tokenService;
-
     @Autowired
     private AccountService userDetailsService;
 

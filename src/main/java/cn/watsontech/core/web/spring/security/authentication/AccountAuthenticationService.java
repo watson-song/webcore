@@ -9,12 +9,10 @@ import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
-import org.springframework.stereotype.Service;
 
 /**
  * Created by Watson on 31/01/2018.
  */
-@Service
 @Log4j2
 public class AccountAuthenticationService implements UserDetailsService {
 

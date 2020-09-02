@@ -42,14 +42,14 @@ public interface AdminManuallyMapper {
      * 获取本角色下的所有角色列表
      * @param adminId 管理员Id
      */
-	@Select("select b.id,b.name,b.label from ref_admin_role a left join tb_role b on a.role_id=b.id and b.enabled = 1 where a.admin_id =#{adminId}")
+	@Select("select b.id,b.name,b.label from tb_role b left join ref_admin_role a on a.role_id=b.id and b.enabled = 1 where a.admin_id =#{adminId}")
     List<Map<String, Object>> selectAllRolesByAdminId(@Param("adminId") Long adminId);
 
 	/**
 	 * 获取本账户下的所有权限列表
 	 * @param adminId 管理员Id
 	 */
-	@Select("select c.id,c.name,c.label from ref_admin_role a left join ref_role_permission b on a.role_id=b.role_id left join tb_permission c on b.permission_id=c.id and c.enabled = true where a.admin_id =#{adminId}")
+	@Select("select c.id,c.name,c.label from tb_permission c left join ref_role_permission b on b.permission_id=c.id left join ref_admin_role a on a.role_id=b.role_id and c.enabled = true where a.admin_id =#{adminId}")
 	@Results({
 			@Result(column = "id", property = "id"),
 			@Result(property = "children", javaType=List.class, column="id", many = @Many(select = "cn.watsontech.core.service.mapper.manually.PermissionManuallyMapper.selectAllChildPermissions")),

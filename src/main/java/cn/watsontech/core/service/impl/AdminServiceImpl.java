@@ -33,7 +33,7 @@ public class AdminServiceImpl extends BaseService<Admin, Long> implements AdminS
 
     @Override
     public LoginUser loadUserByUsername(String username) {
-        return loadUserByUserIdentity("username", username, new String[]{"id", "username", "password", "nickName", "gender", "email", "avatarUrl", "mobile", "lastLoginDate", "lastLoginIp", "enabled", "expired", "locked", "credentialsExpired", "extraData", "type", "department", "title"}, true);
+        return loadUserByUserIdentity("username", username, defaultLoginSelectProperties(), true);
     }
 
     @Override
@@ -77,5 +77,10 @@ public class AdminServiceImpl extends BaseService<Admin, Long> implements AdminS
     @Override
     public int updateLastLoginData(String loginIp, Long userId) {
         return adminManualService.updateLastLoginData(loginIp, userId);
+    }
+
+    @Override
+    public String[] defaultLoginSelectProperties() {
+        return new String[]{"id", "username", "password", "nickName", "gender", "email", "avatarUrl", "mobile", "lastLoginDate", "lastLoginIp", "enabled", "expired", "locked", "credentialsExpired", "extraData", "type", "department", "title"};
     }
 }
