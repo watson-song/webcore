@@ -16,22 +16,22 @@ import java.util.stream.Collectors;
 @Data
 public class Result<T> {
 
-    @ApiModelProperty(notes = "返回码， 200（成功）")
+    @ApiModelProperty(notes = "返回码，200（成功）")
     int code;
     @ApiModelProperty(notes = "成功返回数据")
     T data;
 
-    @ApiModelProperty(notes = "错误内容")
-    Object error;
+    @ApiModelProperty(notes = "错误内容/成功消息")
+    Object message;
     @ApiModelProperty(notes = "仅当有多条错误提示时有此值")
     List errors;
 
     public Result() {}
 
-    public Result(int code, T data, Object error) {
+    public Result(int code, T data, Object message) {
         this.code = code;
         this.data = data;
-        this.error = error;
+        this.message = message;
     }
 
     public Result(int code, T data) {
@@ -39,9 +39,9 @@ public class Result<T> {
         this.data = data;
     }
 
-    public Result(int code, String error, List errors) {
+    public Result(int code, String message, List errors) {
         this.code = code;
-        this.error = error;
+        this.message = message;
         this.errors = errors;
     }
 

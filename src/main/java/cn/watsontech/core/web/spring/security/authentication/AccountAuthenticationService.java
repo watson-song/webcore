@@ -1,24 +1,22 @@
 package cn.watsontech.core.web.spring.security.authentication;
 
-import cn.watsontech.core.service.AdminService;
-import cn.watsontech.core.service.UserService;
 import cn.watsontech.core.web.spring.security.IUserLoginService;
 import cn.watsontech.core.web.spring.security.IUserType;
 import cn.watsontech.core.web.spring.security.LoginUser;
 import cn.watsontech.core.web.spring.security.UserTypeFactory;
 import cn.watsontech.core.web.spring.util.Assert;
+import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
-import org.springframework.util.CollectionUtils;
-
-import java.util.HashMap;
-import java.util.Map;
+import org.springframework.stereotype.Service;
 
 /**
  * Created by Watson on 31/01/2018.
  */
+@Service
+@Log4j2
 public class AccountAuthenticationService implements UserDetailsService {
 
     @Autowired
@@ -26,21 +24,6 @@ public class AccountAuthenticationService implements UserDetailsService {
 
     @Autowired
     JdbcTemplate jdbcTemplate;
-
-    //登录用户服务
-    Map<IUserType, IUserLoginService> loginUserServiceList = new HashMap<>();
-
-    public AccountAuthenticationService(Map<IUserType, IUserLoginService> loginUserServiceList) {
-        if (!CollectionUtils.isEmpty(loginUserServiceList)) {
-            this.loginUserServiceList.putAll(loginUserServiceList);
-        }
-    }
-
-    @Autowired
-    public void afterPropertiesSet(UserService userService, AdminService adminService) {
-        loginUserServiceList.put(LoginUser.Type.admin, adminService);
-        loginUserServiceList.put(LoginUser.Type.user, userService);
-    }
 
     /**
      * 根据用户名加载授权认证信息
@@ -56,7 +39,7 @@ public class AccountAuthenticationService implements UserDetailsService {
 
         IUserType userType = userTypeFactory.valueOf(usernameAndType[1]);
 
-        IUserLoginService service = loginUserServiceList.get(userType);
+        IUserLoginService service = userTypeFactory.getLoginUserService(userType);
         Assert.notNull(service, "不能识别的用户类型，"+userType);
 
         LoginUser loadedUser = service.loadUserByUsername(username);

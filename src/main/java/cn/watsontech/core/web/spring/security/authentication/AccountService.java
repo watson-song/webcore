@@ -1,7 +1,6 @@
 package cn.watsontech.core.web.spring.security.authentication;
 
 import cn.watsontech.core.service.AdminService;
-import cn.watsontech.core.service.UserService;
 import cn.watsontech.core.web.form.AdminRegisterForm;
 import cn.watsontech.core.web.spring.aop.annotation.Access;
 import cn.watsontech.core.web.spring.aop.annotation.AccessParam;
@@ -22,17 +21,20 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsChecker;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 import tk.mybatis.mapper.entity.Condition;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created by Watson on 2020/02/20.
  */
+@Service
 @Log4j2
 public class AccountService {
     UserDetailsChecker preAuthenticationChecks = new DefaultPreAuthenticationChecks();
@@ -78,20 +80,7 @@ public class AccountService {
     PasswordEncoder passwordEncoder;
     @Autowired
     UserTypeFactory userTypeFactory;
-    //登录用户服务
-    Map<IUserType, IUserLoginService> loginUserServiceList = new HashMap<>();
 
-    public AccountService(Map<IUserType, IUserLoginService> loginUserServiceList) {
-        if (!CollectionUtils.isEmpty(loginUserServiceList)) {
-            this.loginUserServiceList.putAll(loginUserServiceList);
-        }
-    }
-
-    @Autowired
-    public void afterPropertiesSet(UserService userService, AdminService adminService) {
-        loginUserServiceList.put(LoginUser.Type.admin, adminService);
-        loginUserServiceList.put(LoginUser.Type.user, userService);
-    }
 
     /**
      * 根据用户名加载授权认证信息
@@ -111,7 +100,7 @@ public class AccountService {
         postAuthenticationChecks.check(loadedUser);
 
         //更新登录时间
-        IUserLoginService service = loginUserServiceList.get(userType);
+        IUserLoginService service = userTypeFactory.getLoginUserService(userType);
         Assert.notNull(service, "未找到用户登录服务类，用户类型："+userType);
 
         service.updateLastLoginData(loginIp, loadedUser.getId());
@@ -189,7 +178,7 @@ public class AccountService {
             return null;
         }
 
-        IUserLoginService service = loginUserServiceList.get(userType);
+        IUserLoginService service = userTypeFactory.getLoginUserService(userType);
         Assert.notNull(service, "未找到用户登录服务类，用户类型："+userType);
 
         loadedUser = service.loadUserByUserIdentity(conditionKey, conditionValue, selectProperties, checkEnabled);

@@ -58,7 +58,7 @@ public abstract class LoginUser implements UserDetails {
     public abstract Long getId();
 
     //获取用户类型，admin或user
-    @JsonIgnore
+//    @JsonIgnore @Robin 打开用户类型
     @ApiModelProperty(value = "用户类型，admin或user")
     public abstract IUserType getUserType();
 

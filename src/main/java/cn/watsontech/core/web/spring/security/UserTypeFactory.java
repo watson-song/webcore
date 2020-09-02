@@ -1,26 +1,32 @@
 package cn.watsontech.core.web.spring.security;
 
+import cn.watsontech.core.service.AdminService;
+import cn.watsontech.core.service.UserService;
 import cn.watsontech.core.web.spring.util.Assert;
+import org.springframework.beans.factory.InitializingBean;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 
 /**
  * 用户类型工厂
  * Created by Watson on 2020/8/12.
  */
-public class UserTypeFactory {
+public class UserTypeFactory implements InitializingBean {
 
-    Set<IUserType> allUserTypes = new HashSet<>();
+    @Autowired
+    UserService userService;
+    @Autowired
+    AdminService adminService;
 
-    public UserTypeFactory(Set<IUserType> extraUserTypes) {
-        allUserTypes.addAll(Arrays.asList(LoginUser.Type.values()));
+    //登录用户服务
+    Map<IUserType, IUserLoginService> loginUserServiceList = new HashMap<>();
 
-        if (allUserTypes!=null) {
-            allUserTypes.addAll(extraUserTypes);
+    public UserTypeFactory(Map<IUserType, IUserLoginService> loginUserServiceList) {
+        if (!CollectionUtils.isEmpty(loginUserServiceList)) {
+            this.loginUserServiceList.putAll(loginUserServiceList);
         }
     }
 
@@ -31,9 +37,23 @@ public class UserTypeFactory {
     public IUserType valueOf(String userType) {
         if (StringUtils.isEmpty(userType)) return LoginUser.Type.user;
 
-        Optional<IUserType> optionUserType = allUserTypes.stream().filter(type -> userType.equals(type.name())).findFirst();
+        Optional<IUserType> optionUserType = loginUserServiceList.keySet().stream().filter(type -> userType.equals(type.name())).findFirst();
         Assert.isTrue(optionUserType.isPresent(), "不能识别的用户类型："+userType);
 
         return optionUserType.get();
+    }
+
+    @Override
+    public void afterPropertiesSet() throws Exception {
+        loginUserServiceList.put(LoginUser.Type.admin, adminService);
+        loginUserServiceList.put(LoginUser.Type.user, userService);
+    }
+
+    /**
+     * 获取用户类型对应的 登录服务
+     * @param userType
+     */
+    public IUserLoginService getLoginUserService(IUserType userType) {
+        return loginUserServiceList.get(userType);
     }
 }

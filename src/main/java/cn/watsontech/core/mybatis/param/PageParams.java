@@ -14,13 +14,11 @@ import java.util.Set;
 @Data
 public class PageParams {
 
-//    @ApiModelProperty(value = "分页码", example="1")
-//    @NotNull(message = "p参数(page)不能为空")
-//    protected Integer p = 1;  //page 默认第一页
-//
-//    @ApiModelProperty(value = "页面大小，默认20", example="20")
-//    @NotNull(message = "ps参数(pageSize)不能为空")
-//    protected Integer ps = 20; //pageSize 默认每页10条
+    @ApiModelProperty(value = "分页码", example="1")
+    protected Integer p = 1;  //page 默认第一页
+
+    @ApiModelProperty(value = "页面大小，默认20", example="20")
+    protected Integer ps = 20; //pageSize 默认每页10条
 
     @ApiModelProperty(value = "分页码", example="0")
     protected Integer offset = 0;  //offset 默认第一页
@@ -33,20 +31,6 @@ public class PageParams {
 
     @ApiModelProperty(value = "升降序", example="desc")
     protected String ord; //order
-
-    public PageParams() {}
-
-    public PageParams(Integer offset, Integer limit) {
-        this.offset = offset;
-        this.limit = limit;
-    }
-
-    public PageParams(Integer offset, Integer limit, String sby, String ord) {
-        this.offset = offset;
-        this.limit = limit;
-        this.sby = sby;
-        this.ord = ord;
-    }
 
     /**
      * @deprecated("使用getOrderByClause(Class entityClass)方法")
