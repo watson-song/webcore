@@ -18,7 +18,7 @@ public class ResultList<T> {
     public ResultList(List<T> list) {
         this.list = list;
         this.total = this.list!=null?this.list.size():0l;
-        this.hasNext = hasNext();
+        this.hasNext = calHasNext();
     }
 
     public ResultList(List<T> list, Long offset, Integer limit) {
@@ -26,7 +26,7 @@ public class ResultList<T> {
         this.limit = limit;
         this.list = list;
         this.total = list!=null?list.size():0l;
-        this.hasNext = hasNext();
+        this.hasNext = calHasNext();
     }
 
     public ResultList(List<T> list, Long offset, Integer limit, Long total) {
@@ -34,10 +34,10 @@ public class ResultList<T> {
         this.limit = limit;
         this.total = total;
         this.list = list;
-        this.hasNext = hasNext();
+        this.hasNext = calHasNext();
     }
 
-    private boolean hasNext() {
+    private boolean calHasNext() {
         if (list!=null&&offset!=null&&total!=null) {
             return offset+list.size()<total;
         }

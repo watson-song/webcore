@@ -21,10 +21,10 @@ public class PageParams {
     protected Integer ps = 20; //pageSize 默认每页10条
 
     @ApiModelProperty(value = "分页码", example="0")
-    protected Integer offset = 0;  //offset 默认第一页
+    protected Integer offset;  //从0开始，默认为空，若传该参数则使用该值，若未传则使用p，默认offset为0，p为1
 
     @ApiModelProperty(value = "页面大小，默认20", example="20")
-    protected Integer limit = 20; //默认每页20条
+    protected Integer limit; //默认为空，若传该参数则使用该值，若未传则使用ps，默认size为20
 
     @ApiModelProperty(value = "排序sortBy", example="createdTime")
     protected String sby;  //sortBy

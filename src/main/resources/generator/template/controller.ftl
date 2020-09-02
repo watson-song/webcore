@@ -35,10 +35,7 @@ public class ${modelNameUpperCamel}Controller {
         params.fillCriteria(condition.and());
         condition.setOrderByClause(params.getOrderByClause(${modelNameUpperCamel}.class));
 
-        List<${modelNameUpperCamel}> lists = services.selectByConditionForStartPage(condition, params.getP(), params.getPs());
-        long total = services.countByCondition(condition);
-
-        return Result.listResult(lists, params.getP(), params.getPs(), total);
+        return Result.pageResult(services.selectByConditionForOffsetAndLimit(condition, params.getOffset(), params.getLimit(), true));
     }
 
     @ApiOperation(value = "获取${modelNameUpperCamel}详情信息", response = ${modelNameUpperCamel}.class)
