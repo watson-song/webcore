@@ -33,6 +33,35 @@ public class PageParams {
     protected String ord; //order
 
     /**
+     * 提供前端支持 p和ps参数
+     */
+    public Integer getOffset() {
+        if (offset==null) {
+            if (p!=null) {
+                if (p<1) p =1;
+
+                return (p-1)*getLimit();
+            }
+        }
+
+        return offset>0?offset:0;
+    }
+
+    /**
+     * 提供前端支持 p和ps参数
+     * 注意：分页大小优先使用limit参数
+     */
+    public Integer getLimit() {
+        if (limit==null) {
+            if (getPs()!=null) {
+                return getPs();
+            }
+        }
+
+        return limit>0?limit:0;
+    }
+
+    /**
      * @deprecated("使用getOrderByClause(Class entityClass)方法")
      */
     @ApiModelProperty(value = "排序合计", example="desc", hidden = true)
