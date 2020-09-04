@@ -160,7 +160,6 @@ public class AccountService {
      * @param userInfo userId@userType, ex. 0@admin
      * @throws UsernameNotFoundException
      */
-    @Access("用户(%s)使用令牌登录")
     public LoginUser loginByUserId(@AccessParam String userInfo) throws UsernameNotFoundException {
         return loginByUserId(userInfo, null);
     }
@@ -170,7 +169,6 @@ public class AccountService {
      * @param userInfo userId@userType, ex. 0@admin
      * @throws UsernameNotFoundException
      */
-    @Access("用户(%s)使用令牌登录")
     public LoginUser loginByUserId(@AccessParam String userInfo, String[] selectProperties) throws UsernameNotFoundException {
         String[] usernameAndType = splitUsernameAndType(userInfo, userTypeFactory);
         Long accountId = Long.parseLong(usernameAndType[0]);
