@@ -73,6 +73,18 @@ public class SiteOption implements CreatedEntity<SiteOption, Long, Long> {
     @ApiModelProperty(value="createdTime创建时间")
     private Date createdTime;
 
+
+    @Column(name = "modified_by")
+    @ApiModelProperty(value="modifiedBy")
+    private Long modifiedBy;
+
+    /**
+     * 修改时间
+     */
+    @Column(name = "modified_time")
+    @ApiModelProperty(value="modifiedTime修改时间")
+    private Date modifiedTime;
+
     /**
      * 版本号
      */
@@ -248,6 +260,24 @@ public class SiteOption implements CreatedEntity<SiteOption, Long, Long> {
     public SiteOption setCreatedTime(Date createdTime) {
         this.createdTime = createdTime;
         return this;
+    }
+
+    public Long getModifiedBy() {
+        return modifiedBy;
+    }
+
+    @Override
+    public SiteOption setModifiedBy(Long modifiedBy) {
+        this.modifiedBy = modifiedBy;
+        return this;
+    }
+
+    public Date getModifiedTime() {
+        return modifiedTime;
+    }
+
+    public void setModifiedTime(Date modifiedTime) {
+        this.modifiedTime = modifiedTime;
     }
 
     /**

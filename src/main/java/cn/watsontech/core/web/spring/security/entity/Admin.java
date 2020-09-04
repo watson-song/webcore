@@ -590,7 +590,7 @@ public class Admin extends LoginUser implements CreatedEntity<Admin, Long, Long>
      *
      * @return enabled - 是否已启用
      */
-    public Boolean getEnabled() {
+    public Boolean getActivated() {
         return enabled;
     }
 

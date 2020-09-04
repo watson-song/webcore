@@ -1027,7 +1027,7 @@ public class User extends LoginUser implements CreatedEntity<User, Long, Long> {
      *
      * @return enabled - 是否已启用
      */
-    public Boolean getEnabled() {
+    public Boolean getActivated() {
         return enabled;
     }
 
