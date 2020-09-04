@@ -154,7 +154,7 @@ public abstract class LoginUser implements UserDetails {
     @Override
     public boolean isEnabled() {
         Boolean value = getEnabled();
-        return value==null?false:!value;
+        return value==null?false:value;
     }
 
     @Override
