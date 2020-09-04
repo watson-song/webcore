@@ -93,8 +93,8 @@ public class AccountService {
      * @param userInfo 用户名@用户类型  watson@admin, watson@worker, watson@user
      * @必要方法
      **/
-    @Access("用户(%s)使用密码登录(ip地址:%s)")
-    public LoginUser loginByUsername(@AccessParam String userInfo, String password, @AccessParam String loginIp) throws UsernameNotFoundException {
+    @Access("用户(%s)使用密码登录")
+    public LoginUser loginByUsername(@AccessParam String userInfo, String password, String loginIp) throws UsernameNotFoundException {
         String[] usernameAndType = splitUsernameAndType(userInfo);
         String username = usernameAndType[0];
         LoginUser.Type userType = LoginUser.Type.valueOf(usernameAndType[1]);
@@ -159,7 +159,6 @@ public class AccountService {
      * @param userInfo userId@userType, ex. 0@admin
      * @throws UsernameNotFoundException
      */
-    @Access("用户(%s)使用令牌登录")
     public LoginUser loginByUserId(@AccessParam String userInfo) throws UsernameNotFoundException {
         String[] usernameAndType = splitUsernameAndType(userInfo);
         Long accountId = null;
