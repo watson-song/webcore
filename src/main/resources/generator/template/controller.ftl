@@ -62,6 +62,10 @@ public class ${modelNameUpperCamel}Controller {
     @ApiOperation(value = "修改${modelNameUpperCamel}信息", response = Integer.class)
     @PutMapping("/{id}")
     public Result update(@PathVariable ${primaryKeyType} id, @RequestBody ${modelNameUpperCamel} model, @AuthenticationPrincipal LoginUser user) {
+        ${modelNameUpperCamel} currentModel = services.selectByPrimaryKey(id);
+        Assert.notNull(currentModel, "未找到该实体类信息");
+
+        model.setVersion(currentModel.getVersion());
         int success = services.updateByPrimaryKeySelective(model);
         return Result.successBaseResult(success);
     }
@@ -83,9 +87,13 @@ public class ${modelNameUpperCamel}Controller {
     @ApiOperation(value = "禁用${modelNameUpperCamel}", response = Integer.class)
     @PutMapping("/{id}/disable")
     public Result disable(@PathVariable Long id, @AuthenticationPrincipal LoginUser user) {
+        ${modelNameUpperCamel} currentModel = services.selectByPrimaryKey(id);
+        Assert.notNull(currentModel, "未找到该实体类信息");
+
         ${modelNameUpperCamel} model = new ${modelNameUpperCamel}();
         model.setId(id);
         model.setEnabled(false);
+        model.setVersion(currentModel.getVersion());
         model.setModifiedBy(user.getId());
         return Result.successBaseResult(services.updateByPrimaryKeySelective(model));
     }
@@ -93,9 +101,13 @@ public class ${modelNameUpperCamel}Controller {
     @ApiOperation(value = "启用${modelNameUpperCamel}", response = Integer.class)
     @PutMapping("/{id}/enable")
     public Result enable(@PathVariable Long id, @AuthenticationPrincipal LoginUser user) {
+        ${modelNameUpperCamel} currentModel = services.selectByPrimaryKey(id);
+        Assert.notNull(currentModel, "未找到该实体类信息");
+
         ${modelNameUpperCamel} model = new ${modelNameUpperCamel}();
         model.setId(id);
         model.setEnabled(true);
+        model.setVersion(currentModel.getVersion());
         model.setModifiedBy(user.getId());
         return Result.successBaseResult(services.updateByPrimaryKeySelective(model));
     }

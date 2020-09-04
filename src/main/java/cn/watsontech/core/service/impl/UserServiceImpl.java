@@ -81,6 +81,6 @@ public class UserServiceImpl extends BaseService<User, Long> implements UserServ
 
     @Override
     public String[] defaultLoginSelectProperties() {
-        return new String[]{"id", "username", "password", "nickName", "gender", "email", "avatarUrl", "mobile", "lastLoginDate", "lastLoginIp", "enabled", "expired", "locked", "credentialsExpired", "extraData", "openid", "email", "logged"};
+        return new String[]{"id", "username", "password", "nickName", "gender", "email", "avatarUrl", "mobile", "lastLoginDate", "lastLoginIp", "enabled", "expired", "locked", "credentialsExpired", "extraData", "openid", "email", "logged", "version"};
     }
 }

@@ -81,6 +81,6 @@ public class AdminServiceImpl extends BaseService<Admin, Long> implements AdminS
 
     @Override
     public String[] defaultLoginSelectProperties() {
-        return new String[]{"id", "username", "password", "nickName", "gender", "email", "avatarUrl", "mobile", "lastLoginDate", "lastLoginIp", "enabled", "expired", "locked", "credentialsExpired", "extraData", "type", "department", "title"};
+        return new String[]{"id", "username", "password", "nickName", "gender", "email", "avatarUrl", "mobile", "lastLoginDate", "lastLoginIp", "enabled", "expired", "locked", "credentialsExpired", "extraData", "type", "department", "title", "version"};
     }
 }

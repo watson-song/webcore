@@ -5,8 +5,9 @@ import cn.watsontech.core.web.spring.security.LoginUser;
 import com.alibaba.fastjson.JSONObject;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
-import java.util.Date;
+
 import javax.persistence.*;
+import java.util.Date;
 
 @ApiModel(value="cn.watsontech.core.security.entity.User")
 @Table(name = "tb_user")
@@ -265,7 +266,7 @@ public class User extends LoginUser implements CreatedEntity<User, Long, Long> {
      * 是否已启用
      */
     @ApiModelProperty(value="enabled是否已启用")
-    private boolean enabled = true;
+    private Boolean enabled;
 
     /**
      * 最后登录ip
@@ -1026,7 +1027,7 @@ public class User extends LoginUser implements CreatedEntity<User, Long, Long> {
      *
      * @return enabled - 是否已启用
      */
-    public boolean isEnabled() {
+    public Boolean getEnabled() {
         return enabled;
     }
 
@@ -1035,7 +1036,7 @@ public class User extends LoginUser implements CreatedEntity<User, Long, Long> {
      *
      * @param enabled 是否已启用
      */
-    public User setEnabled(boolean enabled) {
+    public User setEnabled(Boolean enabled) {
         this.enabled = enabled;
         return this;
     }

@@ -39,11 +39,6 @@ public abstract class LoginUser implements UserDetails {
         public Type valueFor(String name) {
             return valueOf(name);
         }
-//
-//        @Override
-//        public Class getUserClass() {
-//            return userClaz;
-//        }
 
         @Override
         public String toString() {
@@ -82,29 +77,26 @@ public abstract class LoginUser implements UserDetails {
     public abstract String getPassword();
 
     @ApiModelProperty(value = "账户是否启用")
-    public abstract boolean isEnabled();
+    public abstract Boolean getEnabled();
 
-    /**
-     * 仅小程序用户 有openid
-     */
-    @ApiModelProperty(value = " 仅小程序用户有openid")
-    public String getOpenid() { return null; }
-
-    /**
-     * 获取昵称
-     */
     @ApiModelProperty(value = "获取用户昵称")
     public abstract String getNickName();
 
     @ApiModelProperty(value = "获取用户头像")
-    public String getAvatarUrl(){ return null;}
+    public abstract String getAvatarUrl();
+
+    @JsonIgnore
+    @ApiModelProperty(value = "账户数据版本号")
+    public Integer getVersion() {
+        return null;
+    }
 
     /**
      * 是否已认证/备案
      */
     @ApiModelProperty(value = " 用户是否已认证/锁匠是否已备案")
-    public boolean isVerified() {
-        return false;
+    public Boolean isVerified() {
+        return null;
     }
 
     @Transient
@@ -157,6 +149,12 @@ public abstract class LoginUser implements UserDetails {
         }
 
         return roleList.stream().map(role -> new SimpleGrantedAuthority("ROLE_"+role)).collect(Collectors.toList());
+    }
+
+    @Override
+    public boolean isEnabled() {
+        Boolean value = getEnabled();
+        return value==null?false:!value;
     }
 
     @Override
