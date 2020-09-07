@@ -14,12 +14,12 @@ import lombok.extern.log4j.Log4j2;
 import org.apache.commons.lang3.ArrayUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.security.authentication.AccountExpiredException;
-import org.springframework.security.authentication.CredentialsExpiredException;
-import org.springframework.security.authentication.DisabledException;
-import org.springframework.security.authentication.LockedException;
+import org.springframework.security.authentication.*;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsChecker;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -37,7 +37,7 @@ import java.util.List;
  */
 @Service
 @Log4j2
-public class AccountService {
+public class AccountService implements UserDetailsService {
     UserDetailsChecker preAuthenticationChecks = new DefaultPreAuthenticationChecks();
     UserDetailsChecker postAuthenticationChecks = new DefaultPostAuthenticationChecks();
 
@@ -85,23 +85,44 @@ public class AccountService {
     //默认系统预设登录查询属性
     final String[] defaultLoginSelectProperties = new String[]{"id", "username", "nickName", "gender", "avatarUrl", "mobile", "lastLoginDate", "lastLoginIp", "enabled", "expired", "locked", "credentialsExpired", "extraData", "createdTime"};
 
+    @Override
+    public LoginUser loadUserByUsername(@AccessParam String userInfo) throws UsernameNotFoundException {
+        String[] usernameAndType = splitUsernameAndType(userInfo, userTypeFactory);
+        String username = usernameAndType[0];
+        LoginUser.Type userType = LoginUser.Type.valueOf(usernameAndType[1]);
+
+        IUserLoginService service = userTypeFactory.getLoginUserService(userType);
+        Assert.notNull(service, "未找到用户登录服务类，用户类型："+userType);
+
+        String[] selectProperties = service.defaultLoginSelectProperties();
+        if (selectProperties==null||selectProperties.length==0) {
+            selectProperties = defaultLoginSelectProperties;
+        }
+
+        String[] withPasswordProperties = ArrayUtils.add(selectProperties, "password");//添加密码字段
+        LoginUser loadedUser = loadAccountInfo("username", username, userType, withPasswordProperties, false);
+
+        return loadedUser;
+    }
+
     /**
      * 根据用户名加载授权认证信息
      * @param userInfo 用户名@用户类型  watson@admin, watson@worker, watson@user
      * @必要方法
      **/
-    @Access("用户(%s)使用密码登录(ip地址:%s)")
-    public LoginUser loginByUsername(@AccessParam String userInfo, String password, @AccessParam String loginIp) throws UsernameNotFoundException {
+    @Access("用户(%s)使用密码登录")
+    public LoginUser loginByUsername(@AccessParam String userInfo, String password, String loginIp) throws UsernameNotFoundException {
         return loginByUsername(userInfo, password, null, loginIp);
     }
+
     /**
      * 根据用户名加载授权认证信息
      * @param userInfo 用户名@用户类型  watson@admin, watson@worker, watson@user
      * @param selectProperties 登录自定义查询属性，若未定义，则默认使用系统预设值 {"id", "username", "nickName", "gender", "avatarUrl", "mobile", "lastLoginDate", "lastLoginIp", "enabled", "expired", "locked", "credentialsExpired", "extraData"};
      * @必要方法
      **/
-    @Access("用户(%s)使用密码登录(ip地址:%s)")
-    public LoginUser loginByUsername(@AccessParam String userInfo, String password, String[] selectProperties, @AccessParam String loginIp) throws UsernameNotFoundException {
+    @Access("用户(%s)使用密码登录")
+    public LoginUser loginByUsername(@AccessParam String userInfo, String password, String[] selectProperties, String loginIp) throws UsernameNotFoundException {
         String[] usernameAndType = splitUsernameAndType(userInfo, userTypeFactory);
         String username = usernameAndType[0];
         IUserType userType = userTypeFactory.valueOf(usernameAndType[1]);
@@ -126,7 +147,14 @@ public class AccountService {
 
         //更新登录时间
         service.updateLastLoginData(loginIp, loadedUser.getId());
+
+        SecurityContextHolder.getContext().setAuthentication(createNewAuthentication(loadedUser));
         return loadedUser;
+    }
+
+    protected Authentication createNewAuthentication(LoginUser user) {
+        UsernamePasswordAuthenticationToken newAuthentication = new UsernamePasswordAuthenticationToken(user, null, user.getAuthorities());
+        return newAuthentication;
     }
 
     /**
@@ -138,6 +166,7 @@ public class AccountService {
     public LoginUser loginByOpenId(@AccessParam String openId) throws UsernameNotFoundException {
         return loginByOpenId(openId, null);
     }
+
     @Access("小程序用户(%s)自动登录")
     public LoginUser loginByOpenId(@AccessParam String openId, String[] selectProperties) throws UsernameNotFoundException {
         Type userType = Type.user;
