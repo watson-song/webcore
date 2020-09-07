@@ -406,4 +406,22 @@ public class AccessLog implements CreatedEntity<AccessLog, Long, Long> {
         this.dbTimes = dbTimes;
         return this;
     }
+
+    @Override
+    public String toString() {
+        return "AccessLog{" +
+                "id=" + id +
+                ", level='" + level + '\'' +
+                ", title='" + title + '\'' +
+                ", ip='" + ip + '\'' +
+                ", url=["+method+"]'" + url + '\'' +
+                ", params='" + params + '\'' +
+                ", exception='" + exception + '\'' +
+                ", totalTimes=" + totalTimes +
+                ", dbTimes=" + dbTimes +
+                ", createdBy=" + createdBy +
+                ", createdByName='" + createdByName + '\'' +
+                ", createdTime=" + createdTime +
+                '}';
+    }
 }

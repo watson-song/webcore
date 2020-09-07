@@ -112,7 +112,7 @@ public class AccountService implements UserDetailsService {
      * @param userInfo 用户名@用户类型  watson@admin, watson@worker, watson@user
      * @必要方法
      **/
-    @Access("用户(%s)使用密码登录")
+    @Access(value = "${access.loginByUsername.description}", save = "${access.loginByUsername.saveToDatabase}"/*不保存数据库*/, level = "${access.loginByUsername.logLevel}")
     public LoginUser loginByUsername(@AccessParam String userInfo, String password, String loginIp) throws UsernameNotFoundException {
         String[] usernameAndType = splitUsernameAndType(userInfo);
         String username = usernameAndType[0];
@@ -165,7 +165,7 @@ public class AccountService implements UserDetailsService {
      * @param openId
      * @throws UsernameNotFoundException
      */
-    @Access("小程序用户(%s)自动登录")
+    @Access(value = "${access.loginByOpenId.description}", save = "${access.loginByOpenId.saveToDatabase}"/*不保存数据库*/, level = "${access.loginByOpenId.logLevel}")
     public LoginUser loginByOpenId(@AccessParam String openId) throws UsernameNotFoundException {
         LoginUser.Type userType = LoginUser.Type.user;
 
@@ -176,6 +176,7 @@ public class AccountService implements UserDetailsService {
             postAuthenticationChecks.check(loadedUser);
         }
 
+        SecurityContextHolder.getContext().setAuthentication(createNewAuthentication(loadedUser));
         return loadedUser;
     }
 
@@ -184,6 +185,7 @@ public class AccountService implements UserDetailsService {
      * @param userInfo userId@userType, ex. 0@admin
      * @throws UsernameNotFoundException
      */
+    @Access(value = "${access.loginByUserId.description}", save = "${access.loginByUserId.saveToDatabase}"/*不保存数据库*/, level = "${access.loginByUserId.logLevel}")
     public LoginUser loginByUserId(@AccessParam String userInfo) throws UsernameNotFoundException {
         String[] usernameAndType = splitUsernameAndType(userInfo);
         Long accountId = null;
@@ -202,7 +204,6 @@ public class AccountService implements UserDetailsService {
 
         //加载管理员角色/权限
         loadRolesAndPermissions(loadedUser);
-
         return loadedUser;
     }
 

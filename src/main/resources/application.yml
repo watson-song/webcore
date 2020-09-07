@@ -1,0 +1,15 @@
+
+#日志访问参数配置
+access: #日志
+  loginByUsername:
+    description: 用户(%s)使用密码登录
+    saveToDatabase: true
+    logLevel: info
+  loginByOpenId:
+    description: 小程序用户(%s)自动登录
+    saveToDatabase: true
+    logLevel: info
+  loginByUserId:
+    description: 用户(%s)访问接口
+    saveToDatabase: true
+    logLevel: debug
