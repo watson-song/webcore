@@ -18,13 +18,23 @@ public @interface Access {
     /**
      * 获取描述description
      *
-     * @return
-     * @SystemControllerLog(description = "登入系统")
      */
     @AliasFor("value")
     String description() default "";
 
     @AliasFor("description")
     String value() default "";
+
+    /**
+     * 日志级别
+     * @return
+     */
+    String level() default "info";
+
+    /**
+     * 是否保存数据库， 默认为true
+     * @return true 保存数据库， false只打log
+     */
+    String save() default "true";
 
 }

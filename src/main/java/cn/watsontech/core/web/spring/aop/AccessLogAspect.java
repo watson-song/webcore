@@ -13,14 +13,16 @@ import lombok.extern.log4j.Log4j2;
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.annotation.*;
 import org.aspectj.lang.reflect.MethodSignature;
-import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.EmbeddedValueResolverAware;
 import org.springframework.core.NamedThreadLocal;
 import org.springframework.core.annotation.AnnotationUtils;
+import org.springframework.lang.Nullable;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
+import org.springframework.util.StringValueResolver;
 import org.springframework.web.context.request.RequestAttributes;
 import org.springframework.web.context.request.RequestContextHolder;
 
@@ -39,7 +41,7 @@ import java.util.*;
 @Aspect
 @Component
 @Log4j2
-public class AccessLogAspect {
+public class AccessLogAspect implements EmbeddedValueResolverAware {
 
     /**
      * 本地线程日志
@@ -63,6 +65,9 @@ public class AccessLogAspect {
      */
     @Autowired
     private AccessLogService logService;
+
+    @Nullable
+    private StringValueResolver embeddedValueResolver;
 
     /**
      * Controller层切点 注解拦截
@@ -88,7 +93,7 @@ public class AccessLogAspect {
         }
 
         LoginUser user = getCurrentLoginUser();
-        AccessLog testLog = wrapAccessLog(joinPoint, "info", request, user);
+        AccessLog testLog = wrapAccessLog(joinPoint, request, user);
 
         putIntoThreadLocal(logThreadLocal, joinPoint, testLog);
     }
@@ -102,7 +107,7 @@ public class AccessLogAspect {
     public void doAfter(JoinPoint joinPoint) {
 
         LoginUser user = getCurrentLoginUser();
-        AccessLog testLog = getThreadLocalObject(joinPoint, "info", request, user);
+        AccessLog testLog = getThreadLocalObject(joinPoint, null, request, user);
         if (testLog!=null) {
             // 1.直接执行保存操作
             // this.logService.createSystemLog(log);
@@ -111,7 +116,8 @@ public class AccessLogAspect {
             // new SaveLogThread(log, logService).start();
 
             // 3.再优化:通过线程池来执行日志保存
-            threadPoolTaskExecutor.execute(new SaveLogThread(testLog));
+            Access access = getAccessAnnotation(joinPoint);
+            threadPoolTaskExecutor.execute(new SaveLogThread(testLog, isAccessShouldSave(access)));
             putIntoThreadLocal(logThreadLocal, joinPoint, testLog);
         }
     }
@@ -169,6 +175,10 @@ public class AccessLogAspect {
         return testLog;
     }
 
+    private AccessLog wrapAccessLog(JoinPoint joinPoint, HttpServletRequest request, LoginUser user) {
+        return wrapAccessLog(joinPoint, null, request, user);
+    }
+
     private AccessLog wrapAccessLog(JoinPoint joinPoint, String levelType, HttpServletRequest request, LoginUser user) {
         RequestAttributes requestAttributes = RequestContextHolder.getRequestAttributes();
         Map<String, String[]> params = new HashMap<>();
@@ -184,10 +194,23 @@ public class AccessLogAspect {
         }
 
         String title = "info";
-        try {
-            title = getControllerMethodDescription(joinPoint);
-        } catch (Exception e) {
-            e.printStackTrace();
+
+        MethodSignature signature = (MethodSignature) joinPoint.getSignature();
+        Method signatureMethod = signature.getMethod();
+
+        if (levelType==null) {
+            try {
+                Access accessAnnotation = AnnotationUtils.findAnnotation(signatureMethod, Access.class);
+                levelType = accessAnnotation.level();
+
+                title = getControllerMethodDescription(signatureMethod, joinPoint.getArgs(), accessAnnotation);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+
+        if (levelType!=null&&embeddedValueResolver!=null) {
+            levelType = embeddedValueResolver.resolveStringValue(levelType);
         }
 
         AccessLog testLog = new AccessLog();
@@ -205,6 +228,14 @@ public class AccessLogAspect {
         testLog.setCreatedTime(new Date());
         testLog.setTotalTimes(0l);
         return testLog;
+    }
+
+    @AfterReturning(pointcut="accessLogPointCut()", returning="returnValue")
+    public void doAfterRturning(JoinPoint joinPoint, Object returnValue) {
+        LoginUser user = getCurrentLoginUser();
+        AccessLog testLog = wrapAccessLog(joinPoint, request, user);
+
+        putIntoThreadLocal(logThreadLocal, joinPoint, testLog);
     }
 
     /**
@@ -226,32 +257,47 @@ public class AccessLogAspect {
                 testLog.setException(e.toString());
             }
 
-            new UpdateLogThread(testLog).start();
+            Access access = getAccessAnnotation(joinPoint);
+            new UpdateLogThread(testLog, isAccessShouldSave(access)).start();
         }
+    }
+
+    private boolean isAccessShouldSave(Access access) {
+        boolean result = false;
+
+        if (access!=null) {
+            String saveValue = access.save();
+            //支持可配置log语句
+
+            if (this.embeddedValueResolver != null) {
+                saveValue = this.embeddedValueResolver.resolveStringValue(saveValue);
+            }
+
+            try {
+                result = Boolean.parseBoolean(saveValue);
+            } catch (Exception ex) {//eat it}
+            }
+        }
+
+        return result;
     }
 
     /**
      * 获取注解中对方法的描述信息 用于Controller层注解
      *
-     * @param joinPoint 切点
+     * @param method 方法
      * @return 方法描述
      */
-    private String getControllerMethodDescription(JoinPoint joinPoint) {
-
-        /**
-         * Returns the signature at the join point. 返回连接点处的签名。
-         * getStaticPart().getSignature() returns the same object 返回相同的对象
-         */
-        MethodSignature signature = (MethodSignature) joinPoint.getSignature();
-
-        Method method = signature.getMethod();
-
-        Access logAnnotation = AnnotationUtils.findAnnotation(method, Access.class);
-
-        String discription = method.getName();
+    private String getControllerMethodDescription(Method method, Object[] joinPointArgs, Access logAnnotation) {
+        String description = method.getName();
         Object[] descriptionParams = new Object[]{};
         if (logAnnotation !=null) {
-            discription = logAnnotation.description();
+            description = logAnnotation.description();
+            //支持可配置log语句
+            if (this.embeddedValueResolver != null) {
+                description = this.embeddedValueResolver.resolveStringValue(description);
+            }
+
             Parameter[] params = method.getParameters();
             if (params!=null) {
                 List<Object> tempDescParams = new ArrayList<>();
@@ -261,7 +307,7 @@ public class AccessLogAspect {
                 for (int i = 0; i < params.length; i++) {
                     AccessParam logParam = AnnotationUtils.findAnnotation(params[i], AccessParam.class);
                     if (logParam!=null) {
-                        logArg = joinPoint.getArgs()[i];
+                        logArg = joinPointArgs[i];
                         logParamFieldes = logParam.fields();
                         if (logParamFieldes!=null&&logParamFieldes.length>0) {
                             for (int j = 0; j < logParamFieldes.length; j++) {
@@ -289,7 +335,22 @@ public class AccessLogAspect {
             }
         }
 
-        return descriptionParams!=null&&descriptionParams.length>0?String.format(discription, descriptionParams):discription;
+        return descriptionParams!=null&&descriptionParams.length>0?String.format(description, descriptionParams):description;
+    }
+
+    private Access getAccessAnnotation(JoinPoint joinPoint) {
+        /**
+         * Returns the signature at the join point. 返回连接点处的签名。
+         * getStaticPart().getSignature() returns the same object 返回相同的对象
+         */
+        MethodSignature signature = (MethodSignature) joinPoint.getSignature();
+        Method method = signature.getMethod();
+        return AnnotationUtils.findAnnotation(method, Access.class);
+    }
+
+    @Override
+    public void setEmbeddedValueResolver(StringValueResolver resolver) {
+        this.embeddedValueResolver = resolver;
     }
 
     /**
@@ -300,26 +361,24 @@ public class AccessLogAspect {
      */
     private class SaveLogThread implements Runnable {
         private final AccessLog testLog;
+        private final boolean save;
 
-        public SaveLogThread(AccessLog testLog) {
-//            this.testLog = copy(testLog);
+        public SaveLogThread(AccessLog testLog, boolean saveDb) {
             this.testLog = testLog;
-        }
-
-        private AccessLog copy(AccessLog source) {
-            AccessLog log = new AccessLog();
-            BeanUtils.copyProperties(source, log, "id", "createdTime");
-            return log;
+            this.save = saveDb;
         }
 
         @Override
         public void run() {
-            if(testLog.getId()==null) {
-                logService.insertSelective(testLog);
-                log.warn("保存当前日志记录：{}", testLog);
-            }else {
-                log.warn("当前记录已存在，记录：{}", testLog);
+            if (save) {
+                if(testLog.getId()==null) {
+                    logService.insertSelective(testLog);
+                }else {
+                    log.warn("当前记录已存在，记录：{}", testLog);
+                }
             }
+
+            log.info("访问日志：{}", testLog);
         }
     }
 
@@ -331,15 +390,21 @@ public class AccessLogAspect {
      */
     private class UpdateLogThread extends Thread {
         private AccessLog testLog;
+        private boolean save;
 
-        public UpdateLogThread(AccessLog testLog) {
+        public UpdateLogThread(AccessLog testLog, boolean save) {
             super(UpdateLogThread.class.getSimpleName());
             this.testLog = testLog;
+            this.save = save;
         }
 
         @Override
         public void run() {
-            logService.updateByPrimaryKeySelective(testLog);
+            if (save) {
+                logService.updateByPrimaryKeySelective(testLog);
+            }
+
+            log.info("更新访问日志：{}", testLog);
         }
     }
 
