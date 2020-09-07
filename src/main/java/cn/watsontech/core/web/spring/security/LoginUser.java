@@ -86,6 +86,22 @@ public abstract class LoginUser implements UserDetails {
         return false;
     }
 
+    @ApiModelProperty(value = "获取用户名（优先获取昵称，昵称为空则返回username）")
+    @JsonIgnore
+    public String getName() {
+        if (getNickName()!=null) return getNickName();
+
+        return getUsername();
+    }
+
+    @ApiModelProperty(value = "获取昵称加用户名，nickName(username)")
+    @JsonIgnore
+    public String getFullName() {
+        if (getNickName()!=null) return String.format("%s(%s)", getNickName(), getUsername());
+
+        return getUsername();
+    }
+
     @Transient
     @ApiModelProperty(value = "未读消息数")
     int unreadMessages = 0;
