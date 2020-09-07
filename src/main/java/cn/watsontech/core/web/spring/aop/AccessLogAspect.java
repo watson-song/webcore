@@ -162,7 +162,7 @@ public class AccessLogAspect {
 
             if (testLog.getCreatedBy()==null&&user!=null) {
                 testLog.setCreatedBy(user.getId());
-                testLog.setCreatedByName(user.getUsername());
+                testLog.setCreatedByName(user.getFullName());
             }
         }
 
@@ -200,7 +200,7 @@ public class AccessLogAspect {
         testLog.setParams(StringUtils.getMapToParams(params));
         if (user!=null) {
             testLog.setCreatedBy(user.getId());
-            testLog.setCreatedByName(user.getUsername());
+            testLog.setCreatedByName(user.getFullName());
         }
         testLog.setCreatedTime(new Date());
         testLog.setTotalTimes(0l);
@@ -236,7 +236,7 @@ public class AccessLogAspect {
      * @param joinPoint 切点
      * @return 方法描述
      */
-    public static String getControllerMethodDescription(JoinPoint joinPoint) {
+    private String getControllerMethodDescription(JoinPoint joinPoint) {
 
         /**
          * Returns the signature at the join point. 返回连接点处的签名。
@@ -353,7 +353,7 @@ public class AccessLogAspect {
      * @return 该属性值
      * @throws Exception
      */
-    private static Object getFieldValue(Object obj, String name) throws InvocationTargetException, IllegalAccessException {
+    private Object getFieldValue(Object obj, String name) throws InvocationTargetException, IllegalAccessException {
         Class claz = obj.getClass();
         String cachedFieldKey = claz.getName()+":"+name;
         Method result = cachedFieldGetMethod.get(cachedFieldKey);
