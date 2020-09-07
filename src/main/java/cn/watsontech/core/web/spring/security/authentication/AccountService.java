@@ -14,12 +14,12 @@ import lombok.extern.log4j.Log4j2;
 import org.apache.commons.lang3.time.DateFormatUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.security.authentication.AccountExpiredException;
-import org.springframework.security.authentication.CredentialsExpiredException;
-import org.springframework.security.authentication.DisabledException;
-import org.springframework.security.authentication.LockedException;
+import org.springframework.security.authentication.*;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsChecker;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -39,7 +39,7 @@ import java.util.List;
  */
 @Service
 @Log4j2
-public class AccountService {
+public class AccountService implements UserDetailsService {
     UserDetailsChecker preAuthenticationChecks = new DefaultPreAuthenticationChecks();
     UserDetailsChecker postAuthenticationChecks = new DefaultPostAuthenticationChecks();
 
@@ -93,6 +93,25 @@ public class AccountService {
      * @param userInfo 用户名@用户类型  watson@admin, watson@worker, watson@user
      * @必要方法
      **/
+    @Override
+    public LoginUser loadUserByUsername(@AccessParam String userInfo) throws UsernameNotFoundException {
+        String[] usernameAndType = splitUsernameAndType(userInfo);
+        String username = usernameAndType[0];
+        LoginUser.Type userType = LoginUser.Type.valueOf(usernameAndType[1]);
+
+        LoginUser loadedUser = loadAccountInfo("username", username, userType, new String[]{"id", "username", "password", "nickName", "gender", "email", "avatarUrl", "mobile", "lastLoginDate", "lastLoginIp", "enabled", "expired", "locked", "credentialsExpired", "extraData"}, false);
+
+        //加载管理员角色/权限
+        loadRolesAndPermissions(loadedUser);
+
+        return loadedUser;
+    }
+
+    /**
+     * 根据用户名加载授权认证信息
+     * @param userInfo 用户名@用户类型  watson@admin, watson@worker, watson@user
+     * @必要方法
+     **/
     @Access("用户(%s)使用密码登录")
     public LoginUser loginByUsername(@AccessParam String userInfo, String password, String loginIp) throws UsernameNotFoundException {
         String[] usernameAndType = splitUsernameAndType(userInfo);
@@ -118,7 +137,13 @@ public class AccountService {
                 break;
         }
 
+        SecurityContextHolder.getContext().setAuthentication(createNewAuthentication(loadedUser));
         return loadedUser;
+    }
+
+    protected Authentication createNewAuthentication(LoginUser user) {
+        UsernamePasswordAuthenticationToken newAuthentication = new UsernamePasswordAuthenticationToken(user, null, user.getAuthorities());
+        return newAuthentication;
     }
 
     /**
