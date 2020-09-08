@@ -6,7 +6,7 @@
 
     <groupId>cn.watsontech</groupId>
     <artifactId>web-core</artifactId>
-    <version>0.1.3.6</version>
+    <version>0.1.3.7</version>
 
     <url>https://github.com/watson-song/webcore</url>
     <description>Batch of useful tools for Spring web project</description>
@@ -45,6 +45,35 @@
     </properties>
 
     <dependencies>
+        <!-- 腾讯云sms相关 -->
+        <dependency>
+            <groupId>com.github.qcloudsms</groupId>
+            <artifactId>qcloudsms</artifactId>
+            <version>1.0.6</version>
+            <scope>provided</scope>
+        </dependency>
+        <!-- 阿里云sms相关 -->
+        <dependency>
+            <groupId>com.aliyun</groupId>
+            <artifactId>aliyun-java-sdk-core</artifactId>
+            <version>4.0.3</version>
+            <scope>provided</scope>
+        </dependency>
+        <!-- 华为云存储相关 -->
+        <dependency>
+           <groupId>com.huaweicloud</groupId>
+           <artifactId>esdk-obs-java</artifactId>
+           <version>3.19.7</version>
+            <scope>provided</scope>
+        </dependency>
+        <!-- 腾讯云存储相关 -->
+        <dependency>
+           <groupId>com.qcloud</groupId>
+           <artifactId>cos_api</artifactId>
+            <version>5.6.8</version>
+            <scope>provided</scope>
+        </dependency>
+
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>

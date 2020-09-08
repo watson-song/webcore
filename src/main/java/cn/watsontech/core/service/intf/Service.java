@@ -86,7 +86,12 @@ public interface Service<T, PK> {
 
     JdbcTemplate getJdbcTemplate();
 
-    <T> T queryForObject(String sql, Class<T> requiredType, @Nullable Object... args) throws DataAccessException;
+    T queryForObject(String sql, Class<T> requiredType, @Nullable Object... args) throws DataAccessException;
+
+    /**
+     * 根据sql语句查询单列单行数据，注意：多好请设置 limit 1；
+     */
+    T queryForSingleColumn(Class<T> returnClass, String sql, Object[] args);
 
     Map<String, Object> queryForMap(String sql, @Nullable Object... args) throws DataAccessException;
 

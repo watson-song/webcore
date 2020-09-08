@@ -3,12 +3,14 @@ package cn.watsontech.core.service.intf;
 import cn.watsontech.core.mybatis.Mapper;
 import cn.watsontech.core.mybatis.mapper.BatchInsertModel;
 import cn.watsontech.core.mybatis.param.PageParams;
+import cn.watsontech.core.mybatis.util.SingleRowMapperResultSetExtractor;
 import cn.watsontech.core.web.spring.util.Assert;
 import com.github.pagehelper.PageRowBounds;
 import org.apache.ibatis.session.RowBounds;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.IncorrectResultSizeDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.SingleColumnRowMapper;
 import org.springframework.lang.Nullable;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
@@ -199,8 +201,16 @@ public class BaseService<T, PK> implements Service<T, PK> {
      * 根据sql语句查询
      */
     @Override
-    public <T> T queryForObject(String sql, Class<T> requiredType, @Nullable Object... args) {
+    public T queryForObject(String sql, Class<T> requiredType, @Nullable Object... args) {
         return jdbcTemplate.queryForObject(sql, requiredType, args);
+    }
+
+    /**
+     * 根据sql语句查询单列单行数据，注意：多好请设置 limit 1；
+     */
+    @Override
+    public T queryForSingleColumn(Class<T> returnClass, String sql, Object[] args) {
+        return jdbcTemplate.query(sql, args, new SingleRowMapperResultSetExtractor<>(new SingleColumnRowMapper<>(returnClass)));
     }
 
     /**
