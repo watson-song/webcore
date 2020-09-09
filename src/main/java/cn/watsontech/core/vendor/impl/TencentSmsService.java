@@ -16,6 +16,7 @@ import org.springframework.util.StringUtils;
 import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 /**
@@ -156,6 +157,10 @@ public class TencentSmsService extends SmsService {
     @Override
     protected List<SmsSendResult> fireSmsSendRequest(SmsSender sender, String smsSign, String templateId, String[] mobiles, String templateParams, String[] templateDatas, String ext) {
         List<SmsMultiSenderResult.Detail> details = sendTencentMultipleRequest((TencentSmsSender) sender, smsSign, templateId, mobiles, templateDatas, ext);
-        return details.stream().map(detail -> new SmsSendResult(detail.result, MapBuilder.builder().putNext("sid", detail.sid).putNext("fee", detail.fee).putNext("mobile", detail.mobile).putNext("errMsg", detail.errmsg))).collect(Collectors.toList());
+        List result = details.stream().map(detail -> {
+            Map<String, Object> detailMap = MapBuilder.builder().putNext("sid", detail.sid).putNext("fee", detail.fee).putNext("mobile", detail.mobile).putNext("errMsg", detail.errmsg);
+            return new SmsSendResult(detail.result, detailMap);
+        }).collect(Collectors.toList());
+        return result;
     }
 }
