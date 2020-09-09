@@ -71,12 +71,11 @@ public abstract class SmsService {
      * 批量发送短信，系统根据配置自动选择短信服务提供商
      * @param mobiles 电话
      * @param templateKey 模板在properties中sm.templates的key
-     * @param templateParams 仅阿里云短信有效
      * @param templateDatas 模板数据
      * @param ext 额外数据 仅腾讯云短信有效
      * @return true发送成功，否则失败
      */
-    public List<SmsSendResult> sendSms(String[] mobiles, SmsTemplateKey templateKey, String templateParams, List<String> templateDatas, String ext) {
+    public List<SmsSendResult> sendSms(String[] mobiles, SmsTemplateKey templateKey, List<String> templateDatas, String ext) {
         Assert.isTrue(mobiles!=null&&mobiles.length>0, "电话号码不能为空");
 
         String[] templateValues = new String[templateDatas.size()];
@@ -85,6 +84,7 @@ public abstract class SmsService {
         SmsProperties.TemplateConfig templateConfig = smsProperties.getTemplates().get(templateKey.name());
         Assert.notNull(templateConfig, "短信模板不正确，请确认模板已配置");
 
+        String templateParams = templateConfig.getParams();
         SmsSender smsSender = selectSmsSender();
         if (mobiles.length<2) {
             return Arrays.asList(fireSmsSendRequest(smsSender, smsProperties.getSignName(), templateConfig.getId(), mobiles[0], templateParams, templateValues, ext));

@@ -3,6 +3,7 @@ package cn.watsontech.core.vendor.impl;
 import cn.watsontech.core.utils.MapBuilder;
 import cn.watsontech.core.vendor.SmsService;
 import cn.watsontech.core.web.spring.config.SmsProperties;
+import cn.watsontech.core.web.spring.util.Assert;
 import com.aliyuncs.CommonRequest;
 import com.aliyuncs.CommonResponse;
 import com.aliyuncs.DefaultAcsClient;
@@ -123,6 +124,8 @@ public class AliyunSmsService extends SmsService {
 
     @Override
     protected SmsSendResult fireSmsSendRequest(SmsSender sender, String smsSign, String templateId, String mobile, String templateParams, String[] templateDatas, String ext) {
+        Assert.notNull(templateParams, "阿里云短信服务需提供短信参数，请在smsProperties里设置短信参数");
+
         Map detail = sendAliyunRequest((AliyunSmsSender) sender, smsSign, templateId, mobile, templateParams, templateDatas);
 
         Map result = MapBuilder.builder().putNext("mobile", mobile).putNext("errMsg", detail.getOrDefault("Message", ""));
