@@ -178,9 +178,9 @@ public class AccountService implements UserDetailsService {
         if (loadedUser!=null) {
             preAuthenticationChecks.check(loadedUser);
             postAuthenticationChecks.check(loadedUser);
+            SecurityContextHolder.getContext().setAuthentication(createNewAuthentication(loadedUser));
         }
 
-        SecurityContextHolder.getContext().setAuthentication(createNewAuthentication(loadedUser));
         return loadedUser;
     }
 
