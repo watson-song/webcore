@@ -26,6 +26,14 @@ public abstract class SmsService {
             this.result = result;
             this.extraDatas = extraDatas;
         }
+
+        public int getResult() {
+            return result;
+        }
+
+        public Map<String, Object> getExtraDatas() {
+            return extraDatas;
+        }
     }
 
     public interface SmsTemplateKey {

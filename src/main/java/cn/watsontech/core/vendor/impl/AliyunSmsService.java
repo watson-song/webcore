@@ -12,7 +12,6 @@ import com.aliyuncs.exceptions.ClientException;
 import com.aliyuncs.exceptions.ServerException;
 import com.aliyuncs.http.MethodType;
 import com.aliyuncs.profile.DefaultProfile;
-import com.github.qcloudsms.SmsSingleSender;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.json.JsonParserFactory;
@@ -35,7 +34,7 @@ import java.util.Map;
  * Created by watson on 2019/12/22.
  */
 @Log4j2
-@ConditionalOnClass(SmsSingleSender.class)
+@ConditionalOnClass(IAcsClient.class)
 public class AliyunSmsService extends SmsService {
 
     class AliyunSmsSender implements SmsSender {
@@ -115,8 +114,12 @@ public class AliyunSmsService extends SmsService {
     @Override
     protected synchronized SmsSender initSmsSender(SmsProperties smsProperties) {
         //加载配置信息
-        String smsAppid = smsProperties.getAppKey(), smsAppkey = smsProperties.getAppSecret();
-        DefaultProfile profile = DefaultProfile.getProfile(smsProperties.getRegionId(), smsAppid, smsAppkey);
+        String smsAppid = smsProperties.getAppKey(), smsAppkey = smsProperties.getAppSecret(), regionId = smsProperties.getRegionId();
+        Assert.notNull(smsAppid, "阿里云短信服务appkey配置信息(sms.appkey)不能为空");
+        Assert.notNull(smsAppkey, "阿里云短信服务appSecret配置信息(sms.appSecret)不能为空");
+        Assert.notNull(regionId, "阿里云短信服务regionId配置信息(sms.regionId)不能为空");
+
+        DefaultProfile profile = DefaultProfile.getProfile(regionId, smsAppid, smsAppkey);
         IAcsClient aliyunClient = new DefaultAcsClient(profile);
 
         return new AliyunSmsSender(aliyunClient);

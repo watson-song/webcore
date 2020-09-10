@@ -7,7 +7,6 @@ import cn.watsontech.core.web.spring.aop.annotation.AccessParam;
 import cn.watsontech.core.web.spring.security.IUserLoginService;
 import cn.watsontech.core.web.spring.security.IUserType;
 import cn.watsontech.core.web.spring.security.LoginUser;
-import cn.watsontech.core.web.spring.security.LoginUser.Type;
 import cn.watsontech.core.web.spring.security.UserTypeFactory;
 import cn.watsontech.core.web.spring.security.entity.Admin;
 import lombok.extern.log4j.Log4j2;
@@ -89,7 +88,7 @@ public class AccountService implements UserDetailsService {
     public LoginUser loadUserByUsername(@AccessParam String userInfo) throws UsernameNotFoundException {
         String[] usernameAndType = splitUsernameAndType(userInfo, userTypeFactory);
         String username = usernameAndType[0];
-        LoginUser.Type userType = LoginUser.Type.valueOf(usernameAndType[1]);
+        IUserType userType = userTypeFactory.valueOf(usernameAndType[1]);
 
         IUserLoginService service = userTypeFactory.getLoginUserService(userType);
         Assert.notNull(service, "未找到用户登录服务类，用户类型："+userType);
@@ -169,7 +168,7 @@ public class AccountService implements UserDetailsService {
 
     @Access("小程序用户(%s)自动登录")
     public LoginUser loginByOpenId(@AccessParam String openId, String[] selectProperties) throws UsernameNotFoundException {
-        Type userType = Type.user;
+        LoginUser.Type userType = LoginUser.Type.user;
 
         IUserLoginService service = userTypeFactory.getLoginUserService(userType);
         Assert.notNull(service, "未找到用户登录服务类，用户类型："+userType);
@@ -281,7 +280,7 @@ public class AccountService implements UserDetailsService {
 
     public static String[] splitUsernameAndType(String usernameAndType, UserTypeFactory userTypeFactory) {
         int atIndex = usernameAndType.lastIndexOf("@");
-        IUserType userType = Type.user;
+        IUserType userType = LoginUser.Type.user;
 
         String username = usernameAndType;
         if(atIndex>0) {

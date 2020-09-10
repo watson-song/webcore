@@ -129,21 +129,28 @@ public class TencentSmsService extends SmsService {
     /**
      * 初始化tencent sender
      */
-    private SmsSingleSender initTencentSingleSender(SmsProperties smsProperties) {
-        return new SmsSingleSender(Integer.parseInt(smsProperties.getAppKey()), smsProperties.getAppSecret());
+    private SmsSingleSender initTencentSingleSender(Integer smsAppid, String smsAppKey) {
+        return new SmsSingleSender(smsAppid, smsAppKey);
     }
 
     /**
      * 初始化tencent sender
      */
-    private SmsMultiSender initTencentMultiSender(SmsProperties smsProperties) {
-        return new SmsMultiSender(Integer.parseInt(smsProperties.getAppKey()), smsProperties.getAppSecret());
+    private SmsMultiSender initTencentMultiSender(Integer smsAppid, String smsAppKey) {
+        return new SmsMultiSender(smsAppid, smsAppKey);
     }
 
     @Override
     protected synchronized SmsSender initSmsSender(SmsProperties smsProperties) {
-        SmsSingleSender singleSender =  initTencentSingleSender(smsProperties);
-        SmsMultiSender multiSender = initTencentMultiSender(smsProperties);
+        //加载配置信息
+        String smsAppid = smsProperties.getAppKey(), smsAppkey = smsProperties.getAppSecret();
+        Assert.notNull(smsAppid, "腾讯云短信服务appkey配置信息(sms.appkey)不能为空");
+        Assert.notNull(smsAppkey, "腾讯云短信服务appSecret配置信息(sms.appSecret)不能为空");
+
+        Integer tencentAppId = Integer.parseInt(smsAppid);
+
+        SmsSingleSender singleSender =  initTencentSingleSender(tencentAppId, smsAppkey);
+        SmsMultiSender multiSender = initTencentMultiSender(tencentAppId, smsAppkey);
 
         return new TencentSmsSender(singleSender, multiSender);
     }
