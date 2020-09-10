@@ -61,8 +61,6 @@ public class SiteOptionProperties {
             Map<String, Map<String, Object>> newSiteOptions = siteOptions.stream().filter(option -> (Boolean)option.getOrDefault("enabled", 1)).collect(Collectors.toMap(option -> option.getOrDefault("type", "unknowType")+"."+option.getOrDefault("_key", "unknowKey"), option -> option));//.filter(option -> option.get("_key")!=null&&option.get("value")!=null)
             keyValues.putAll(newSiteOptions);
         }
-
-        System.out.println(String.format("本地已加载站点参数：%s, 数据库加载参数：%s", keyValues, siteOptions));
     }
 
     /**
