@@ -4,6 +4,7 @@ import cn.watsontech.core.web.result.Result;
 import lombok.extern.log4j.Log4j2;
 import org.apache.ibatis.exceptions.PersistenceException;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.validation.BindException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
@@ -79,6 +80,12 @@ public class GlobalExceptionHandler {
         }else {
             return Result.errorInternal("对不起，服务器(数据访问)出错，请稍后再试");
         }
+    }
+
+    @ExceptionHandler(AuthenticationException.class)
+    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+    public Result authenticationException(AuthenticationException exception, final HttpServletResponse response) {
+        return Result.errorInternal(exception.getMessage());
     }
 
     @ExceptionHandler(Exception.class)
