@@ -77,7 +77,7 @@ public abstract class LoginUser implements UserDetails {
     public abstract String getPassword();
 
     @ApiModelProperty(value = "账户是否启用(替代 enabled，仅为enabled别名)")
-    public abstract Boolean getActivated();
+    public abstract Boolean getEnabled();
 
     @ApiModelProperty(value = "获取用户昵称")
     public abstract String getNickName();
@@ -169,7 +169,7 @@ public abstract class LoginUser implements UserDetails {
 
     @Override
     public boolean isEnabled() {
-        Boolean value = getActivated();
+        Boolean value = getEnabled();
         return value==null?false:value;
     }
 

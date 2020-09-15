@@ -47,7 +47,7 @@ public class AdminServiceImpl extends BaseService<Admin, Long> implements AdminS
         condition.selectProperties(selectProperties);
         Example.Criteria criteria = condition.createCriteria().andEqualTo(identity, identityValue);
         if (checkEnabled) {
-            criteria.andEqualTo("enabled", true).andEqualTo("locked", false);
+            criteria.andEqualTo("isEnabled", true).andEqualTo("locked", false);
         }
         LoginUser loginUser = selectFirstByCondition(condition);
 
@@ -81,6 +81,6 @@ public class AdminServiceImpl extends BaseService<Admin, Long> implements AdminS
 
     @Override
     public String[] defaultLoginSelectProperties() {
-        return new String[]{"id", "username", "password", "nickName", "gender", "email", "avatarUrl", "mobile", "lastLoginDate", "lastLoginIp", "enabled", "expired", "locked", "credentialsExpired", "extraData", "type", "department", "title", "version"};
+        return new String[]{"id", "username", "password", "nickName", "gender", "email", "avatarUrl", "mobile", "lastLoginDate", "lastLoginIp", "isEnabled", "expired", "locked", "credentialsExpired", "extraData", "type", "department", "title", "version"};
     }
 }

@@ -132,7 +132,7 @@ public class AdminListVo {
      * 是否已启用
      */
     @ApiModelProperty(value="enabled是否已启用")
-    private boolean enabled = true;
+    private Boolean enabled;
 
     /**
      * 最后登录ip

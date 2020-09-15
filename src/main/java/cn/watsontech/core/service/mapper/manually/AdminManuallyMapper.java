@@ -33,6 +33,7 @@ public interface AdminManuallyMapper {
 	@Select(" select id, no, username, nick_name nickName, title, department, gender, type, avatar_url avatarUrl, mobile, email, enabled, created_by createdBy, created_by_name createdByName, created_time createdTime from tb_admin where id=#{adminId}")
 	@Results({
 		@Result(property = "id", column = "id"),
+		@Result(property = "isEnabled", column = "enabled"),
 		@Result(property = "roles", javaType=List.class, column="id", many = @Many(select = "selectAllRolesByAdminId")),
 		@Result(property = "permissions", javaType=List.class, column="id", many = @Many(select = "selectAllPermissionsByAdminId")),
 	})

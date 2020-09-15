@@ -82,7 +82,7 @@ public class AccountService implements UserDetailsService {
     UserTypeFactory userTypeFactory;
 
     //默认系统预设登录查询属性
-    final String[] defaultLoginSelectProperties = new String[]{"id", "username", "nickName", "gender", "avatarUrl", "mobile", "lastLoginDate", "lastLoginIp", "enabled", "expired", "locked", "credentialsExpired", "extraData", "createdTime"};
+    final String[] defaultLoginSelectProperties = new String[]{"id", "username", "nickName", "gender", "avatarUrl", "mobile", "lastLoginDate", "lastLoginIp", "isEnabled", "expired", "locked", "credentialsExpired", "extraData", "createdTime"};
 
     @Override
     public LoginUser loadUserByUsername(@AccessParam String userInfo) throws UsernameNotFoundException {

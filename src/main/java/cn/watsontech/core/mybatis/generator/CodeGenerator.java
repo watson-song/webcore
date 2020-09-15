@@ -102,21 +102,39 @@ public class CodeGenerator {
         List<ColumnOverride> columnOverrides;
         List<IgnoredColumn> ignoredColumns;
 
+        /**
+         * @param tableName: target table name
+         */
         public TableModelParam(String tableName) {
             this.tableName = tableName;
         }
 
+        /**
+         * @param tableName: target table name
+         * @param modelName: target java bean name
+         */
         public TableModelParam(String tableName, String modelName) {
             this.tableName = tableName;
             this.modelName = modelName;
         }
 
+        /**
+         * @param tableName: target table name
+         * @param modelName: target java bean name
+         * @param primaryKeyType: target table primary key java type
+         */
         public TableModelParam(String tableName, String modelName, String primaryKeyType) {
             this.tableName = tableName;
             this.modelName = modelName;
             this.primaryKeyType = primaryKeyType;
         }
 
+        /**
+         * @param tableName: target table name
+         * @param modelName: target java bean name
+         * @param primaryKeyType: target table primary key java type
+         * @param apiPrefix: controller base url prefix
+         */
         public TableModelParam(String tableName, String modelName, String primaryKeyType, String apiPrefix) {
             this.tableName = tableName;
             this.modelName = modelName;
@@ -124,6 +142,13 @@ public class CodeGenerator {
             this.apiPrefix = apiPrefix;
         }
 
+        /**
+         * @param tableName: target table name
+         * @param modelName: target java bean name
+         * @param primaryKeyType: target table primary key java type
+         * @param apiPrefix: controller base url prefix
+         * @param isGeneratedKey：use database default auto generate id, if use your customize id generator, then true
+         */
         public TableModelParam(String tableName, String modelName, String primaryKeyType, String apiPrefix, boolean isGeneratedKey) {
             this.tableName = tableName;
             this.modelName = modelName;
@@ -132,6 +157,13 @@ public class CodeGenerator {
             this.isGeneratedKey = isGeneratedKey;
         }
 
+        /**
+         * @param tableName: target table name
+         * @param modelName: target java bean name
+         * @param primaryKeyType: target table primary key java type
+         * @param apiPrefix: controller base url prefix
+         * @param columnOverrides override column's name\type
+         */
         public TableModelParam(String tableName, String modelName, String primaryKeyType, String apiPrefix, List<ColumnOverride> columnOverrides) {
             this.tableName = tableName;
             this.modelName = modelName;
@@ -140,6 +172,14 @@ public class CodeGenerator {
             this.columnOverrides = columnOverrides;
         }
 
+        /**
+         * @param tableName: target table name
+         * @param modelName: target java bean name
+         * @param primaryKeyType: target table primary key java type
+         * @param apiPrefix: controller base url prefix
+         * @param columnOverrides override column's name\type
+         * @param implementationPackages the implementation package name
+         */
         public TableModelParam(String tableName, String modelName, String primaryKeyType, String apiPrefix, List<ColumnOverride> columnOverrides, String implementationPackages) {
             this.tableName = tableName;
             this.modelName = modelName;

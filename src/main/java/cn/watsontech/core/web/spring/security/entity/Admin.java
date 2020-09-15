@@ -155,7 +155,8 @@ public class Admin extends LoginUser implements CreatedEntity<Admin, Long, Long>
      * 是否已启用
      */
     @ApiModelProperty(value="enabled是否已启用")
-    private Boolean enabled;
+    @Column(name = "enabled")
+    private Boolean isEnabled;
 
     /**
      * 最后登录ip
@@ -590,8 +591,8 @@ public class Admin extends LoginUser implements CreatedEntity<Admin, Long, Long>
      *
      * @return enabled - 是否已启用
      */
-    public Boolean getActivated() {
-        return enabled;
+    public Boolean getEnabled() {
+        return isEnabled;
     }
 
     /**
@@ -600,7 +601,7 @@ public class Admin extends LoginUser implements CreatedEntity<Admin, Long, Long>
      * @param enabled 是否已启用
      */
     public Admin setEnabled(Boolean enabled) {
-        this.enabled = enabled;
+        this.isEnabled = enabled;
         return this;
     }
 
