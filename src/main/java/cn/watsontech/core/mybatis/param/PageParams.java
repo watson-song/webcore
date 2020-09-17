@@ -72,7 +72,7 @@ public class PageParams {
     public String getOrderByClause(Class entityClass) {
         if (!StringUtils.isEmpty(getSby())) {
             //分割点好 a.createdTime
-            String[] sbySplit = getSby().split(".");
+            String[] sbySplit = getSby().split("\\.");
             String prefix = "";
             if (sbySplit.length>1) {
                 prefix = sbySplit[0]+".";
