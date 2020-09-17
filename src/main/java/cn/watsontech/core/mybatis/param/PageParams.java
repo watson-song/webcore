@@ -1,5 +1,6 @@
 package cn.watsontech.core.mybatis.param;
 
+import cn.watsontech.core.web.spring.util.Assert;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import org.springframework.util.StringUtils;
@@ -70,14 +71,18 @@ public class PageParams {
     }
 
     public String getOrderByClause(Class entityClass) {
-        if (!StringUtils.isEmpty(getSby())) {
+        String property = getSby();
+        if (!StringUtils.isEmpty(property)) {
             //分割点好 a.createdTime
-            String[] sbySplit = getSby().split("\\.");
+            String[] sbySplit = property.split("\\.");
             String prefix = "";
             if (sbySplit.length>1) {
                 prefix = sbySplit[0]+".";
+                Assert.isTrue(sbySplit.length==2, "排序不支持多层级属性");
+                property = sbySplit[1];
             }
-            String column = getColumn(entityClass, getSby());
+
+            String column = getColumn(entityClass, property);
             if (!StringUtils.isEmpty(getOrd())) {
                 if (column!=null) {
                     return prefix + column +" "+ getOrd();
