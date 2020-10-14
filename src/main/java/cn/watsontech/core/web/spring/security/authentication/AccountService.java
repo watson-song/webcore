@@ -271,7 +271,8 @@ public class AccountService implements UserDetailsService {
 
         if (notFoundCheck) {
             if (loadedUser==null) {
-                throw new UsernameNotFoundException("数据库中未找到用户("+conditionValue+"@"+userType+")");
+//                throw new UsernameNotFoundException("数据库中未找到用户("+conditionValue+"@"+userType+")");
+                throw new UsernameNotFoundException("用户名未找到("+conditionValue+")");
             }
         }
 

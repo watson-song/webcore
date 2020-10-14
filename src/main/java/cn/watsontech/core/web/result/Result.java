@@ -23,6 +23,13 @@ public class Result<T> {
 
     @ApiModelProperty(notes = "错误内容/成功消息")
     Object message;
+
+    /**
+     * @deprecated error字段即将废弃，使用message代替 @see message
+     */
+    @ApiModelProperty(notes = "错误内容/成功消息")
+    Object error;
+
     @ApiModelProperty(notes = "仅当有多条错误提示时有此值")
     List errors;
 
@@ -32,6 +39,7 @@ public class Result<T> {
         this.code = code;
         this.data = data;
         this.message = message;
+        this.error = message;
     }
 
     public Result(int code, T data) {
@@ -42,6 +50,7 @@ public class Result<T> {
     public Result(int code, String message, List errors) {
         this.code = code;
         this.message = message;
+        this.error = message;
         this.errors = errors;
     }
 
