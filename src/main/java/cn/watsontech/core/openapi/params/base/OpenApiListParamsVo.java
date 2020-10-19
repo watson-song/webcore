@@ -15,12 +15,12 @@ import java.util.regex.Pattern;
 @Data
 public class OpenApiListParamsVo extends OpenApiParamsVo {
     @ApiModelProperty(value = "分页码", example="1")
-    @NotNull(message = "p参数(page)不能为空")
-    protected Integer p;  //page 默认第一页
+    @NotNull(message = "offset参数不能为空")
+    protected Integer offset;  //offset 默认第一页
 
     @ApiModelProperty(value = "页面大小，默认10", example="10")
-    @NotNull(message = "ps参数(pageSize)不能为空")
-    protected Integer ps; //pageSize 默认每页10条
+    @NotNull(message = "limit参数不能为空")
+    protected Integer limit; //limit 默认每页10条
 
     @ApiModelProperty(value = "排序", example="createdTime")
     protected String sby;  //sortBy
@@ -69,6 +69,6 @@ public class OpenApiListParamsVo extends OpenApiParamsVo {
 
     @Override
     public String toString() {
-        return "p=" + p + "|ps=" + ps + "|sby=" + sby + "|ord=" + ord;
+        return "offset=" + offset + "|limit=" + limit + "|sby=" + sby + "|ord=" + ord;
     }
 }
