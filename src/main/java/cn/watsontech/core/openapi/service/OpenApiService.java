@@ -4,6 +4,7 @@ import lombok.extern.log4j.Log4j2;
 import org.springframework.stereotype.Service;
 
 /**
+ * 示例service
  * Created by Watson on 2020/02/09.
  */
 @Service
