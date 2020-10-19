@@ -50,7 +50,7 @@ public class OpenApiAspect {
     /**
      * 定义一个切入点.
      */
-    @Pointcut("@annotation(com.watsontech.cloudhel.aop.annotation.OpenApi)")
+    @Pointcut("@annotation(cn.watsontech.core.web.spring.aop.annotation.OpenApi)")
     public void openApi() {}
 
     /**
