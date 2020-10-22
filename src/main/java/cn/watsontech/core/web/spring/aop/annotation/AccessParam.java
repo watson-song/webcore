@@ -23,4 +23,15 @@ public @interface AccessParam {
 
     @AliasFor("fields")
     String[] value() default {};
+
+    /**
+     * 日志分组关键字，可以是商家ID，个人ID等
+     */
+    String groupIdField() default "";
+
+    /**
+     * 是否是分组id
+     * @return
+     */
+    boolean isGroupId() default false;
 }

@@ -134,19 +134,15 @@ public class AccessLogAspect implements EmbeddedValueResolverAware {
     // 读取session中的用户
     private LoginUser getCurrentLoginUser() {
         LoginUser user = null;
-//        HttpSession session = request.getSession();
-//        LoginUser user = (LoginUser) session.getAttribute("logged_user");
-//        if (user==null) {
-            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-            if (authentication!=null) {
-                Object principal = authentication.getPrincipal();
-                if (principal!=null) {
-                    if (principal instanceof LoginUser) {
-                        user = (LoginUser) principal;
-                    }
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication!=null) {
+            Object principal = authentication.getPrincipal();
+            if (principal!=null) {
+                if (principal instanceof LoginUser) {
+                    user = (LoginUser) principal;
                 }
             }
-//        }
+        }
 
         // 登入login操作 前置通知时用户未校验 所以session中不存在用户信息
         if (user == null) {
@@ -193,32 +189,33 @@ public class AccessLogAspect implements EmbeddedValueResolverAware {
             params = request.getParameterMap(); // 请求提交的参数
         }
 
-        String title = "info";
+        AccessParamValue accessParamValue = null;
 
         MethodSignature signature = (MethodSignature) joinPoint.getSignature();
         Method signatureMethod = signature.getMethod();
 
-        if (levelType==null) {
-            try {
-                Access accessAnnotation = AnnotationUtils.findAnnotation(signatureMethod, Access.class);
-                levelType = accessAnnotation.level();
-
-                title = getControllerMethodDescription(signatureMethod, joinPoint.getArgs(), accessAnnotation);
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        }
-
+        Access accessAnnotation = AnnotationUtils.findAnnotation(signatureMethod, Access.class);
+        levelType = accessAnnotation.level();
         if (levelType!=null&&embeddedValueResolver!=null) {
             levelType = embeddedValueResolver.resolveStringValue(levelType);
         }
 
+        try {
+            accessParamValue = getControllerMethodDescription(signatureMethod, joinPoint.getArgs(), accessAnnotation);
+        } catch (Exception e) {
+            e.printStackTrace();
+            accessParamValue = new AccessParamValue("未知",null);
+        }
+
         AccessLog testLog = new AccessLog();
-        testLog.setTitle(title);
         testLog.setLevel(levelType);
         testLog.setIp(remoteAddr);
         testLog.setUrl(requestUri);
         testLog.setMethod(method);
+        if (accessParamValue!=null) {
+            testLog.setTitle(accessParamValue.getDescription());
+            testLog.setGroupId(accessParamValue.getGroupId());
+        }
         testLog.setVersion(1);
         testLog.setParams(StringUtils.getMapToParams(params));
         if (user!=null) {
@@ -282,14 +279,41 @@ public class AccessLogAspect implements EmbeddedValueResolverAware {
         return result;
     }
 
+    static class AccessParamValue {
+        String description;
+        String groupId;
+
+        public AccessParamValue(String description, String groupId) {
+            this.description = description;
+            this.groupId = groupId;
+        }
+
+        public String getDescription() {
+            return description;
+        }
+
+        public void setDescription(String description) {
+            this.description = description;
+        }
+
+        public String getGroupId() {
+            return groupId;
+        }
+
+        public void setGroupId(String groupId) {
+            this.groupId = groupId;
+        }
+    }
+
     /**
      * 获取注解中对方法的描述信息 用于Controller层注解
      *
      * @param method 方法
      * @return 方法描述
      */
-    private String getControllerMethodDescription(Method method, Object[] joinPointArgs, Access logAnnotation) {
+    private AccessParamValue getControllerMethodDescription(Method method, Object[] joinPointArgs, Access logAnnotation) {
         String description = method.getName();
+        Object logGroupId = null;
         Object[] descriptionParams = new Object[]{};
         if (logAnnotation !=null) {
             description = logAnnotation.description();
@@ -310,6 +334,7 @@ public class AccessLogAspect implements EmbeddedValueResolverAware {
                         logArg = joinPointArgs[i];
                         logParamFieldes = logParam.fields();
                         if (logParamFieldes!=null&&logParamFieldes.length>0) {
+                            String groupField = logParam.groupIdField();
                             for (int j = 0; j < logParamFieldes.length; j++) {
                                 try {
                                     logParamValue = getFieldValue(logArg,logParamFieldes[j]);
@@ -321,9 +346,17 @@ public class AccessLogAspect implements EmbeddedValueResolverAware {
                                     logParamValue = "未知";
                                 }
                                 tempDescParams.add(logParamValue);
+
+                                if (groupField!=null&&groupField.equalsIgnoreCase(logParamFieldes[j])) {
+                                    logGroupId = logParamValue;
+                                }
                             }
                         }else {
                             tempDescParams.add(logArg);
+                            if (logParam.isGroupId()) {
+                                //若是组id，则设置logGroupId
+                                logGroupId = logArg;
+                            }
                         }
                     }
                 }
@@ -335,7 +368,7 @@ public class AccessLogAspect implements EmbeddedValueResolverAware {
             }
         }
 
-        return descriptionParams!=null&&descriptionParams.length>0?String.format(description, descriptionParams):description;
+        return new AccessParamValue(descriptionParams!=null&&descriptionParams.length>0?String.format(description, descriptionParams):description, logGroupId!=null?logGroupId.toString():null);
     }
 
     private Access getAccessAnnotation(JoinPoint joinPoint) {

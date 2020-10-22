@@ -16,7 +16,7 @@ public interface RoleManuallyMapper {
 	 * @param roleId  角色Id
 	 * @return
 	 */
-	@Select(" select id,name,label,tag,status,type,enabled,created_by createdBy, created_by_name createdByName, created_time createdTime from tb_role where id=#{roleId}")
+	@Select(" select id,name,label,tag,status,type,builtin_type builtinType,enabled,created_by createdBy, created_by_name createdByName, created_time createdTime from tb_role where id=#{roleId}")
 	@Results({
 		@Result(property = "id", column="id"),
 		@Result(property = "permissions", javaType=List.class, column="id", many = @Many(select = "selectAllPermissionsByRoleId")),

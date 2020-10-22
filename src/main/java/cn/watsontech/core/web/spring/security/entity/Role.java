@@ -3,8 +3,9 @@ package cn.watsontech.core.web.spring.security.entity;
 import cn.watsontech.core.mybatis.CreatedEntity;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
-import java.util.Date;
+
 import javax.persistence.*;
+import java.util.Date;
 
 @ApiModel(value="cn.watsontech.core.security.entity.Role")
 @Table(name = "tb_role")
@@ -30,10 +31,16 @@ public class Role implements CreatedEntity<Role, Long, Long> {
     private Integer status;
 
     /**
-     * 0系统自带，1用户创建的
+     * 角色类型，对应admin的type
      */
-    @ApiModelProperty(value="type0系统自带，1用户创建的")
+    @ApiModelProperty(value="账号类型：1管理员，2运营，支持更多自定义")
     private Integer type;
+
+    /**
+     * 内置类型：0系统自带，1用户创建的
+     */
+    @ApiModelProperty(value="0系统自带，1用户创建的")
+    private Boolean builtinType;
 
     @Column(name = "created_by")
     @ApiModelProperty(value="createdBy")
@@ -162,20 +169,33 @@ public class Role implements CreatedEntity<Role, Long, Long> {
     /**
      * 获取0系统自带，1用户创建的
      *
-     * @return type - 0系统自带，1用户创建的
+     * @return type - 账号类型：1管理员，2运营，3自定义
      */
     public Integer getType() {
         return type;
     }
 
     /**
-     * 设置0系统自带，1用户创建的
+     * 账号类型：1管理员，2运营，3自定义
      *
-     * @param type 0系统自带，1用户创建的
+     * @param type 账号类型：1管理员，2运营，3自定义
      */
     public Role setType(Integer type) {
         this.type = type;
         return this;
+    }
+
+    /**
+     * 获取0系统自带，1用户创建的
+     *
+     * @return type - 0系统自带，1用户创建的
+     */
+    public Boolean getBuiltinType() {
+        return builtinType;
+    }
+
+    public void setBuiltinType(Boolean builtinType) {
+        this.builtinType = builtinType;
     }
 
     /**

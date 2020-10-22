@@ -3,10 +3,9 @@ package cn.watsontech.core.web.spring.security.entity;
 import cn.watsontech.core.mybatis.CreatedEntity;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
-import tk.mybatis.mapper.annotation.*;
 
-import java.util.Date;
 import javax.persistence.*;
+import java.util.Date;
 
 @ApiModel(value="cn.watsontech.core.security.entity.Access")
 @Table(name = "tb_access_log")
@@ -15,6 +14,13 @@ public class AccessLog implements CreatedEntity<AccessLog, Long, Long> {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @ApiModelProperty(value="id")
     private Long id;
+
+    /**
+     * 组ID
+     */
+    @ApiModelProperty(value="分组ID")
+    @Column(name = "group_id")
+    private String groupId;
 
     /**
      * 日志级别
@@ -405,6 +411,14 @@ public class AccessLog implements CreatedEntity<AccessLog, Long, Long> {
     public AccessLog setDbTimes(Long dbTimes) {
         this.dbTimes = dbTimes;
         return this;
+    }
+
+    public String getGroupId() {
+        return groupId;
+    }
+
+    public void setGroupId(String groupId) {
+        this.groupId = groupId;
     }
 
     @Override
