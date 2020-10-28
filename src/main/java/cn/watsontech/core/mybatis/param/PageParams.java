@@ -15,6 +15,12 @@ import java.util.Set;
 @Data
 public class PageParams {
 
+    public PageParams() {}
+    public PageParams(Integer offset, Integer limit) {
+        this.offset = offset;
+        this.limit = limit;
+    }
+
     @ApiModelProperty(value = "分页码", example="1")
     protected Integer p = 1;  //page 默认第一页
 
