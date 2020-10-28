@@ -201,7 +201,7 @@ public class BaseService<T, PK> implements Service<T, PK> {
      * 根据sql语句查询
      */
     @Override
-    public T queryForObject(String sql, Class<T> requiredType, @Nullable Object... args) {
+    public <T> T queryForObject(String sql, Class<T> requiredType, @Nullable Object... args) {
         return jdbcTemplate.queryForObject(sql, requiredType, args);
     }
 
@@ -209,7 +209,7 @@ public class BaseService<T, PK> implements Service<T, PK> {
      * 根据sql语句查询单列单行数据，注意：多好请设置 limit 1；
      */
     @Override
-    public T queryForSingleColumn(Class<T> returnClass, String sql, Object[] args) {
+    public <T> T queryForSingleColumn(Class<T> returnClass, String sql, Object[] args) {
         return jdbcTemplate.query(sql, args, new SingleRowMapperResultSetExtractor<>(new SingleColumnRowMapper<>(returnClass)));
     }
 
