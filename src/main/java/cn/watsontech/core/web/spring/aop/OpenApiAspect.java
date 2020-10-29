@@ -97,9 +97,9 @@ public class OpenApiAspect {
 
         String appSecret = openAppinfoVo.getSecret();
 
-        int maximumDelayTime = 60000;//默认60s
+        int maximumDelayTime = 30000;//默认30s
         if (openAppinfoVo.getAllowDelay()!=null) {
-            maximumDelayTime = openAppinfoVo.getAllowDelay()*1000;//60s
+            maximumDelayTime = openAppinfoVo.getAllowDelay()*1000;//30s
         }
 
         String needSignParamString = apiParams.getNeedSignParamString(extraApiParams);
@@ -111,7 +111,7 @@ public class OpenApiAspect {
 
         Assert.isTrue(signedString.equals(apiParams.getSign()), "非法请求：签名错误");
         long timestampGap = currentTimestamp-apiParams.getTimestamp();
-        Assert.isTrue(timestampGap<maximumDelayTime&&timestampGap>0, "非法请求：无效的时间戳");
+        Assert.isTrue(Math.abs(timestampGap)<maximumDelayTime/*&&timestampGap>0*/, "非法请求：无效的时间戳");
     }
 
     @After("openApi()")
