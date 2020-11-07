@@ -4,12 +4,14 @@ import cn.watsontech.core.openapi.error.OpenApiResponseErrorHandler;
 import cn.watsontech.core.utils.MapBuilder;
 import cn.watsontech.core.utils.MapUrlParamsUtils;
 import cn.watsontech.core.utils.Md5Util;
+import cn.watsontech.core.vo.WxAuthorizeUserVo;
 import cn.watsontech.core.web.result.Result;
 import cn.watsontech.core.web.spring.util.CollectionUtils;
 import lombok.Data;
 import lombok.extern.log4j.Log4j2;
+import org.apache.commons.beanutils.ConvertUtils;
+import org.apache.commons.beanutils.locale.converters.DateLocaleConverter;
 import org.apache.commons.lang3.RandomStringUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.util.Assert;
 import org.springframework.web.client.HttpServerErrorException;
@@ -24,8 +26,26 @@ import java.util.*;
 @Log4j2
 public class OpenApiDecodeService {
 
-    @Autowired
-    protected RestTemplate restTemplate;
+    RestTemplate restTemplate;
+    String host;
+
+    //微信小程序登录code换openid接口地址
+    static final String WXAPP_LOGIN_URL = "/api/open/v1/%s/wxapp/login";
+    static final String WXAPP_PARSE_USERINFO_URL = "/api/open/v1/%s/wxapp/parseWxUserInfo";
+    static final String WXAPP_SECCHECK_TEXT_URL = "/api/open/v1/%s/secCheck/text";
+
+    static final String WXPUB_AUTHORIZATION_URL = "/api/open/v1/%s/wxpub/buildAuthorizationUrl";//获取授权验证url
+    static final String WXPUB_JSTICKETS_URL = "/api/open/v1/%s/wxpub/jsTickets";//获取jsticket
+    static final String WXPUB_AUTHCODE_TO_USERINFO_URL = "/api/open/v1/%s/wxpub/getWxAuthorizeUserInfo";//authCode换取userInf
+
+
+    public OpenApiDecodeService(RestTemplate restTemplate, String host) {
+        ConvertUtils.register(new DateLocaleConverter(), Date.class);
+
+        this.restTemplate = restTemplate;
+        this.host = host;
+        Assert.notNull(host, "开放接口地址不能为空");
+    }
 
     /**
      * 示例参数
@@ -39,43 +59,17 @@ public class OpenApiDecodeService {
             this.wxAppid = wxAppId;
             this.code = code;
         }
-
-        public Map<String, Object> toQueryMap() {
-            MapBuilder mapBuilder = MapBuilder.builder();
-            if (code != null) {
-                mapBuilder.putNext("code", code);
-            }
-            if (wxAppid != null) {
-                mapBuilder.putNext("wxAppid", wxAppid);
-            }
-            return mapBuilder;
-        }
     }
 
     /**
      * 示例接口返回包装类
      */
     @Data
-    public static class WxAppLoginResponse implements MapResponse<WxAppLoginResponse> {
+    public static class WxAppLoginResponse {
         String openid;
         String sessionKey;
         String unionid;
         String tag = "来自loginResponse";
-
-        @Override
-        public WxAppLoginResponse initWithMap(Map<String, Object> data) {
-            if (data != null) {
-                openid = (String) data.get("openid");
-                sessionKey = (String) data.get("sessionKey");
-                unionid = (String) data.get("unionid");
-            }
-
-            return this;
-        }
-    }
-
-    public interface MapResponse<T> {
-        T initWithMap(Map<String, Object> data);
     }
 
     /**
@@ -85,27 +79,99 @@ public class OpenApiDecodeService {
      * @param code    登录code
      * @return openid/sessionKey/unionid
      */
-    private WxAppLoginResponse wxAppLogin(String requestUrl, String appid, String appSecret, String wxAppId, String code) {
+    private WxAppLoginResponse wxAppLogin(String appid, String appSecret, String wxAppId, String code) {
+        String requestUrl = String.format(WXAPP_LOGIN_URL, appid);
         WxAppLoginForm form = new WxAppLoginForm(wxAppId, code);
-        String query = MapUrlParamsUtils.getUrlParamsByMap(openApiParams(appid, appSecret, form.toQueryMap(), requestUrl));
-//GET请求：return getForResult(requestUrl, query+"&"+MapUrlParamsUtils.getUrlParamsByMap(form.toQueryMap()), WxAppTextSecCheckResponse.class);
+        String query = MapUrlParamsUtils.getUrlParamsByMap(openApiParams(appid, appSecret, objectToMap(form), requestUrl));
         return postForResult(requestUrl, query, form, WxAppLoginResponse.class);
     }
 
-    protected <T extends MapResponse> T postForResult(String requestUrl, String query, Object requestData, Class<T> responseType) {
+    @Data
+    public class WxPubBuildAuthorizationUrlForm {
+        String wxAppid;
+        String redirectURI;
+        String scope;
+        String state;
+
+        public WxPubBuildAuthorizationUrlForm(String wxAppid, String redirectURI, String scope, String state) {
+            this.wxAppid = wxAppid;
+            this.redirectURI = redirectURI;
+            this.scope = scope;
+            this.state = state;
+        }
+    }
+
+    @Data
+    public class WxPubGetJsTicketForm {
+        String wxAppid;
+        String requestUrl;
+
+        public WxPubGetJsTicketForm(String wxAppid, String requestUrl) {
+            this.wxAppid = wxAppid;
+            this.requestUrl = requestUrl;
+        }
+    }
+
+    @Data
+    public class WxPubExchangeAuthCodeToUserForm {
+        String wxAppid;
+        String code;
+
+        public WxPubExchangeAuthCodeToUserForm(String wxAppid, String code) {
+            this.wxAppid = wxAppid;
+            this.code = code;
+        }
+    }
+
+    @Data
+    public static class WxPubSuccessResponse {
+        String success;
+    }
+
+    /**
+     * 公众号获取授权验证url
+     */
+    public WxPubSuccessResponse wxpubBuildAuthorizationUrl(String appid, String appSecret, String wxAppId, String redirectURI, String scope, String state) {
+        String requestUrl = String.format(WXPUB_AUTHORIZATION_URL, appid);
+        WxPubBuildAuthorizationUrlForm form = new WxPubBuildAuthorizationUrlForm(wxAppId, redirectURI, scope, state);
+        String query = MapUrlParamsUtils.getUrlParamsByMap(openApiParams(appid, appSecret, objectToMap(form), requestUrl));
+        return postForResult(requestUrl, query, form, WxPubSuccessResponse.class);
+    }
+
+    /**
+     * 公众号获取授权验证url
+     */
+    public Map wxpubGetJsTickets(String appid, String appSecret, String wxAppId, String url) {
+        String requestUrl = String.format(WXPUB_JSTICKETS_URL, appid);
+        WxPubGetJsTicketForm form = new WxPubGetJsTicketForm(wxAppId, url);
+        String query = MapUrlParamsUtils.getUrlParamsByMap(openApiParams(appid, appSecret, objectToMap(form), requestUrl));
+        return postForResult(requestUrl, query, form, Map.class);
+    }
+
+    /**
+     * 公众号授权码换取用户信息
+     */
+    public WxAuthorizeUserVo wxpubExchangeAuthCodeToUserInfo(String appid, String appSecret, String wxAppId, String code) {
+        String requestUrl = String.format(WXPUB_AUTHCODE_TO_USERINFO_URL, appid);
+        WxPubExchangeAuthCodeToUserForm form = new WxPubExchangeAuthCodeToUserForm(wxAppId, code);
+        String query = MapUrlParamsUtils.getUrlParamsByMap(openApiParams(appid, appSecret, objectToMap(form), requestUrl));
+        return postForResult(requestUrl, query, form, WxAuthorizeUserVo.class);
+    }
+
+    protected <T> T postForResult(String requestUrl, String query, Object requestData, Class<T> responseType) {
         String message = "未知错误";
         HttpStatus statusCode = HttpStatus.INTERNAL_SERVER_ERROR;
         try {
             restTemplate.setErrorHandler(new OpenApiResponseErrorHandler());
-            String fullRequestUrl = getHostRequestUrl(requestUrl, query);
-            log.debug("发起远程调用请求 {}", fullRequestUrl);
-            Result result = restTemplate.postForObject(fullRequestUrl, requestData, Result.class);
-            log.debug("收到程调用响应 {}", result);
-
-            if (result.getData() != null) {
-                return (T) responseType.newInstance().initWithMap((Map) result.getData());
+            Result result = restTemplate.postForObject(getHostRequestUrl(requestUrl, query), requestData, Result.class);
+            if(result.getData()!=null) {
+                if (result.getData() instanceof Map) {
+                    return mapToObject((Map<String, Object>)result.getData(), responseType);
+                }else {
+                    return (T)result.getData();
+                }
             }
-        } catch (RestClientException ex) {
+        }catch (RestClientException ex) {
             ex.printStackTrace();
             message = ex.getMessage();
         } catch (IllegalAccessException ex) {
@@ -114,25 +180,28 @@ public class OpenApiDecodeService {
         } catch (InstantiationException ex) {
             ex.printStackTrace();
             message = ex.getMessage();
+        } catch (Exception e) {
+            e.printStackTrace();
+            message = e.getMessage();
         }
 
         throw new HttpServerErrorException(statusCode, message);
     }
 
-    protected <T extends MapResponse> T getForResult(String requestUrl, String query, Class<T> responseType) {
+    protected <T> T getForResult(String requestUrl, String query, Class<T> responseType) {
         String message = "未知错误";
         HttpStatus statusCode = HttpStatus.INTERNAL_SERVER_ERROR;
         try {
             restTemplate.setErrorHandler(new OpenApiResponseErrorHandler());
-            String fullRequestUrl = getHostRequestUrl(requestUrl, query);
-            log.debug("发起远程调用请求 {}", fullRequestUrl);
-            Result result = restTemplate.getForObject(fullRequestUrl, Result.class);
-            log.debug("收到程调用响应 {}", result);
-
-            if (result.getData() != null) {
-                return (T) responseType.newInstance().initWithMap((Map) result.getData());
+            Result result = restTemplate.getForObject(getHostRequestUrl(requestUrl, query), Result.class);
+            if(result.getData()!=null) {
+                if (result.getData() instanceof Map) {
+                    return mapToObject((Map<String, Object>)result.getData(), responseType);
+                }else {
+                    return (T)result.getData();
+                }
             }
-        } catch (RestClientException ex) {
+        }catch (RestClientException ex) {
             ex.printStackTrace();
             message = ex.getMessage();
         } catch (IllegalAccessException ex) {
@@ -141,51 +210,89 @@ public class OpenApiDecodeService {
         } catch (InstantiationException ex) {
             ex.printStackTrace();
             message = ex.getMessage();
+        } catch (Exception e) {
+            e.printStackTrace();
+            message = e.getMessage();
+        }
+
+        throw new HttpServerErrorException(statusCode, message);
+    }
+
+    protected void putForResult(String requestUrl, String query, Object requestData) {
+        String message = "未知错误";
+        HttpStatus statusCode = HttpStatus.INTERNAL_SERVER_ERROR;
+        try {
+            restTemplate.setErrorHandler(new OpenApiResponseErrorHandler());
+            restTemplate.put(getHostRequestUrl(requestUrl, query), requestData);
+        }catch (RestClientException ex) {
+            ex.printStackTrace();
+            message = ex.getMessage();
+        } catch (Exception e) {
+            e.printStackTrace();
+            message = e.getMessage();
+        }
+
+        throw new HttpServerErrorException(statusCode, message);
+    }
+
+    protected void deleteForResult(String requestUrl, String query) {
+        String message = "未知错误";
+        HttpStatus statusCode = HttpStatus.INTERNAL_SERVER_ERROR;
+        try {
+            restTemplate.setErrorHandler(new OpenApiResponseErrorHandler());
+            restTemplate.delete(getHostRequestUrl(requestUrl, query));
+        }catch (RestClientException ex) {
+            ex.printStackTrace();
+            message = ex.getMessage();
+        } catch (Exception e) {
+            e.printStackTrace();
+            message = e.getMessage();
         }
 
         throw new HttpServerErrorException(statusCode, message);
     }
 
     private String getHostRequestUrl(String url, String query) {
-        return url + "?" + query;
+        return host + url + "?" + query;
     }
 
-    protected Map<String, Object> openApiParams(String appid, String appSecret, Map<String, Object> queryParams, String requestUrl) {
+    private Map<String, Object> openApiParams(String appid, String appSecret, Map<Object, Object> queryParams, String requestUrl) {
         Map<String, Object> willSignParams = MapBuilder.builder().putNext("appid", appid).putNext("timestamp", System.currentTimeMillis()).putNext("nonce", RandomStringUtils.randomAlphabetic(5));
-        if (queryParams == null) {
+        if (queryParams==null) {
             queryParams = new HashMap<>();
         }
         queryParams.putAll(willSignParams);
 
-        willSignParams.put("sign", signParams(appSecret, queryParams, requestUrl));
+        willSignParams.put("sign", signParams(queryParams, requestUrl, appSecret));
         return willSignParams;
     }
 
-    private String signParams(String appSecret, Map<String, Object> apiParams, String requestUrl) {
+    private String signParams(Map<Object, Object> apiParams, String requestUrl, String appSecret) {
         String needSignParamString = getNeedSignParamString(apiParams);
-        Assert.isTrue(needSignParamString != null && !needSignParamString.equals(""), "请求签名参数列表为空");
+        Assert.isTrue(needSignParamString!=null&&!needSignParamString.equals(""), "请求签名参数列表为空");
 
         return Md5Util.MD5Encode(String.format("%s&appSecret=%s&url=%s", needSignParamString, appSecret, requestUrl)).toUpperCase();
     }
 
-    private String getNeedSignParamString(Map<String, Object> paramMap) {
-        List<String> fields = new ArrayList<>(paramMap.keySet());
-        fields.sort(new Comparator<String>() {
+    private String getNeedSignParamString(Map<Object, ?> paramMap) {
+
+        List<Object> fields = new ArrayList<>(paramMap.keySet());
+        fields.sort(new Comparator<Object>() {
             @Override
-            public int compare(String o1, String o2) {
-                return o1.compareToIgnoreCase(o2);
+            public int compare(Object o1, Object o2) {
+                return o1.toString().compareToIgnoreCase(o2.toString());
             }
         });
 
         StringBuilder sb = new StringBuilder();
         if (!CollectionUtils.isEmpty(fields)) {
-            String field;
+            Object field;
             Object fieldValue;
             for (int i = 0; i < fields.size(); i++) {
                 field = fields.get(i);
                 fieldValue = paramMap.get(field);
-                if (fieldValue != null) {
-                    if (i > 0) {
+                if (fieldValue!=null) {
+                    if (i>0) {
                         sb.append("&");
                     }
                     sb.append(field).append("=").append(fieldValue);
@@ -194,6 +301,23 @@ public class OpenApiDecodeService {
         }
 
         return sb.toString();
+    }
+
+    public <E> E mapToObject(Map<String, Object> map, Class<E> beanClass) throws Exception {
+        if (map == null) return null;
+        if (beanClass == Map.class) return (E)map;
+
+        E obj = beanClass.newInstance();
+        org.apache.commons.beanutils.BeanUtils.populate(obj, map);
+
+        return obj;
+    }
+
+    public Map<Object, Object> objectToMap(Object obj) {
+        if(obj == null)
+            return null;
+
+        return new org.apache.commons.beanutils.BeanMap(obj);
     }
 
 }
