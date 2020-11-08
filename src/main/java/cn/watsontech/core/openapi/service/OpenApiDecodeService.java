@@ -252,11 +252,11 @@ public class OpenApiDecodeService {
         throw new HttpServerErrorException(statusCode, message);
     }
 
-    private String getHostRequestUrl(String url, String query) {
+    protected String getHostRequestUrl(String url, String query) {
         return host + url + "?" + query;
     }
 
-    private Map<String, Object> openApiParams(String appid, String appSecret, Map<Object, Object> queryParams, String requestUrl) {
+    protected Map<String, Object> openApiParams(String appid, String appSecret, Map<String, Object> queryParams, String requestUrl) {
         Map<String, Object> willSignParams = MapBuilder.builder().putNext("appid", appid).putNext("timestamp", System.currentTimeMillis()).putNext("nonce", RandomStringUtils.randomAlphabetic(5));
         if (queryParams==null) {
             queryParams = new HashMap<>();
@@ -267,16 +267,16 @@ public class OpenApiDecodeService {
         return willSignParams;
     }
 
-    private String signParams(Map<Object, Object> apiParams, String requestUrl, String appSecret) {
+    protected String signParams(Map<String, Object> apiParams, String requestUrl, String appSecret) {
         String needSignParamString = getNeedSignParamString(apiParams);
         Assert.isTrue(needSignParamString!=null&&!needSignParamString.equals(""), "请求签名参数列表为空");
 
         return Md5Util.MD5Encode(String.format("%s&appSecret=%s&url=%s", needSignParamString, appSecret, requestUrl)).toUpperCase();
     }
 
-    private String getNeedSignParamString(Map<Object, ?> paramMap) {
+    protected String getNeedSignParamString(Map<String, ?> paramMap) {
 
-        List<Object> fields = new ArrayList<>(paramMap.keySet());
+        List<String> fields = new ArrayList<>(paramMap.keySet());
         fields.sort(new Comparator<Object>() {
             @Override
             public int compare(Object o1, Object o2) {
@@ -286,7 +286,7 @@ public class OpenApiDecodeService {
 
         StringBuilder sb = new StringBuilder();
         if (!CollectionUtils.isEmpty(fields)) {
-            Object field;
+            String field;
             Object fieldValue;
             for (int i = 0; i < fields.size(); i++) {
                 field = fields.get(i);
@@ -303,7 +303,7 @@ public class OpenApiDecodeService {
         return sb.toString();
     }
 
-    public <E> E mapToObject(Map<String, Object> map, Class<E> beanClass) throws Exception {
+    protected <E> E mapToObject(Map<String, Object> map, Class<E> beanClass) throws Exception {
         if (map == null) return null;
         if (beanClass == Map.class) return (E)map;
 
@@ -313,11 +313,21 @@ public class OpenApiDecodeService {
         return obj;
     }
 
-    public Map<Object, Object> objectToMap(Object obj) {
+    protected Map<String, Object> objectToMap(Object obj) {
         if(obj == null)
             return null;
 
-        return new org.apache.commons.beanutils.BeanMap(obj);
+        Map<Object, Object> beanMap= new org.apache.commons.beanutils.BeanMap(obj);
+        Map<String, Object> result = new HashMap<>();
+        //移除class并重新装map，beanmap不能put
+        for (Object keyObject:beanMap.keySet()) {
+            String key = keyObject.toString();
+            if (!"class".equalsIgnoreCase(key)) {
+                result.put(key, beanMap.get(key));
+            }
+        }
+
+        return result;
     }
 
 }
