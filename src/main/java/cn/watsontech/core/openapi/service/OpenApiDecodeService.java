@@ -79,7 +79,7 @@ public class OpenApiDecodeService {
      * @param code    登录code
      * @return openid/sessionKey/unionid
      */
-    private WxAppLoginResponse wxAppLogin(String appid, String appSecret, String wxAppId, String code) {
+    public WxAppLoginResponse wxAppLogin(String appid, String appSecret, String wxAppId, String code) {
         String requestUrl = String.format(WXAPP_LOGIN_URL, appid);
         WxAppLoginForm form = new WxAppLoginForm(wxAppId, code);
         String query = MapUrlParamsUtils.getUrlParamsByMap(openApiParams(appid, appSecret, objectToMap(form), requestUrl));
