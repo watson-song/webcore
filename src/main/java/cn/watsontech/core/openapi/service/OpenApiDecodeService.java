@@ -34,6 +34,8 @@ public class OpenApiDecodeService {
     static final String WXAPP_PARSE_USERINFO_URL = "/api/open/v1/%s/wxapp/parseWxUserInfo";
     static final String WXAPP_SECCHECK_TEXT_URL = "/api/open/v1/%s/secCheck/text";
 
+    static final String FILE_BATCH_UPLOAD_URL = "/api/open/v1/%s/files/batch";
+
     static final String WXPUB_AUTHORIZATION_URL = "/api/open/v1/%s/wxpub/buildAuthorizationUrl";//获取授权验证url
     static final String WXPUB_JSTICKETS_URL = "/api/open/v1/%s/wxpub/jsTickets";//获取jsticket
     static final String WXPUB_AUTHCODE_TO_USERINFO_URL = "/api/open/v1/%s/wxpub/getWxAuthorizeUserInfo";//authCode换取userInf
