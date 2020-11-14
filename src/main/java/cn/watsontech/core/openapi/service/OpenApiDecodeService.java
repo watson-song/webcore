@@ -13,6 +13,7 @@ import org.apache.commons.beanutils.ConvertUtils;
 import org.apache.commons.beanutils.locale.converters.DateLocaleConverter;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.util.Assert;
 import org.springframework.web.client.HttpServerErrorException;
 import org.springframework.web.client.RestClientException;
@@ -158,6 +159,43 @@ public class OpenApiDecodeService {
         WxPubExchangeAuthCodeToUserForm form = new WxPubExchangeAuthCodeToUserForm(wxAppId, code);
         String query = MapUrlParamsUtils.getUrlParamsByMap(openApiParams(appid, appSecret, objectToMap(form), requestUrl));
         return postForResult(requestUrl, query, form, WxAuthorizeUserVo.class);
+    }
+
+    protected <T> T postFilesForResult(String requestUrl, String query, Object requestData, Class<T> responseType) {
+        String message = "未知错误";
+        HttpStatus statusCode = HttpStatus.INTERNAL_SERVER_ERROR;
+        try {
+            restTemplate.setErrorHandler(new OpenApiResponseErrorHandler());
+            ResponseEntity<Result> resultResponseEntity = restTemplate.postForEntity(getHostRequestUrl(requestUrl, query), requestData, Result.class);
+            if (resultResponseEntity!=null) {
+                Result result = resultResponseEntity.getBody();
+                if (result!=null) {
+                    if(result.getData()!=null) {
+                        if (result.getData() instanceof Map) {
+                            return mapToObject((Map<String, Object>)result.getData(), responseType);
+                        }else {
+                            return (T)result.getData();
+                        }
+                    }
+                }
+
+                statusCode = resultResponseEntity.getStatusCode();
+            }
+        }catch (RestClientException ex) {
+            ex.printStackTrace();
+            message = ex.getMessage();
+        } catch (IllegalAccessException ex) {
+            ex.printStackTrace();
+            message = ex.getMessage();
+        } catch (InstantiationException ex) {
+            ex.printStackTrace();
+            message = ex.getMessage();
+        } catch (Exception e) {
+            e.printStackTrace();
+            message = e.getMessage();
+        }
+
+        throw new HttpServerErrorException(statusCode, message);
     }
 
     protected <T> T postForResult(String requestUrl, String query, Object requestData, Class<T> responseType) {
