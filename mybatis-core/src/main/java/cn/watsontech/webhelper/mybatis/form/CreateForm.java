@@ -1,6 +1,6 @@
 package cn.watsontech.webhelper.mybatis.form;
 
-import cn.watsontech.webhelper.mybatis.CreatedEntity;
+import cn.watsontech.webhelper.utils.mybatis.CreatedEntity;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import io.swagger.annotations.ApiModelProperty;
 import org.springframework.beans.BeanUtils;

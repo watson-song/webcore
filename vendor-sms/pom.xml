@@ -5,7 +5,7 @@
     <parent>
         <groupId>cn.watsontech</groupId>
         <artifactId>web-helper</artifactId>
-        <version>0.2</version>
+        <version>${watsontech.webcore}</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
@@ -15,7 +15,7 @@
         <dependency>
             <groupId>cn.watsontech.webhelper</groupId>
             <artifactId>common</artifactId>
-            <version>0.2</version>
+            <version>${watsontech.webcore}</version>
         </dependency>
         <dependency>
             <groupId>com.fasterxml.jackson.core</groupId>

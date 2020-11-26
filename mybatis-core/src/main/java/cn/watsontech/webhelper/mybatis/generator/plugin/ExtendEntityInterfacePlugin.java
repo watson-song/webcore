@@ -1,11 +1,11 @@
 package cn.watsontech.webhelper.mybatis.generator.plugin;
 
-import org.apache.commons.lang3.time.DateFormatUtils;
 import org.mybatis.generator.api.IntrospectedTable;
 import org.mybatis.generator.api.PluginAdapter;
 import org.mybatis.generator.api.dom.java.FullyQualifiedJavaType;
 import org.mybatis.generator.api.dom.java.TopLevelClass;
 
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 
@@ -32,8 +32,9 @@ public class ExtendEntityInterfacePlugin extends PluginAdapter {
             }
         }
 
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         topLevelClass.addFileCommentLine("/**" +
-                "* @generatedBy Watson WebCore " + DateFormatUtils.format(new Date(), "yyyy-MM-dd HH:mm:ss") +
+                "* @generatedBy Watson WebCore " + dateFormat.format(new Date()) +
                 "*/");
 
         return super.modelBaseRecordClassGenerated(topLevelClass, introspectedTable);

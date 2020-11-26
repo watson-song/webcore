@@ -1,7 +1,7 @@
 package cn.watsontech.webhelper.common.vo;
 
-import cn.watsontech.webhelper.common.security.entity.Permission;
-import cn.watsontech.webhelper.common.security.entity.Role;
+import cn.watsontech.webhelper.common.entity.Permission;
+import cn.watsontech.webhelper.common.entity.Role;
 import io.swagger.annotations.ApiModelProperty;
 import org.springframework.beans.BeanUtils;
 

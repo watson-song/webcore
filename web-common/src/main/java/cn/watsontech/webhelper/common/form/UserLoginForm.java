@@ -1,16 +1,12 @@
 package cn.watsontech.webhelper.common.form;
 
 import io.swagger.annotations.ApiModelProperty;
-import lombok.Getter;
-import lombok.Setter;
 
 import javax.validation.constraints.NotBlank;
 
 /**
  * Created by Watson on 2019/10/09.
  */
-@Getter
-@Setter
 public class UserLoginForm {
 
     @NotBlank(message = "用户名不能为空")
@@ -22,4 +18,20 @@ public class UserLoginForm {
 //    @Pattern(regexp = "[0-9]{1,}[a-zA-Z]{1,}[-_!?./\\|+*~@#%^&;:',.=()\\[\\]\\{\\}]{0,}", message = "必须包含至少一个数组、字母和符号[-_!?./\\|+*~@#%^&;:',.=(){}]")
     @ApiModelProperty(name = "密码", notes = "密码", example = "xxxxxx")
     String password;
+
+    public String getUsername() {
+        return username;
+    }
+
+    public void setUsername(String username) {
+        this.username = username;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
+    }
 }

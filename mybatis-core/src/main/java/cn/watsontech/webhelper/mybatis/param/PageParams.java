@@ -1,8 +1,7 @@
 package cn.watsontech.webhelper.mybatis.param;
 
-import cn.watsontech.webhelper.web.spring.util.Assert;
 import io.swagger.annotations.ApiModelProperty;
-import lombok.Data;
+import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
 import tk.mybatis.mapper.entity.EntityColumn;
 import tk.mybatis.mapper.mapperhelper.EntityHelper;
@@ -12,7 +11,6 @@ import java.util.Set;
 /**
  * Created by Watson on 2019/12/18.
  */
-@Data
 public class PageParams {
 
     public PageParams() {}
@@ -112,4 +110,43 @@ public class PageParams {
         return null;
     }
 
+    public Integer getP() {
+        return p;
+    }
+
+    public void setP(Integer p) {
+        this.p = p;
+    }
+
+    public Integer getPs() {
+        return ps;
+    }
+
+    public void setPs(Integer ps) {
+        this.ps = ps;
+    }
+
+    public void setOffset(Integer offset) {
+        this.offset = offset;
+    }
+
+    public void setLimit(Integer limit) {
+        this.limit = limit;
+    }
+
+    public String getSby() {
+        return sby;
+    }
+
+    public void setSby(String sby) {
+        this.sby = sby;
+    }
+
+    public String getOrd() {
+        return ord;
+    }
+
+    public void setOrd(String ord) {
+        this.ord = ord;
+    }
 }

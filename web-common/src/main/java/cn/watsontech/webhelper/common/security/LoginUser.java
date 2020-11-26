@@ -1,7 +1,7 @@
 package cn.watsontech.webhelper.common.security;
 
-import cn.watsontech.webhelper.common.security.entity.Admin;
-import cn.watsontech.webhelper.common.security.entity.User;
+import cn.watsontech.webhelper.common.entity.Admin;
+import cn.watsontech.webhelper.common.entity.User;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import io.swagger.annotations.ApiModelProperty;
 import org.springframework.security.core.GrantedAuthority;

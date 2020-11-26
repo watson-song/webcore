@@ -1,13 +1,12 @@
 package cn.watsontech.webhelper.mybatis.generator;
 
 import cn.watsontech.webhelper.mybatis.util.Inflector;
-import cn.watsontech.webhelper.web.spring.util.Assert;
 import com.google.common.base.CaseFormat;
 import freemarker.template.TemplateExceptionHandler;
-import org.apache.commons.lang3.time.DateFormatUtils;
 import org.mybatis.generator.api.MyBatisGenerator;
 import org.mybatis.generator.config.*;
 import org.mybatis.generator.internal.DefaultShellCallback;
+import org.springframework.util.Assert;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 
@@ -54,7 +53,7 @@ public class CodeGenerator {
     /*可通过set方法配置参数*/
     String MAPPER_INTERFACE_REFERENCE = "cn.watsontech.webhelper.mybatis.Mapper";//Mapper插件基础接口的完全限定名(第二步提到的核心继承接口Mapper)
     String PROJECT_PATH = System.getProperty("user.dir");//项目在硬盘上的基础路径
-    String TEMPLATE_FILE_PATH = PROJECT_PATH + "/src/test/main/resources/generator/template";//模板位置
+    String TEMPLATE_FILE_PATH = PROJECT_PATH + "/src/test/resources/generator/template";//模板位置
     String TARGET_JAVA_PATH = "/src/main/java"; //java文件路径
     String RESOURCES_PATH = "/src/main/resources";//资源文件路径
 
@@ -83,7 +82,8 @@ public class CodeGenerator {
         this.JDBC_PASSWORD = jdbcPassword;
         this.JDBC_URL = "jdbc:mysql://"+this.JDBC_HOST+"/"+this.JDBC_DB+"?useSSL=false&nullCatalogMeansCurrent=true";//数据库url
 
-        this.COPYRIGHT = "Copyright (c) "+ DateFormatUtils.format(new Date(), "yyyy")+". " + orgName;
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy");
+        this.COPYRIGHT = "Copyright (c) "+ dateFormat.format(new Date())+". " + orgName;
         this.AUTHOR = author;
         this.tableModelParams = tableModelParams;
     }
@@ -386,7 +386,7 @@ public class CodeGenerator {
         //添加 CreatedEntity 接口继承
         pluginConfiguration = new PluginConfiguration();
         pluginConfiguration.setConfigurationType("cn.watsontech.webhelper.mybatis.generator.plugin.ExtendEntityInterfacePlugin");
-        String finalImplementationPackages = "cn.watsontech.webhelper.mybatis.CreatedEntity<"+modelName+", Long, Long>;";//多个接口用分号隔开
+        String finalImplementationPackages = "cn.watsontech.webhelper.utils.mybatis.CreatedEntity<"+modelName+", Long, Long>;";//多个接口用分号隔开
         if (implementationPackages!=null) {
             finalImplementationPackages += implementationPackages;
         }
