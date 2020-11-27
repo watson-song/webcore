@@ -3,9 +3,11 @@
 */
 package ${currentPackage};
 
-import cn.watsontech.core.mybatis.param.TimeRangeCriteriaPageParams;
-import cn.watsontech.core.web.result.Result;
-import cn.watsontech.core.web.spring.security.LoginUser;
+import cn.watsontech.webhelper.common.result.Result;
+import cn.watsontech.webhelper.common.result.ResultCode;
+import cn.watsontech.webhelper.common.result.ResultList;
+import cn.watsontech.webhelper.common.security.LoginUser;
+import cn.watsontech.webhelper.mybatis.param.TimeRangeCriteriaPageParams;
 import ${basePackage}.entity.${modelNameUpperCamel};
 import ${basePackage}.service.${modelNameUpperCamel}Service;
 import org.springframework.web.bind.annotation.*;

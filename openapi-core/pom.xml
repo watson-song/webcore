@@ -5,7 +5,7 @@
     <parent>
         <groupId>cn.watsontech</groupId>
         <artifactId>web-helper</artifactId>
-        <version>${watsontech.webcore}</version>
+        <version>0.2</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 

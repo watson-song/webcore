@@ -3,7 +3,7 @@
 */
 package ${basePackage}.service;
 import ${basePackage}.entity.${modelNameUpperCamel};
-import cn.watsontech.core.service.intf.Service;
+import cn.watsontech.webhelper.mybatis.intf.Service;
 
 
 /**

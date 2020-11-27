@@ -7,7 +7,7 @@ import java.util.List;
  */
 public class ResultList<T> {
     Boolean hasNext;
-    Long offset;
+    Integer offset;
     Integer limit;
     Long total;
     List<T> list;
@@ -18,7 +18,7 @@ public class ResultList<T> {
         this.hasNext = calHasNext();
     }
 
-    public ResultList(List<T> list, Long offset, Integer limit) {
+    public ResultList(List<T> list, Integer offset, Integer limit) {
         this.offset = offset;
         this.limit = limit;
         this.list = list;
@@ -26,7 +26,7 @@ public class ResultList<T> {
         this.hasNext = calHasNext();
     }
 
-    public ResultList(List<T> list, Long offset, Integer limit, Long total) {
+    public ResultList(List<T> list, Integer offset, Integer limit, Long total) {
         this.offset = offset;
         this.limit = limit;
         this.total = total;
@@ -50,11 +50,11 @@ public class ResultList<T> {
         this.hasNext = hasNext;
     }
 
-    public Long getOffset() {
+    public Integer getOffset() {
         return offset;
     }
 
-    public void setOffset(Long offset) {
+    public void setOffset(Integer offset) {
         this.offset = offset;
     }
 

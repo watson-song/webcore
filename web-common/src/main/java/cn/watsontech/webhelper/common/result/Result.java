@@ -1,5 +1,6 @@
 package cn.watsontech.webhelper.common.result;
 
+import com.github.pagehelper.Page;
 import io.swagger.annotations.ApiModelProperty;
 import org.springframework.validation.FieldError;
 
@@ -56,20 +57,20 @@ public class Result<T> {
     }
 
     public static <T> Result listResult(List<T> data, Integer page, Integer pageSize, Long total) {
-        return new Result(ResultCode.SUCCESS, new ResultList(data, Long.valueOf(page), pageSize, total));
+        return new Result(ResultCode.SUCCESS, new ResultList(data, page, pageSize, total));
     }
 
     public static <T> Result listResult(List<T> data) {
-        return new Result(ResultCode.SUCCESS, new ResultList(data, 0l, data.size(), new Long(data.size())));
+        return new Result(ResultCode.SUCCESS, new ResultList(data, 0, data.size(), new Long(data.size())));
     }
-//
-//    public static <T> Result pageResult(List<T> data) {
-//        if (data instanceof Page) {
-//            return new Result(ResultCode.SUCCESS, new ResultList(((Page) data).getResult(), ((Page) data).getStartRow(), ((Page) data).getPageSize(), ((Page) data).getTotal()));
-//        }
-//
-//        return listResult(data);
-//    }
+
+    public static <T> Result pageResult(List<T> data) {
+        if (data instanceof Page) {
+            return new Result(ResultCode.SUCCESS, new ResultList(((Page) data).getResult(), ((Page) data).getStartRow(), ((Page) data).getPageSize(), ((Page) data).getTotal()));
+        }
+
+        return listResult(data);
+    }
 
     public static Result errorBadRequest(String error) {
         return new Result(ResultCode.BAD_REQUEST, null, error);
