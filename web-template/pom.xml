@@ -15,24 +15,14 @@
 	<description>Template project for webhelper library</description>
 
 	<properties>
-		<webcore.version>0.2.1</webcore.version>
+		<watsontech.webcore>0.2.1.1</watsontech.webcore>
 	</properties>
 
 	<dependencies>
-		<!--公共组件工具-->
-		<dependency>
-			<groupId>cn.watsontech.webhelper</groupId>
-			<artifactId>common</artifactId>
-		</dependency>
 		<!--web相关组件-->
 		<dependency>
 			<groupId>cn.watsontech.webhelper</groupId>
 			<artifactId>web-common</artifactId>
-		</dependency>
-		<!--mybatis相关组件-->
-		<dependency>
-			<groupId>cn.watsontech.webhelper</groupId>
-			<artifactId>mybatis-core</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>com.github.misterchangray.mybatis.generator.plugins</groupId>
@@ -114,25 +104,25 @@
 			<dependency>
 				<groupId>cn.watsontech.webhelper</groupId>
 				<artifactId>web-helper</artifactId>
-				<version>0.2.1</version>
+                <version>${watsontech.webcore}</version>
 			</dependency>
 			<!--公共组件工具-->
 			<dependency>
 				<groupId>cn.watsontech.webhelper</groupId>
 				<artifactId>common</artifactId>
-				<version>0.2.1</version>
+				<version>${watsontech.webcore}</version>
 			</dependency>
 			<!--web相关组件-->
 			<dependency>
 				<groupId>cn.watsontech.webhelper</groupId>
 				<artifactId>web-common</artifactId>
-				<version>0.2.1</version>
+				<version>${watsontech.webcore}</version>
 			</dependency>
 			<!--mybatis相关组件-->
 			<dependency>
 				<groupId>cn.watsontech.webhelper</groupId>
 				<artifactId>mybatis-core</artifactId>
-				<version>0.2.1</version>
+				<version>${watsontech.webcore}</version>
 			</dependency>
 		</dependencies>
 	</dependencyManagement>

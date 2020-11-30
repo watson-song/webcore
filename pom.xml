@@ -7,7 +7,7 @@
     <groupId>cn.watsontech</groupId>
     <artifactId>web-helper</artifactId>
     <packaging>pom</packaging>
-    <version>0.2.1</version>
+    <version>0.2.1.1</version>
 
     <url>https://github.com/watson-song/webcore</url>
 
@@ -52,7 +52,7 @@
     </issueManagement>
 
     <properties>
-        <watsontech.webcore>0.2.1</watsontech.webcore>
+        <watsontech.webcore>0.2.1.1</watsontech.webcore>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <encoding>UTF-8</encoding>
         <java.version>1.8</java.version>
@@ -282,20 +282,20 @@
                 </executions>
             </plugin>
             <!--Maven GPG插件用于使用以下配置对组件进行签名-->
-            <!--<plugin>-->
-                <!--<groupId>org.apache.maven.plugins</groupId>-->
-                <!--<artifactId>maven-gpg-plugin</artifactId>-->
-                <!--<version>1.5</version>-->
-                <!--<executions>-->
-                    <!--<execution>-->
-                        <!--<id>sign-artifacts</id>-->
-                        <!--<phase>verify</phase>-->
-                        <!--<goals>-->
-                            <!--<goal>sign</goal>-->
-                        <!--</goals>-->
-                    <!--</execution>-->
-                <!--</executions>-->
-            <!--</plugin>-->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-gpg-plugin</artifactId>
+                <version>1.5</version>
+                <executions>
+                    <execution>
+                        <id>sign-artifacts</id>
+                        <phase>verify</phase>
+                        <goals>
+                            <goal>sign</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
             <!--Nexus Staging Maven插件是将组件部署到OSSRH并将其发布到Central Repository的推荐方法-->
             <plugin>
                 <groupId>org.sonatype.plugins</groupId>

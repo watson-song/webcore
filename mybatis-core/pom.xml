@@ -5,7 +5,7 @@
     <parent>
         <groupId>cn.watsontech</groupId>
         <artifactId>web-helper</artifactId>
-        <version>0.2.1</version>
+        <version>0.2.1.1</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
@@ -13,7 +13,7 @@
     <artifactId>mybatis-core</artifactId>
 
     <properties>
-        <watsontech.webcore>0.2.1</watsontech.webcore>
+        <watsontech.webcore>0.2.1.1</watsontech.webcore>
     </properties>
     <dependencies>
         <dependency>

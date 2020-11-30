@@ -5,20 +5,20 @@
     <parent>
         <groupId>cn.watsontech</groupId>
         <artifactId>web-helper</artifactId>
-        <version>0.2.1</version>
+        <version>0.2.1.1</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>cn.watsontech.webhelper</groupId>
     <artifactId>web-common</artifactId>
     <properties>
-        <watsontech.webcore>0.2.1</watsontech.webcore>
+        <webcore.version>0.2.1.1</webcore.version>
     </properties>
 
     <dependencies>
         <dependency>
             <groupId>cn.watsontech.webhelper</groupId>
-            <artifactId>common</artifactId>
+            <artifactId>mybatis-core</artifactId>
             <version>${watsontech.webcore}</version>
         </dependency>
         <dependency>
@@ -121,11 +121,6 @@
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-autoconfigure</artifactId>
             <version>2.4.0</version>
-        </dependency>
-        <dependency>
-            <groupId>cn.watsontech.webhelper</groupId>
-            <artifactId>mybatis-core</artifactId>
-            <version>0.2</version>
         </dependency>
     </dependencies>
 
