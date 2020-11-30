@@ -2,6 +2,16 @@
 
 You can use the this project for your spring web project to 
 
+V0.2.1更新
+1) 分离各模块，使使用者可以按需加载，具体模块有
+    - common    公共工具，不依赖任何项目
+    - web-common    web公共组件，包括用户登陆相关
+    - mybatis-core  mybatis相关组件，包括代码生成器等
+    - openapi-core  开放接口相关，开放接口仅需添加注解即可
+    - vendor-file   文件服务，集成了腾讯云存储，华为云存储，阿里云存储服务
+    - vendor-push   app推送服务，目前仅集成华为推送
+    - verdor-sms    短信服务，支持华为短信、腾讯云短信、阿里云短信服务
+    - web-template  springboot的模版项目结构，包括crud和用户登陆
 
 V0.1.5更新
 
