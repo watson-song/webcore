@@ -30,7 +30,7 @@ public interface RoleManuallyMapper {
 	@Select("select b.id, b.name, b.label from ref_role_permission a left join tb_permission b on a.permission_id=b.id and b.enabled = true where a.role_id =#{roleId}")
 	@Results({
 			@Result(property = "id", column="id"),
-			@Result(property = "children", javaType=List.class, column="id", many = @Many(select = "cn.watsontech.webhelper.service.mapper.manually.PermissionManuallyMapper.selectAllChildPermissions")),
+			@Result(property = "children", javaType=List.class, column="id", many = @Many(select = "cn.watsontech.webhelper.common.service.mapper.permission.manually.PermissionManuallyMapper.selectAllChildPermissions")),
 	})
     List<PermissionVo> selectAllPermissionsByRoleId(@Param("roleId") Long roleId);
 
