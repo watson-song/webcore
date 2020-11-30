@@ -5,6 +5,7 @@ import cn.watsontech.webhelper.common.security.LoginUser;
 import cn.watsontech.webhelper.common.security.UserTypeFactory;
 import cn.watsontech.webhelper.common.security.authentication.AccountService;
 import cn.watsontech.webhelper.utils.MapBuilder;
+import org.apache.ibatis.plugin.Interceptor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -54,5 +55,11 @@ public class TemplateBaseApplication {
 	@Bean
 	public UserTypeFactory userTypeFactory(@Autowired AdminService adminService) {
 		return new UserTypeFactory(MapBuilder.builder().putNext(LoginUser.Type.admin, adminService));
+	}
+
+	//分页插件，不能配置在properties文件：https://github.com/mybatis/spring-boot-starter/issues/180
+	@Bean
+	public Interceptor pageInterceptor() {
+		return new com.github.pagehelper.PageInterceptor();
 	}
 }
