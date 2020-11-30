@@ -1,0 +1,49 @@
+server:
+  port: 7070
+spring:
+  application:
+    name: template-webcore
+  jackson:
+    time-zone: GMT+8
+    date-format: yyyy/MM/dd HH:mm:ss
+    #全局设置NON_NULL,参考：https://www.jianshu.com/p/0296cae42569
+    default-property-inclusion: non_null
+  datasource:
+    hikari:
+      minimum-idle: 5
+      maximum-pool-size: 15
+      auto-commit: true
+      idle-timeout: 30000 #连接允许在池中闲置的最长时间，默认为600000，即10分钟。如果idleTimeout+1秒>maxLifetime 且 maxLifetime>0，则会被重置为0（代表永远不会退出）；如果idleTimeout!=0且小于10秒，则会被重置为10秒。只有当minimumIdle小于maximumPoolSize时，这个参数才生效，当空闲连接数超过minimumIdle，而且空闲时间超过idleTimeout，则会被移除。
+      max-lifetime: 120000 #池中连接最长生命周期。默认为1800000，如果不等于0且小于30秒则会被重置回30分钟。
+      connection-timeout: 3000 #等待来自池的连接的最大毫秒数，默认为30000，如果小于250毫秒，则被重置回30秒。
+      connection-test-query: SELECT 1
+    url: jdbc:mysql://localhost:3306/template_project?useSSL=true&useUnicode=true&characterEncoding=utf-8&serverTimezone=Asia/Shanghai&rewriteBatchedStatements=true
+    username: root
+    password: root
+    type: com.zaxxer.hikari.HikariDataSource
+    driverClassName: com.mysql.cj.jdbc.Driver
+
+mybatis:
+  type-handlers-package: cn.watsontech.webhelper.mybatis.handler
+  type-aliases-package: cn.watsontech.web.template.entity
+#  mapper-locations: classpath:Mapping/*.xml
+  configuration:
+    entityTypeAliasesPackage: com.watsontech.web.template.entity
+    call-setters-on-nulls: true
+    map-underscore-to-camel-case: true
+    pageHelper:
+      offsetAsPageNum: false #设置为true时，会将RowBounds第一个参数offset当成pageNum页码使用
+      rowBoundsWithCount: false #设置为true时，使用RowBounds分页会进行count查询
+      reasonable: false
+
+#定义日志格式和路径
+logging:
+  file:
+    max-history: 30
+    name: logs/web.log
+    max-size: 100MB
+    total-size-cap: 50GB
+  level:
+    org.mybatis.spring: error
+    org.spring.springboot.dao: error
+    cn.watsontech.web.template: info
