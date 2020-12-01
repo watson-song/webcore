@@ -22,3 +22,9 @@ V0.1.5.1更新
 
 1）修复BaseService的 <T> T queryForObject(String sql, Class<T> requiredType, @Nullable Object... args) throws DataAccessException;方法泛型丢弃问题
 2）修复openapi时间间隔检查过于严格问题，容易导致时间戳非法
+
+
+    Gpg版本过高无法弹出密码输入框解决方法（gpg: signing failed: Inappropriate ioctl for device）
+    export GPG_TTY=$(tty)
+    mvn clean install deploy -P release
+
