@@ -19,9 +19,9 @@ public interface IUserType {
      * 根据值返回对应的用户类型
      */
     IUserType valueFor(String name);
-//
-//    /**
-//     * 获取用户类
-//     */
-//    Class getUserClass();
+
+    /**
+     * 获取用户类
+     */
+    Class<LoginUser> getUserClass();
 }

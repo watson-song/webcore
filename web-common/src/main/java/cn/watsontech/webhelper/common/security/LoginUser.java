@@ -44,6 +44,11 @@ public abstract class LoginUser implements UserDetails {
         public String toString() {
             return name();
         }
+
+        @Override
+        public Class<LoginUser> getUserClass() {
+            return userClaz;
+        }
     }
 
     /**

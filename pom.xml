@@ -16,11 +16,11 @@
         <module>openapi-core</module>
         <module>vendor-file</module>
         <module>vendor-push</module>
-        <module>vendor-sms</module>
         <module>common</module>
         <module>web-common</module>
 
         <!--模版web项目-->
+        <!--<module>vendor-sms</module>-->
         <module>web-template</module>
     </modules>
 
