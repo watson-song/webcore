@@ -27,4 +27,5 @@ V0.1.5.1更新
     Gpg版本过高无法弹出密码输入框解决方法（gpg: signing failed: Inappropriate ioctl for device）
     export GPG_TTY=$(tty)
     mvn clean install deploy -P release
+    mvn clean install deploy versions:set -DnewVersion=0.2.1.3
 

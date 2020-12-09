@@ -14,7 +14,6 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import org.springframework.util.Assert;
 
 import java.util.logging.Logger;
 
@@ -75,7 +74,8 @@ public class AccountService implements UserDetailsService {
         IUserType userType = userTypeFactory.valueOf(usernameAndType[1]);
 
         IUserLoginService service = userTypeFactory.getLoginUserService(userType);
-        Assert.notNull(service, "未找到用户登录服务类，用户类型："+userType);
+//        Assert.notNull(service, "未找到用户登录服务类，用户类型："+userType);
+        checkUserLoginService(service, userType);
 
         String[] selectProperties = service.defaultLoginSelectProperties();
         if (selectProperties==null||selectProperties.length==0) {
@@ -126,7 +126,8 @@ public class AccountService implements UserDetailsService {
         IUserType userType = userTypeFactory.valueOf(usernameAndType[1]);
 
         IUserLoginService service = userTypeFactory.getLoginUserService(userType);
-        Assert.notNull(service, "未找到用户登录服务类，用户类型："+userType);
+//        Assert.notNull(service, "未找到用户登录服务类，用户类型："+userType);
+        checkUserLoginService(service, userType);
 
         if (selectProperties==null||selectProperties.length==0) {
             //若未提供selectProperties，则使用loginUserService提供参数
@@ -140,7 +141,10 @@ public class AccountService implements UserDetailsService {
         LoginUser loadedUser = loadAccountInfo("username", username, userType, withPasswordProperties, false);
 
         preAuthenticationChecks.check(loadedUser);
-        Assert.isTrue(passwordEncoder.matches(password, loadedUser.getPassword()), "密码不正确");
+//        Assert.isTrue(passwordEncoder.matches(password, loadedUser.getPassword()), "密码不正确");
+        if (!passwordEncoder.matches(password, loadedUser.getPassword())) {
+            throw new BadCredentialsException("登录账号或密码不正确");
+        }
         postAuthenticationChecks.check(loadedUser);
 
         //更新登录时间
@@ -170,7 +174,8 @@ public class AccountService implements UserDetailsService {
         LoginUser.Type userType = LoginUser.Type.user;
 
         IUserLoginService service = userTypeFactory.getLoginUserService(userType);
-        Assert.notNull(service, "未找到用户登录服务类，用户类型："+userType);
+//        Assert.notNull(service, "未找到用户登录服务类，用户类型："+userType);
+        checkUserLoginService(service, userType);
 
         LoginUser loadedUser = loadAccountInfo("openid", openId, userType, selectProperties, false, false);
 
@@ -226,7 +231,8 @@ public class AccountService implements UserDetailsService {
      */
     public LoginUser loadLoginAccount(Long accountId, IUserType userType, String[] selectProperties) {
         IUserLoginService service = userTypeFactory.getLoginUserService(userType);
-        Assert.notNull(service, "未找到用户登录服务类，用户类型："+userType);
+//        Assert.notNull(service, "未找到用户登录服务类，用户类型："+userType);
+        checkUserLoginService(service, userType);
 
         LoginUser loadedUser = loadAccountInfo("id", accountId, userType, selectProperties, false);
 
@@ -256,7 +262,8 @@ public class AccountService implements UserDetailsService {
         }
 
         IUserLoginService service = userTypeFactory.getLoginUserService(userType);
-        Assert.notNull(service, "未找到用户登录服务类，用户类型："+userType);
+//        Assert.notNull(service, "未找到用户登录服务类，用户类型："+userType);
+        checkUserLoginService(service, userType);
 
         if (selectProperties==null||selectProperties.length==0) {
             //若未提供selectProperties，则使用loginUserService提供参数
@@ -271,7 +278,7 @@ public class AccountService implements UserDetailsService {
         if (notFoundCheck) {
             if (loadedUser==null) {
 //                throw new UsernameNotFoundException("数据库中未找到用户("+conditionValue+"@"+userType+")");
-                throw new UsernameNotFoundException("用户名未找到("+conditionValue+")");
+                throw new UsernameNotFoundException("登录账号不存在("+conditionValue+")");
             }
         }
 
@@ -294,6 +301,12 @@ public class AccountService implements UserDetailsService {
             }
         }
         return new String[]{username, userType.name()};
+    }
+
+    private void checkUserLoginService(IUserLoginService service, IUserType userType) {
+        if(service==null) {
+            throw new AuthenticationServiceException("当前用户登录服务不可用，用户类型："+userType);
+        }
     }
 
     /**************************************账号注册服务****************************************************/
