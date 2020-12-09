@@ -10,6 +10,8 @@ import io.swagger.annotations.ApiModelProperty;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class LoginResponse {
 
+    public LoginResponse() {}
+
     public LoginResponse(Integer errCode, String errMsg) {
         this.code = errCode;
         this.error = errMsg;
@@ -40,4 +42,44 @@ public class LoginResponse {
     Integer code;
     @ApiModelProperty(value = "错误消息，仅适用于微信登录，app端忽略该属性")
     String error;
+
+    public String getToken() {
+        return token;
+    }
+
+    public void setToken(String token) {
+        this.token = token;
+    }
+
+    public String getRefreshToken() {
+        return refreshToken;
+    }
+
+    public void setRefreshToken(String refreshToken) {
+        this.refreshToken = refreshToken;
+    }
+
+    public LoginUser getAccount() {
+        return account;
+    }
+
+    public void setAccount(LoginUser account) {
+        this.account = account;
+    }
+
+    public Integer getCode() {
+        return code;
+    }
+
+    public void setCode(Integer code) {
+        this.code = code;
+    }
+
+    public String getError() {
+        return error;
+    }
+
+    public void setError(String error) {
+        this.error = error;
+    }
 }

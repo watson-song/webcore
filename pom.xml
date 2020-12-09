@@ -21,7 +21,7 @@
 
         <!--模版web项目-->
         <!--<module>vendor-sms</module>-->
-        <module>web-template</module>
+        <!--<module>web-template</module>-->
     </modules>
 
     <description>Batch of useful tools for Spring web project</description>
@@ -237,6 +237,16 @@
 
     <build>
         <plugins>
+            <plugin>
+                <artifactId>versions-maven-plugin</artifactId>
+                <groupId>org.codehaus.mojo</groupId>
+                <version>2.8.1</version>
+                <configuration>
+                    <!--这是新版本号-->
+                    <newVersion>0.2.1.2</newVersion>
+                </configuration>
+            </plugin>
+
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
