@@ -3,8 +3,8 @@ package cn.watsontech.webhelper.common.aop;
 import cn.watsontech.webhelper.common.aop.annotation.Access;
 import cn.watsontech.webhelper.common.aop.annotation.AccessParam;
 import cn.watsontech.webhelper.common.aop.entity.AccessLog;
-import cn.watsontech.webhelper.common.entity.Admin;
 import cn.watsontech.webhelper.common.security.LoginUser;
+import cn.watsontech.webhelper.common.security.authentication.AccountService;
 import cn.watsontech.webhelper.common.util.HttpUtils;
 import cn.watsontech.webhelper.utils.MapBuilder;
 import cn.watsontech.webhelper.utils.StringUtils;
@@ -47,6 +47,7 @@ public class AccessLogAspect implements EmbeddedValueResolverAware {
      * 本地线程日志
      */
     private static final ThreadLocal<Map<JoinPoint, AccessLog>> logThreadLocal = new NamedThreadLocal("AccessLogAspectThreadLocal");
+    private static final ThreadLocal<LoginUser> authenticalThreadLocal = new NamedThreadLocal("AccessLogAspectAuthenticalThreadLocal");
 
     /**
      * 全局变量，同一个请求
@@ -133,21 +134,22 @@ public class AccessLogAspect implements EmbeddedValueResolverAware {
 
     // 读取session中的用户
     private LoginUser getCurrentLoginUser() {
-        LoginUser user = null;
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        if (authentication!=null) {
-            Object principal = authentication.getPrincipal();
-            if (principal!=null) {
-                if (principal instanceof LoginUser) {
-                    user = (LoginUser) principal;
+        LoginUser user = authenticalThreadLocal.get();
+        if(user==null) {
+            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+            if (authentication!=null) {
+                Object principal = authentication.getPrincipal();
+                if (principal!=null) {
+                    if (principal instanceof LoginUser) {
+                        user = (LoginUser) principal;
+
+                        //setLocalUser
+                        authenticalThreadLocal.set(user);
+                    }
                 }
             }
         }
 
-        // 登入login操作 前置通知时用户未校验 所以session中不存在用户信息
-        if (user == null) {
-            user = new Admin();
-        }
         return user;
     }
 
@@ -229,9 +231,24 @@ public class AccessLogAspect implements EmbeddedValueResolverAware {
 
     @AfterReturning(pointcut="accessLogPointCut()", returning="returnValue")
     public void doAfterRturning(JoinPoint joinPoint, Object returnValue) {
-        LoginUser user = getCurrentLoginUser();
-        AccessLog testLog = wrapAccessLog(joinPoint, request, user);
 
+        LoginUser user = getCurrentLoginUser();
+
+        if (user==null) {
+            org.aspectj.lang.Signature signature = joinPoint.getSignature();
+            if (signature.getDeclaringType()==AccountService.class) {
+                if (signature.getName().startsWith("loginBy")) {
+                    if (returnValue instanceof LoginUser) {
+                        user = (LoginUser) returnValue;
+
+                        //setLocalUser
+                        authenticalThreadLocal.set(user);
+                    }
+                }
+            }
+        }
+
+        AccessLog testLog = wrapAccessLog(joinPoint, request, user);
         putIntoThreadLocal(logThreadLocal, joinPoint, testLog);
     }
 
@@ -437,7 +454,7 @@ public class AccessLogAspect implements EmbeddedValueResolverAware {
                 logService.update(testLog.getId(), testLog);
             }
 
-            log.info(String.format("更新访问日志：%s", testLog));
+            log.log(Level.INFO, String.format("更新访问日志：%s", testLog));
         }
     }
 

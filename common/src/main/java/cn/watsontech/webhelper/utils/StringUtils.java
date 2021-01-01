@@ -1,5 +1,6 @@
 package cn.watsontech.webhelper.utils;
 
+import java.lang.reflect.Array;
 import java.util.*;
 
 /**
@@ -1329,12 +1330,54 @@ public class StringUtils {
         List<String> stringList = new ArrayList<>();
         for (Map.Entry<String, T> param : paramMap.entrySet()) {
             if(param.getKey()!=null&&param.getValue()!=null) {
-                stringList.add(param.getKey()+"="+param.getValue());
+                stringList.add(param.getKey()+"="+valueToString(param.getValue()));
             }
         }
         return collectionToDelimitedString(stringList, "&");
     }
 
+    private static String valueToString(Object value) {
+        if (value!=null) {
+            if (value instanceof String[]) {
+                return arrayToString((String[])value);
+            }
+            return value.toString();
+        }
+
+        return "";
+    }
+
+    /**
+     * Returns a string representation of the contents of the specified array.
+     * If the array contains other arrays as elements, they are converted to
+     * strings by the {@link Object#toString} method inherited from
+     * <tt>Object</tt>, which describes their <i>identities</i> rather than
+     * their contents.
+     *
+     * <p>The value returned by this method is equal to the value that would
+     * be returned by <tt>Arrays.asList(a).toString()</tt>, unless <tt>a</tt>
+     * is <tt>null</tt>, in which case <tt>"null"</tt> is returned.
+     *
+     * @param a the array whose string representation to return
+     * @return a string representation of <tt>a</tt>
+     * @since 1.5
+     */
+    public static String arrayToString(Object[] a) {
+        if (a == null)
+            return "";
+
+        int iMax = a.length - 1;
+        if (iMax == -1)
+            return "";
+
+        StringBuilder b = new StringBuilder();
+        for (int i = 0; ; i++) {
+            b.append(String.valueOf(a[i]));
+            if (i == iMax)
+                return b.toString();
+            b.append(", ");
+        }
+    }
 
     /**
      * Represents a failed index search.

@@ -1,5 +1,7 @@
 package cn.watsontech.webhelper.common.security.authentication;
 
+import cn.watsontech.webhelper.common.aop.annotation.Access;
+import cn.watsontech.webhelper.common.aop.annotation.AccessParam;
 import cn.watsontech.webhelper.common.security.IUserLoginService;
 import cn.watsontech.webhelper.common.security.IUserType;
 import cn.watsontech.webhelper.common.security.LoginUser;
@@ -68,7 +70,8 @@ public class AccountService implements UserDetailsService {
     final String[] defaultLoginSelectProperties = new String[]{"id", "username", "nickName", "gender", "avatarUrl", "mobile", "lastLoginDate", "lastLoginIp", "isEnabled", "expired", "locked", "credentialsExpired", "extraData", "createdTime"};
 
     @Override
-    public LoginUser loadUserByUsername(/*@AccessParam */String userInfo) throws UsernameNotFoundException {
+    @Access(value = "${access.loadUserByUsername.description}", save = "${access.loadUserByUsername.saveToDatabase}", level = "${access.loadUserByUsername.logLevel}")
+    public LoginUser loadUserByUsername(@AccessParam String userInfo) throws UsernameNotFoundException {
         String[] usernameAndType = splitUsernameAndType(userInfo, userTypeFactory);
         String username = usernameAndType[0];
         IUserType userType = userTypeFactory.valueOf(usernameAndType[1]);
@@ -108,8 +111,8 @@ public class AccountService implements UserDetailsService {
      * @param userInfo 用户名@用户类型  watson@admin, watson@worker, watson@user
      * @必要方法
      **/
-    /*@Access(value = "${access.loginByUsername.description}", save = "${access.loginByUsername.saveToDatabase}", level = "${access.loginByUsername.logLevel}")*/
-    public LoginUser loginByUsername(/*@AccessParam */String userInfo, String password, String loginIp) throws UsernameNotFoundException {
+    @Access(value = "${access.loginByUsername.description}", save = "${access.loginByUsername.saveToDatabase}", level = "${access.loginByUsername.logLevel}")
+    public LoginUser loginByUsername(@AccessParam String userInfo, String password, String loginIp) throws UsernameNotFoundException {
         return loginByUsername(userInfo, password, null, loginIp);
     }
 
@@ -119,8 +122,8 @@ public class AccountService implements UserDetailsService {
      * @param selectProperties 登录自定义查询属性，若未定义，则默认使用系统预设值 {"id", "username", "nickName", "gender", "avatarUrl", "mobile", "lastLoginDate", "lastLoginIp", "enabled", "expired", "locked", "credentialsExpired", "extraData"};
      * @必要方法
      **/
-    /*@Access("用户(%s)使用密码登录")*/
-    public LoginUser loginByUsername(/*@AccessParam */String userInfo, String password, String[] selectProperties, String loginIp) throws UsernameNotFoundException {
+    @Access(value = "${access.loginByUsername.description}", save = "${access.loginByUsername.saveToDatabase}", level = "${access.loginByUsername.logLevel}")
+    public LoginUser loginByUsername(@AccessParam String userInfo, String password, String[] selectProperties, String loginIp) throws UsernameNotFoundException {
         String[] usernameAndType = splitUsernameAndType(userInfo, userTypeFactory);
         String username = usernameAndType[0];
         IUserType userType = userTypeFactory.valueOf(usernameAndType[1]);
@@ -164,13 +167,13 @@ public class AccountService implements UserDetailsService {
      * @param openId
      * @throws UsernameNotFoundException
      */
-    /*@Access(value = "${access.loginByOpenId.description}", save = "${access.loginByOpenId.saveToDatabase}", level = "${access.loginByOpenId.logLevel}")*/
-    public LoginUser loginByOpenId(/*@AccessParam */String openId) throws UsernameNotFoundException {
+    @Access(value = "${access.loginByOpenId.description}", save = "${access.loginByOpenId.saveToDatabase}", level = "${access.loginByOpenId.logLevel}")
+    public LoginUser loginByOpenId(@AccessParam String openId) throws UsernameNotFoundException {
         return loginByOpenId(openId, null);
     }
 
-    /*@Access("小程序用户(%s)自动登录")*/
-    public LoginUser loginByOpenId(/*@AccessParam */String openId, String[] selectProperties) throws UsernameNotFoundException {
+    @Access(value = "${access.loginByOpenId.description}", save = "${access.loginByOpenId.saveToDatabase}", level = "${access.loginByOpenId.logLevel}")
+    public LoginUser loginByOpenId(@AccessParam String openId, String[] selectProperties) throws UsernameNotFoundException {
         LoginUser.Type userType = LoginUser.Type.user;
 
         IUserLoginService service = userTypeFactory.getLoginUserService(userType);
@@ -193,8 +196,8 @@ public class AccountService implements UserDetailsService {
      * @param userInfo userId@userType, ex. 0@admin
      * @throws UsernameNotFoundException
      */
-    /*@Access(value = "${access.loginByUserId.description}", save = "${access.loginByUserId.saveToDatabase}", level = "${access.loginByUserId.logLevel}")*/
-    public LoginUser loginByUserId(/*@AccessParam */String userInfo) throws UsernameNotFoundException {
+    @Access(value = "${access.loginByUserId.description}", save = "${access.loginByUserId.saveToDatabase}", level = "${access.loginByUserId.logLevel}")
+    public LoginUser loginByUserId(@AccessParam String userInfo) throws UsernameNotFoundException {
         return loginByUserId(userInfo, null);
     }
 
@@ -203,7 +206,8 @@ public class AccountService implements UserDetailsService {
      * @param userInfo userId@userType, ex. 0@admin
      * @throws UsernameNotFoundException
      */
-    public LoginUser loginByUserId(/*@AccessParam */String userInfo, String[] selectProperties) throws UsernameNotFoundException {
+    @Access(value = "${access.loginByUserId.description}", save = "${access.loginByUserId.saveToDatabase}", level = "${access.loginByUserId.logLevel}")
+    public LoginUser loginByUserId(@AccessParam String userInfo, String[] selectProperties) throws UsernameNotFoundException {
         String[] usernameAndType = splitUsernameAndType(userInfo, userTypeFactory);
         Long accountId = Long.parseLong(usernameAndType[0]);
         IUserType userType = userTypeFactory.valueOf(usernameAndType[1]);
