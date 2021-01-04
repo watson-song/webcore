@@ -272,7 +272,7 @@ public class AccessLogAspect implements EmbeddedValueResolverAware {
             }
 
             Access access = getAccessAnnotation(joinPoint);
-            new UpdateLogThread(testLog, isAccessShouldSave(access)).start();
+            threadPoolTaskExecutor.execute(new SaveLogThread(testLog, isAccessShouldSave(access)));
         }
     }
 
@@ -421,40 +421,16 @@ public class AccessLogAspect implements EmbeddedValueResolverAware {
         @Override
         public void run() {
             if (save) {
-                if(testLog.getId()==null) {
-                    logService.save(testLog);
-                }else {
-                    log.warning(String.format("当前记录已存在，记录：%s", testLog));
+                if (testLog!=null) {
+                    if (testLog.getId()!=null) {
+                        logService.update(testLog.getId(), testLog);
+                    }else {
+                        logService.save(testLog);
+                    }
                 }
             }
 
             log.info(String.format("访问日志：%s", testLog));
-        }
-    }
-
-    /**
-     * 日志更新线程
-     *
-     * @author xuxiaowei
-     *
-     */
-    private class UpdateLogThread extends Thread {
-        private AccessLog testLog;
-        private boolean save;
-
-        public UpdateLogThread(AccessLog testLog, boolean save) {
-            super(UpdateLogThread.class.getSimpleName());
-            this.testLog = testLog;
-            this.save = save;
-        }
-
-        @Override
-        public void run() {
-            if (save) {
-                logService.update(testLog.getId(), testLog);
-            }
-
-            log.log(Level.INFO, String.format("更新访问日志：%s", testLog));
         }
     }
 
