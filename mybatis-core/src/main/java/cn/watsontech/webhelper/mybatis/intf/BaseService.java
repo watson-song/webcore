@@ -27,10 +27,10 @@ import java.util.stream.Collectors;
  */
 public class BaseService<T, PK> implements Service<T, PK> {
 
-    Mapper<T> mapper;
+    protected Mapper<T> mapper;
 
     @Autowired
-    JdbcTemplate jdbcTemplate;
+    protected JdbcTemplate jdbcTemplate;
 
     public BaseService(Mapper<T> mapper) {
         this.mapper = mapper;

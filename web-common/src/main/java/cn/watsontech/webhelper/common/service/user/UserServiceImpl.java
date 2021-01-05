@@ -3,6 +3,7 @@ package cn.watsontech.webhelper.common.service.user;
 import cn.watsontech.webhelper.common.entity.User;
 import cn.watsontech.webhelper.common.security.LoginUser;
 import cn.watsontech.webhelper.common.service.mapper.user.UserMapper;
+import cn.watsontech.webhelper.common.service.mapper.user.manually.UserManuallyMapper;
 import cn.watsontech.webhelper.mybatis.intf.BaseService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -21,12 +22,12 @@ import java.util.Map;
 @Transactional
 public class UserServiceImpl extends BaseService<User, Long> implements UserService {
 
-    @Autowired
-    UserManualService manualService;
+    UserManuallyMapper manuallyMapper;
 
     @Autowired
-    public UserServiceImpl(UserMapper mapper){
+    public UserServiceImpl(UserMapper mapper, UserManuallyMapper manuallyMapper){
         super(mapper);
+        this.manuallyMapper = manuallyMapper;
     }
 
     @Override
@@ -59,7 +60,7 @@ public class UserServiceImpl extends BaseService<User, Long> implements UserServ
 
     @Override
     public int countUnreadMessages(Long userId) {
-        return manualService.countUnreadMessages(userId);
+        return manuallyMapper.countUnreadMessage(userId);
     }
 
     @Override
@@ -74,7 +75,7 @@ public class UserServiceImpl extends BaseService<User, Long> implements UserServ
 
     @Override
     public int updateLastLoginData(String loginIp, Long userId) {
-        return manualService.updateLastLoginData(loginIp, userId);
+        return manuallyMapper.updateLastLoginDate(userId, loginIp);
     }
 
     @Override
