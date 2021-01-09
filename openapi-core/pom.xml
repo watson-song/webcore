@@ -11,10 +11,10 @@
 
     <groupId>cn.watsontech.webhelper</groupId>
     <artifactId>openapi-core</artifactId>
-    <version>0.2.1.3</version>
+    <version>0.2.1.4</version>
 
     <properties>
-        <watsontech.webcore>0.2.1.8</watsontech.webcore>
+        <watsontech.webcore>0.2.1.12</watsontech.webcore>
     </properties>
 
     <dependencies>
