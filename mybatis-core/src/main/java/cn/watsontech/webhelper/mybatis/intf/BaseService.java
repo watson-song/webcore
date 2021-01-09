@@ -7,9 +7,10 @@ import cn.watsontech.webhelper.mybatis.util.SingleRowMapperResultSetExtractor;
 import com.github.pagehelper.PageRowBounds;
 import org.apache.ibatis.session.RowBounds;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.dao.IncorrectResultSizeDataAccessException;
-import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.jdbc.core.SingleColumnRowMapper;
+import org.springframework.dao.support.DataAccessUtils;
+import org.springframework.jdbc.core.*;
 import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 import org.springframework.util.CollectionUtils;
@@ -201,8 +202,21 @@ public class BaseService<T, PK> implements Service<T, PK> {
      * 根据sql语句查询
      */
     @Override
-    public <T> T queryForObject(String sql, Class<T> requiredType, @Nullable Object... args) {
-        return jdbcTemplate.queryForObject(sql, requiredType, args);
+    public <T> T queryForObject(String sql, Class<T> returnClass, @Nullable Object... args) {
+//        return jdbcTemplate.queryForObject(sql, requiredType, args);
+        List<T> results = jdbcTemplate.query(sql, new RowMapperResultSetExtractor<>(new SingleColumnRowMapper<>(returnClass), 1), args);
+        return nullableSingleResult(results);
+    }
+
+    @Nullable
+    private <T> T nullableSingleResult(@Nullable Collection<T> results) throws IncorrectResultSizeDataAccessException {
+        if (CollectionUtils.isEmpty(results)) {
+            return null;
+        } else if (results.size() > 1) {
+            throw new IncorrectResultSizeDataAccessException(1, results.size());
+        } else {
+            return results.iterator().next();
+        }
     }
 
     /**
@@ -210,7 +224,7 @@ public class BaseService<T, PK> implements Service<T, PK> {
      */
     @Override
     public <T> T queryForSingleColumn(Class<T> returnClass, String sql, Object[] args) {
-        return jdbcTemplate.query(sql, args, new SingleRowMapperResultSetExtractor<>(new SingleColumnRowMapper<>(returnClass)));
+        return jdbcTemplate.query(sql, new SingleRowMapperResultSetExtractor<>(new SingleColumnRowMapper<>(returnClass)), args);
     }
 
     /**
@@ -219,14 +233,7 @@ public class BaseService<T, PK> implements Service<T, PK> {
     @Override
     public Map<String, Object> queryForMap(String sql, @Nullable Object... args) {
         List<Map<String, Object>> results = queryForList(sql, args);
-        if (CollectionUtils.isEmpty(results)) {
-            return null;
-        }
-
-        if (results.size() > 1) {
-            throw new IncorrectResultSizeDataAccessException(1, results.size());
-        }
-        return results.iterator().next();
+        return nullableSingleResult(results);
     }
 
     /**
@@ -234,7 +241,7 @@ public class BaseService<T, PK> implements Service<T, PK> {
      */
     @Override
     public <T> List<T> queryForList(String sql, Object[] args, Class<T> elementType) {
-        return jdbcTemplate.queryForList(sql, args, elementType);
+        return jdbcTemplate.queryForList(sql, elementType, args);
     }
 
     /**
