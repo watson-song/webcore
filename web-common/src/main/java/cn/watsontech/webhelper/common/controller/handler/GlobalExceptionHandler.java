@@ -177,7 +177,7 @@ public class GlobalExceptionHandler {
             args[2] = remoteAddr;
             args[3] = method;
             args[6] = requestUri;
-            args[7] = StringUtils.mapToQueryString(params);
+            args[7] = StringUtils.getMapToParams(params);
         }
     }
 }
