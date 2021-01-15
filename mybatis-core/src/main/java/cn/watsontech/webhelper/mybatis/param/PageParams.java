@@ -19,11 +19,11 @@ public class PageParams {
         this.limit = limit;
     }
 
-    @ApiModelProperty(value = "分页码", example="1")
-    protected Integer p = 1;  //page 默认第一页
-
-    @ApiModelProperty(value = "页面大小，默认20", example="20")
-    protected Integer ps = 20; //pageSize 默认每页10条
+//    @ApiModelProperty(value = "分页码", example="1")
+//    protected Integer p = 1;  //page 默认第一页
+//
+//    @ApiModelProperty(value = "页面大小，默认20", example="20")
+//    protected Integer ps = 20; //pageSize 默认每页10条
 
     @ApiModelProperty(value = "分页码", example="0")
     protected Integer offset;  //从0开始，默认为空，若传该参数则使用该值，若未传则使用p，默认offset为0，p为1
@@ -42,11 +42,12 @@ public class PageParams {
      */
     public Integer getOffset() {
         if (offset==null) {
-            if (p!=null) {
-                if (p<1) p =1;
-
-                return (p-1)*getLimit();
-            }
+//            if (p!=null) {
+//                if (p<1) p =1;
+//
+//                return (p-1)*getLimit();
+//            }
+            return 0;
         }
 
         return offset>0?offset:0;
@@ -58,9 +59,10 @@ public class PageParams {
      */
     public Integer getLimit() {
         if (limit==null) {
-            if (getPs()!=null) {
-                return getPs();
-            }
+//            if (getPs()!=null) {
+//                return getPs();
+//            }
+            return 10;
         }
 
         return limit>0?limit:0;
@@ -110,21 +112,21 @@ public class PageParams {
         return null;
     }
 
-    public Integer getP() {
-        return p;
-    }
-
-    public void setP(Integer p) {
-        this.p = p;
-    }
-
-    public Integer getPs() {
-        return ps;
-    }
-
-    public void setPs(Integer ps) {
-        this.ps = ps;
-    }
+//    public Integer getP() {
+//        return p;
+//    }
+//
+//    public void setP(Integer p) {
+//        this.p = p;
+//    }
+//
+//    public Integer getPs() {
+//        return ps;
+//    }
+//
+//    public void setPs(Integer ps) {
+//        this.ps = ps;
+//    }
 
     public void setOffset(Integer offset) {
         this.offset = offset;
