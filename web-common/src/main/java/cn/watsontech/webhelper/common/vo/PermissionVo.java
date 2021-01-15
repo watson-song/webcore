@@ -1,7 +1,6 @@
 package cn.watsontech.webhelper.common.vo;
 
 import cn.watsontech.webhelper.common.entity.Permission;
-import cn.watsontech.webhelper.common.entity.Role;
 import io.swagger.annotations.ApiModelProperty;
 import org.springframework.beans.BeanUtils;
 
@@ -15,14 +14,21 @@ public class PermissionVo extends Permission {
         super();
     }
 
-    public PermissionVo(Role role, List<Permission> permissions) {
+    public PermissionVo(Permission permission, List<PrinciplePermissionVo> permissions) {
         super();
 
-        BeanUtils.copyProperties(role, this);
+        BeanUtils.copyProperties(permission, this);
         this.children = permissions;
     }
 
     @ApiModelProperty(value = "子权限列表")
-    private List<Permission> children;
+    private List<PrinciplePermissionVo> children;
 
+    public List<PrinciplePermissionVo> getChildren() {
+        return children;
+    }
+
+    public void setChildren(List<PrinciplePermissionVo> children) {
+        this.children = children;
+    }
 }

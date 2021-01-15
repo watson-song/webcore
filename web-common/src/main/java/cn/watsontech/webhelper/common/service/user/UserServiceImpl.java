@@ -4,6 +4,7 @@ import cn.watsontech.webhelper.common.entity.User;
 import cn.watsontech.webhelper.common.security.LoginUser;
 import cn.watsontech.webhelper.common.service.mapper.user.UserMapper;
 import cn.watsontech.webhelper.common.service.mapper.user.manually.UserManuallyMapper;
+import cn.watsontech.webhelper.common.vo.PrinciplePermissionVo;
 import cn.watsontech.webhelper.mybatis.intf.BaseService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -69,7 +70,7 @@ public class UserServiceImpl extends BaseService<User, Long> implements UserServ
     }
 
     @Override
-    public List<Map<String, Object>> loadUserPermissions(Long userId) {
+    public List<PrinciplePermissionVo> loadUserPermissions(Long userId) {
         return null;
     }
 

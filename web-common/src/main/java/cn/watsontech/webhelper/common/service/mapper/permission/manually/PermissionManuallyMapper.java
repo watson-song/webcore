@@ -3,6 +3,7 @@ package cn.watsontech.webhelper.common.service.mapper.permission.manually;
 
 
 import cn.watsontech.webhelper.common.vo.PermissionVo;
+import cn.watsontech.webhelper.common.vo.PrinciplePermissionVo;
 import org.apache.ibatis.annotations.*;
 
 import java.util.List;
@@ -53,6 +54,6 @@ public interface PermissionManuallyMapper {
 		@Result(property = "id", column = "id"),
 		@Result(property = "children", javaType=List.class, column="id", many = @Many(select = "selectAllChildPermissions")),
 	})
-    List<PermissionVo> selectAllChildPermissions(@Param("parentId") Long parentId);
+    List<PrinciplePermissionVo> selectAllChildPermissions(@Param("parentId") Long parentId);
 
 }

@@ -1,6 +1,5 @@
 package cn.watsontech.webhelper.common.vo;
 
-import cn.watsontech.webhelper.common.entity.Permission;
 import cn.watsontech.webhelper.common.entity.Role;
 import io.swagger.annotations.ApiModelProperty;
 import org.springframework.beans.BeanUtils;
@@ -15,7 +14,7 @@ public class RoleVo extends Role {
         super();
     }
 
-    public RoleVo(Role role, List<Permission> permissions) {
+    public RoleVo(Role role, List<PrinciplePermissionVo> permissions) {
         super();
 
         BeanUtils.copyProperties(role, this);
@@ -23,6 +22,6 @@ public class RoleVo extends Role {
     }
 
     @ApiModelProperty(value = "权限列表")
-    private List<Permission> permissions;
+    private List<PrinciplePermissionVo> permissions;
 
 }

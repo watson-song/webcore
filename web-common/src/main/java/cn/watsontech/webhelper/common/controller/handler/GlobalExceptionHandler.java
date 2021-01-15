@@ -10,6 +10,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.validation.BindException;
+import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -51,6 +52,18 @@ public class GlobalExceptionHandler {
             return Result.errorBadRequest(exception.getMessage());
         }else {
             return Result.errorBadRequest(exception.getMessage());
+        }
+    }
+
+    @ExceptionHandler(MissingServletRequestParameterException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public Result requestParameterException(MissingServletRequestParameterException exception, final HttpServletRequest request) {
+        insertErrorLog(request, exception, "请求缺少参数异常MissingServletRequestParameterException，返回BAD_REQUEST");
+
+        if(log.isLoggable(Level.CONFIG)) {
+            return Result.errorBadRequest(exception.getMessage());
+        }else {
+            return Result.errorBadRequest(String.format("参数：%s必传", exception.getParameterName()));
         }
     }
 

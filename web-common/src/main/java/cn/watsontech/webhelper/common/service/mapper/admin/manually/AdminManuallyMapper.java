@@ -4,6 +4,7 @@ package cn.watsontech.webhelper.common.service.mapper.admin.manually;
 
 import cn.watsontech.webhelper.common.entity.Admin;
 import cn.watsontech.webhelper.common.vo.AdminListVo;
+import cn.watsontech.webhelper.common.vo.PrinciplePermissionVo;
 import org.apache.ibatis.annotations.*;
 import org.apache.ibatis.session.RowBounds;
 
@@ -50,12 +51,12 @@ public interface AdminManuallyMapper {
 	 * 获取本账户下的所有权限列表
 	 * @param adminId 管理员Id
 	 */
-	@Select("select c.id,c.name,c.label from tb_permission c left join ref_role_permission b on b.permission_id=c.id left join ref_admin_role a on a.role_id=b.role_id and c.enabled = true where a.admin_id =#{adminId}")
+	@Select("select c.id,c.name from tb_permission c left join ref_role_permission b on b.permission_id=c.id left join ref_admin_role a on a.role_id=b.role_id and c.enabled = true where a.admin_id =#{adminId}")
 	@Results({
 			@Result(column = "id", property = "id"),
 			@Result(property = "children", javaType=List.class, column="id", many = @Many(select = "cn.watsontech.webhelper.common.service.mapper.permission.manually.PermissionManuallyMapper.selectAllChildPermissions")),
 	})
-	List<Map<String, Object>> selectAllPermissionsByAdminId(@Param("adminId") Long adminId);
+	List<PrinciplePermissionVo> selectAllPermissionsByAdminId(@Param("adminId") Long adminId);
 
 	/**
 	 * 更新最后登录时间

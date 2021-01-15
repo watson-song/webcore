@@ -5,6 +5,7 @@ import cn.watsontech.webhelper.common.security.LoginUser;
 import cn.watsontech.webhelper.common.service.mapper.admin.AdminMapper;
 import cn.watsontech.webhelper.common.service.mapper.admin.manually.AdminManuallyMapper;
 import cn.watsontech.webhelper.common.vo.AdminListVo;
+import cn.watsontech.webhelper.common.vo.PrinciplePermissionVo;
 import cn.watsontech.webhelper.mybatis.intf.BaseService;
 import cn.watsontech.webhelper.mybatis.param.PageParams;
 import com.github.pagehelper.PageRowBounds;
@@ -72,7 +73,7 @@ public class AdminServiceImpl extends BaseService<Admin, Long> implements AdminS
     }
 
     @Override
-    public List<Map<String, Object>> loadUserPermissions(Long adminId) {
+    public List<PrinciplePermissionVo> loadUserPermissions(Long adminId) {
         return manuallyMapper.selectAllPermissionsByAdminId(adminId);
     }
 

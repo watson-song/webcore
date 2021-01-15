@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSONObject;
 import io.swagger.annotations.ApiModelProperty;
 import org.hibernate.validator.constraints.Length;
 
+import javax.persistence.Column;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Pattern;
 import java.util.List;
@@ -77,6 +78,35 @@ public class AdminRegisterForm {
 
     @ApiModelProperty(name = "额外数据字段")
     private JSONObject extraData;
+    /**
+     * 是否启用web登录
+     */
+    @Column(name = "is_weblogin_active")
+    @ApiModelProperty(value="isWebloginActive是否启用web登录")
+    private Boolean isWebloginActive;
+
+    /**
+     * 是否已过期
+     */
+    @ApiModelProperty(value="expired是否已过期")
+    private Boolean expired;
+
+    /**
+     * 是否已锁定
+     */
+    @ApiModelProperty(value="locked是否已锁定")
+    private Boolean locked;
+
+    /**
+     * 是否已启用
+     */
+    @ApiModelProperty(value="enabled是否已启用")
+    private Boolean isEnabled;
+    /**
+     * 密码是否已过期
+     */
+    @ApiModelProperty(value="credentialsExpired密码是否已过期")
+    private Boolean credentialsExpired;
 
     public String getUsername() {
         return username;
@@ -180,5 +210,45 @@ public class AdminRegisterForm {
 
     public void setExtraData(JSONObject extraData) {
         this.extraData = extraData;
+    }
+
+    public Boolean getWebloginActive() {
+        return isWebloginActive;
+    }
+
+    public void setWebloginActive(Boolean webloginActive) {
+        isWebloginActive = webloginActive;
+    }
+
+    public Boolean getExpired() {
+        return expired;
+    }
+
+    public void setExpired(Boolean expired) {
+        this.expired = expired;
+    }
+
+    public Boolean getLocked() {
+        return locked;
+    }
+
+    public void setLocked(Boolean locked) {
+        this.locked = locked;
+    }
+
+    public Boolean getCredentialsExpired() {
+        return credentialsExpired;
+    }
+
+    public void setCredentialsExpired(Boolean credentialsExpired) {
+        this.credentialsExpired = credentialsExpired;
+    }
+
+    public Boolean getEnabled() {
+        return isEnabled;
+    }
+
+    public void setEnabled(Boolean enabled) {
+        isEnabled = enabled;
     }
 }

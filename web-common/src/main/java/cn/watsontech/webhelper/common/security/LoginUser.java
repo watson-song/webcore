@@ -2,6 +2,7 @@ package cn.watsontech.webhelper.common.security;
 
 import cn.watsontech.webhelper.common.entity.Admin;
 import cn.watsontech.webhelper.common.entity.User;
+import cn.watsontech.webhelper.common.vo.PrinciplePermissionVo;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import io.swagger.annotations.ApiModelProperty;
 import org.springframework.security.core.GrantedAuthority;
@@ -138,7 +139,7 @@ public abstract class LoginUser implements UserDetails {
 
     //用户权限
     @Transient
-    List<Map<String, Object>> permissions = new ArrayList<>();
+    List<PrinciplePermissionVo> permissions = new ArrayList<>();
 
 //    @JsonIgnore
     @ApiModelProperty(value = "用户角色")
@@ -151,11 +152,11 @@ public abstract class LoginUser implements UserDetails {
     }
 
     @ApiModelProperty(value = "用户权限集合")
-    public List<Map<String, Object>> getPermissions() {
+    public List<PrinciplePermissionVo> getPermissions() {
         return permissions;
     }
 
-    public void setPermissions(List<Map<String, Object>> permissions) {
+    public void setPermissions(List<PrinciplePermissionVo> permissions) {
         this.permissions = permissions;
     }
 

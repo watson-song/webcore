@@ -1,5 +1,7 @@
 package cn.watsontech.webhelper.common.security;
 
+import cn.watsontech.webhelper.common.vo.PrinciplePermissionVo;
+
 import java.util.List;
 import java.util.Map;
 
@@ -46,7 +48,7 @@ public interface IUserLoginService<T> {
     /**
      * 加载用户权限
      */
-    List<Map<String, Object>> loadUserPermissions(T userId);
+    List<PrinciplePermissionVo> loadUserPermissions(T userId);
 
     /**
      * 更新最后登录时间
