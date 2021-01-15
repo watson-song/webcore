@@ -33,11 +33,11 @@ public class OpenApiResponseErrorHandler extends DefaultResponseErrorHandler {
         Result result;
         if (isEmpty(body)) {
             result = new Result();
-            result.setError("未知错误");
+            result.setMessage("未知错误");
         }else {
             result = new ObjectMapper().readValue(body, Result.class);
         }
-        String message = (String)result.getError();
+        String message = (String)result.getMessage();
         switch (statusCode.series()) {
             case CLIENT_ERROR:
                 throw HttpClientErrorException.create(message, statusCode, statusText, headers, body, charset);
