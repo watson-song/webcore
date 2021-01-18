@@ -16,7 +16,7 @@ public interface RoleManuallyMapper {
 	 * @param roleId  角色Id
 	 * @return
 	 */
-	@Select(" select id,name,label,tag,status,type,builtin_type builtinType,enabled,created_by createdBy, created_by_name createdByName, created_time createdTime from tb_role where id=#{roleId}")
+	@Select(" select id, name, label, tag, status, type, builtin_type builtinType, enabled, created_by createdBy, created_by_name createdByName, created_time createdTime from tb_role where id=#{roleId}")
 	@Results({
 		@Result(property = "id", column="id"),
 		@Result(property = "permissions", javaType=List.class, column="id", many = @Many(select = "selectAllPermissionsByRoleId")),
@@ -34,4 +34,31 @@ public interface RoleManuallyMapper {
 	})
     List<PermissionVo> selectAllPermissionsByRoleId(@Param("roleId") Long roleId);
 
+	/**
+	 * 批量新增角色权限
+	 * @param permission 权限列表
+	 * @param roleId 角色ID
+	 * @param userId 创建人ID
+	 * @param userName 创建人名称
+	 */
+	@Insert(value = "insert ignore into ref_role_permission(role_id, permission_id, created_by, created_by_name) values " +
+			" <foreach collection=\"permissionIds\" separator=\",\" item=\"item\"> " +
+			" (#{roleId}, #{item}, #{createdBy}, #{createdByName}) " +
+			"</foreach>")
+	int addPermissionsToRole(@Param("permissionIds") List<Long> permission, @Param("roleId") Long roleId, @Param("createdBy") Long userId, @Param("createdByName") String userName);
+
+	/**
+	 * 清空角色权限
+	 * @param roleId 角色id
+	 */
+	@Delete("delete from ref_role_permission where role_id=#{roleId}")
+	int clearRolePermissions(@Param("roleId") Long roleId);
+
+	/**
+	 * 删除角色某个权限
+	 * @param roleId 角色id
+	 * @param permissionId 权限id
+	 */
+	@Delete("delete from ref_role_permission where role_id=#{roleId} and permission_id=#{permissionId}")
+	int removeRolePermission(@Param("roleId") Long roleId, @Param("permissionId") Long permissionId);
 }
