@@ -37,9 +37,9 @@ public class Role implements CreatedEntity<Role, Long, Long> {
     private Integer type;
 
     /**
-     * 内置类型：0系统自带，1用户创建的
+     * 内置类型：true系统自带，false用户创建的
      */
-    @ApiModelProperty(value="0系统自带，1用户创建的")
+    @ApiModelProperty(value="true系统自带，false用户创建的")
     private Boolean builtinType;
 
     @Column(name = "created_by")

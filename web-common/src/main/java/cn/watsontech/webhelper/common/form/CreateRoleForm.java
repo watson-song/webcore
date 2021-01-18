@@ -25,7 +25,7 @@ public class CreateRoleForm extends CreateForm<Role> {
     @ApiModelProperty("账号类型：0超级管理员，1管理员，2运营，支持更多自定义；type是归属类型。type=0是超级管理员可以看见的，=1是集团管理员可以看见的，=2是商场管理员可见；")
     private Integer type;
 
-    @ApiModelProperty(value = "0系统自带，1用户创建的；builtinType是 是否是后期建的，=0是系统自带不可以删除的，=1是后期建的可以删除", hidden = true)
+    @ApiModelProperty(value = "true系统自带，false用户创建的；builtinType是 是否是后期建的，=true是系统自带不可以删除的，=false是后期建的可以删除", hidden = true)
     private Boolean builtinType;
 
     @ApiModelProperty(value = "权限ID集合")

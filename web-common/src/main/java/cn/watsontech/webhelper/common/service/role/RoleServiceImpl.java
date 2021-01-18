@@ -12,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
+import tk.mybatis.mapper.entity.Condition;
 
 import java.util.List;
 
@@ -29,6 +30,31 @@ public class RoleServiceImpl extends BaseService<Role, Long> implements RoleServ
     public RoleServiceImpl(RoleMapper mapper, RoleManuallyMapper roleVoMapper){
         super(mapper);
         this.roleVoMapper = roleVoMapper;
+    }
+
+    @Override
+    public int deleteByPrimaryKey(Long id) {
+        Condition condition = wrapCondition(Role.class, id);
+        return this.deleteByCondition(condition);
+    }
+
+    @Override
+    public int deleteByIds(List<Long> ids) {
+        Condition condition = wrapCondition(Role.class);
+        condition.createCriteria().andIn("id", ids);
+        return this.deleteByCondition(condition);
+    }
+
+    /**
+     * 删除会检查是否是系统自建角色，仅能删除非系统自建角色
+     */
+    @Override
+    public int deleteByCondition(Condition condition) {
+        if (condition!=null) {
+            condition.and().andEqualTo("builtinType", false);
+        }
+
+        return super.deleteByCondition(condition);
     }
 
     /**
