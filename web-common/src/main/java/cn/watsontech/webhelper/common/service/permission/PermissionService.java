@@ -34,5 +34,11 @@ public interface PermissionService extends Service<Permission, Long> {
      * 加载当前权限所有子权限集合
      * @param parentId
      */
-    List<PrinciplePermissionVo> loadAllChild(long parentId);
+    List<PermissionVo> loadAllChild(long parentId);
+
+    /**
+     * 加载当前权限所有子权限集合
+     * @param parentId
+     */
+    List<PrinciplePermissionVo> loadAllPrincipleChild(long parentId);
 }

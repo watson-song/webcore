@@ -14,7 +14,7 @@ public class RoleVo extends Role {
         super();
     }
 
-    public RoleVo(Role role, List<PrinciplePermissionVo> permissions) {
+    public RoleVo(Role role, List<PermissionVo> permissions) {
         super();
 
         BeanUtils.copyProperties(role, this);
@@ -22,6 +22,6 @@ public class RoleVo extends Role {
     }
 
     @ApiModelProperty(value = "权限列表")
-    private List<PrinciplePermissionVo> permissions;
+    private List<PermissionVo> permissions;
 
 }

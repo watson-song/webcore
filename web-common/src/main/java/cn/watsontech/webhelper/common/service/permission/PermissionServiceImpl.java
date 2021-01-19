@@ -59,8 +59,17 @@ public class PermissionServiceImpl extends BaseService<Permission, Long> impleme
      * @param parentId
      */
     @Override
-    public List<PrinciplePermissionVo> loadAllChild(long parentId) {
+    public List<PermissionVo> loadAllChild(long parentId) {
         return voMapper.selectAllChildPermissions(parentId);
+    }
+
+    /**
+     * 加载当前权限所有子权限集合
+     * @param parentId
+     */
+    @Override
+    public List<PrinciplePermissionVo> loadAllPrincipleChild(long parentId) {
+        return voMapper.selectAllChildPrinciplePermissions(parentId);
     }
 
 }

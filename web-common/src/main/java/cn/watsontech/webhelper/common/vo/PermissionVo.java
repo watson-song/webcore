@@ -14,7 +14,7 @@ public class PermissionVo extends Permission {
         super();
     }
 
-    public PermissionVo(Permission permission, List<PrinciplePermissionVo> permissions) {
+    public PermissionVo(Permission permission, List<PermissionVo> permissions) {
         super();
 
         BeanUtils.copyProperties(permission, this);
@@ -22,13 +22,13 @@ public class PermissionVo extends Permission {
     }
 
     @ApiModelProperty(value = "子权限列表")
-    private List<PrinciplePermissionVo> children;
+    private List<PermissionVo> children;
 
-    public List<PrinciplePermissionVo> getChildren() {
+    public List<PermissionVo> getChildren() {
         return children;
     }
 
-    public void setChildren(List<PrinciplePermissionVo> children) {
+    public void setChildren(List<PermissionVo> children) {
         this.children = children;
     }
 }

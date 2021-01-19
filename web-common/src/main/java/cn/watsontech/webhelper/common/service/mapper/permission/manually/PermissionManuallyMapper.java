@@ -45,6 +45,18 @@ public interface PermissionManuallyMapper {
 	})
 	PermissionVo selectInfoById(@Param("id") Long id);
 
+
+	/**
+	 * 获取本权限下的所有子权限列表
+	 * @param parentId 父亲谦虚Id
+	 */
+	@Select("select id, name, label from tb_permission where parent_id =#{parentId} and enabled = true")
+	@Results({
+			@Result(property = "id", column = "id"),
+			@Result(property = "children", javaType=List.class, column="id", many = @Many(select = "selectAllChildPermissions")),
+	})
+	List<PermissionVo> selectAllChildPermissions(@Param("parentId") Long parentId);
+
     /**
      * 获取本权限下的所有子权限列表
      * @param parentId 父亲谦虚Id
@@ -52,8 +64,8 @@ public interface PermissionManuallyMapper {
 	@Select("select id, name, label from tb_permission where parent_id =#{parentId} and enabled = true")
 	@Results({
 		@Result(property = "id", column = "id"),
-		@Result(property = "children", javaType=List.class, column="id", many = @Many(select = "selectAllChildPermissions")),
+		@Result(property = "children", javaType=List.class, column="id", many = @Many(select = "selectAllChildPrinciplePermissions")),
 	})
-    List<PrinciplePermissionVo> selectAllChildPermissions(@Param("parentId") Long parentId);
+    List<PrinciplePermissionVo> selectAllChildPrinciplePermissions(@Param("parentId") Long parentId);
 
 }

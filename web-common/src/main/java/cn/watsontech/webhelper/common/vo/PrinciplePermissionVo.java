@@ -18,7 +18,7 @@ public class PrinciplePermissionVo {
     @Transient
     private Long id;
 
-    @ApiModelProperty(value="关键字")
+    @ApiModelProperty(value="系统标识")
     private String name;
 
     @ApiModelProperty(value="名称")
