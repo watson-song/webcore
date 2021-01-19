@@ -9,6 +9,8 @@ import com.qcloud.cos.auth.COSCredentials;
 import com.qcloud.cos.model.*;
 import com.qcloud.cos.region.Region;
 import org.apache.commons.lang3.time.DateFormatUtils;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
@@ -22,7 +24,6 @@ import java.net.URL;
 import java.net.URLEncoder;
 import java.text.SimpleDateFormat;
 import java.util.*;
-import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
 /**
@@ -38,7 +39,7 @@ import java.util.stream.Collectors;
 @Service
 @ConditionalOnClass(COSClient.class)
 public class TencentUploadServiceImpl extends UploadService {
-    Logger log = Logger.getLogger(getClass().getName());
+    Log log = LogFactory.getLog(TencentUploadServiceImpl.class);
 
     //缓存已经初始化的tencentcos客户端
     COSClient tencentCosClient;

@@ -1,5 +1,7 @@
 package cn.watsontech.webhelper.common.security;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.token.DefaultToken;
@@ -14,8 +16,6 @@ import org.springframework.util.StringUtils;
 import java.security.SecureRandom;
 import java.util.Base64;
 import java.util.Date;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  * Basic implementation of {@link TokenService} that is compatible with clusters and
@@ -64,7 +64,7 @@ import java.util.logging.Logger;
  *
  */
 public class TimeKeyBasedPersistenceTokenService implements TokenService, InitializingBean {
-	Logger log = Logger.getLogger(TimeKeyBasedPersistenceTokenService.class.getName());
+	Log log = LogFactory.getLog(TimeKeyBasedPersistenceTokenService.class);
 
 	private int pseudoRandomNumberBytes = 32;
 	private String serverSecret;
@@ -111,7 +111,7 @@ public class TimeKeyBasedPersistenceTokenService implements TokenService, Initia
 		try {
 			tokens = StringUtils.delimitedListToStringArray(Utf8.decode(Base64.getDecoder().decode(Utf8.encode(key))), ":");
 		}catch (IllegalArgumentException ex) {
-			log.log(Level.WARNING, "Invalid Token, {}", ex.getMessage());
+			log.error(String.format("Invalid Token, {}", ex.getMessage()));
 
 			throw new BadCredentialsException("无效的访问Token, " + ex.getMessage());
 		}
@@ -125,7 +125,7 @@ public class TimeKeyBasedPersistenceTokenService implements TokenService, Initia
 			creationTime = Long.decode(tokens[0]);
 			expireTime = Long.decode(tokens[1]);
 		} catch (NumberFormatException nfe) {
-			log.log(Level.WARNING, "Invalid token, number format exception {}", nfe.getMessage());
+			log.error(String.format("Invalid token, number format exception {}", nfe.getMessage()));
 
 			throw new BadCredentialsException("无效的访问Token, Expected number but found " + tokens[0]+" or "+tokens[1]);
 		}
@@ -140,7 +140,7 @@ public class TimeKeyBasedPersistenceTokenService implements TokenService, Initia
 		}
 
 		if (expireTime<new Date().getTime()) {
-			log.log(Level.INFO, "Token expired, accountInfo = {}", extendedInfo.toString());
+			log.info(String.format("Token expired, accountInfo = {}", extendedInfo.toString()));
 			throw new BadCredentialsException("登录已过期，请重新登录");
 		}
 
@@ -154,7 +154,7 @@ public class TimeKeyBasedPersistenceTokenService implements TokenService, Initia
 		String expectedSha512Hex = Sha512DigestUtils.shaHex(content + ":" + serverSecret);
 
 		if (!expectedSha512Hex.equals(sha1Hex)) {
-			log.log(Level.INFO, "Key verification failure, accountInfo = {}", extendedInfo.toString());
+			log.info(String.format("Key verification failure, accountInfo = {}", extendedInfo.toString()));
 			throw new BadCredentialsException("Token验证失败，拒绝访问");
 		}
 

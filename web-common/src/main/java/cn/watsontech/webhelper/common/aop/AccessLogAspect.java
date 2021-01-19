@@ -8,6 +8,8 @@ import cn.watsontech.webhelper.common.security.authentication.AccountService;
 import cn.watsontech.webhelper.common.util.HttpUtils;
 import cn.watsontech.webhelper.utils.MapBuilder;
 import cn.watsontech.webhelper.utils.StringUtils;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.annotation.*;
 import org.aspectj.lang.reflect.MethodSignature;
@@ -30,8 +32,6 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
 import java.text.SimpleDateFormat;
 import java.util.*;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  * 系统日志切点类
@@ -41,7 +41,7 @@ import java.util.logging.Logger;
 @Aspect
 @Component
 public class AccessLogAspect implements EmbeddedValueResolverAware {
-    Logger log = Logger.getLogger(getClass().getName());
+    protected static final Log log = LogFactory.getLog(AccessLogAspect.class);
 
     /**
      * 本地线程日志
@@ -86,10 +86,15 @@ public class AccessLogAspect implements EmbeddedValueResolverAware {
      */
     @Before("accessLogPointCut()")
     public void doBefore(JoinPoint joinPoint) throws InterruptedException {
+
+        //注意：清空threadlocal变量，因为大部分web服务器使用线程池，会导致不释放authenticationUser
+        logThreadLocal.set(null);
+        authenticalThreadLocal.set(null);
+
         // debug模式下 显式打印开始时间用于调试
         // 在log4j中开启本类的debug
 
-        if (log.isLoggable(Level.CONFIG)) {
+        if (log.isDebugEnabled()) {
             log.info(String.format("开始计时: %s  URI: %s", new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS").format(new Date()), request.getRequestURI()));
         }
 

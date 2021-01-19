@@ -20,7 +20,7 @@
         <module>web-common</module>
 
         <!--模版web项目-->
-        <!--<module>vendor-sms</module>-->
+        <module>vendor-sms</module>
         <!--<module>web-template</module>-->
     </modules>
 

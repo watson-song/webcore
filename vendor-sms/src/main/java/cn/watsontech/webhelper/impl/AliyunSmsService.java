@@ -12,6 +12,8 @@ import com.aliyuncs.exceptions.ServerException;
 import com.aliyuncs.http.MethodType;
 import com.aliyuncs.profile.DefaultProfile;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
@@ -20,8 +22,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  * 使用阿里云短信服务需要添加以下依赖
@@ -37,7 +37,7 @@ import java.util.logging.Logger;
  */
 @ConditionalOnClass(IAcsClient.class)
 public class AliyunSmsService extends SmsService {
-    Logger log = Logger.getLogger(getClass().getName());
+    Log log = LogFactory.getLog(AliyunSmsService.class);
 
     class AliyunSmsSender implements SmsService.SmsSender {
 
@@ -89,16 +89,16 @@ public class AliyunSmsService extends SmsService {
             errMsg = responseMessage;
         } catch (ServerException e) {
             errMsg = e.getMessage();
-            log.log(Level.WARNING, String.format("发送短信失败：%s", errMsg));
+            log.info(String.format("发送短信失败：%s", errMsg));
         } catch (ClientException e) {
             errMsg = e.getMessage();
-            log.log(Level.WARNING, String.format("发送短信失败：%s", errMsg));
+            log.info(String.format("发送短信失败：%s", errMsg));
         } catch (IOException e) {
             errMsg = e.getMessage();
-            log.log(Level.WARNING, String.format("发送短信失败：%s", errMsg));
+            log.info(String.format("发送短信失败：%s", errMsg));
         }
 
-        log.log(Level.WARNING, String.format("发送短信(%s)失败, 短信参数：%s", mobile, StringUtils.arrayToCommaDelimitedString(templateDatas)));
+        log.info(String.format("发送短信(%s)失败, 短信参数：%s", mobile, StringUtils.arrayToCommaDelimitedString(templateDatas)));
         throw new IllegalArgumentException("发送短信失败："+errMsg);
     }
 

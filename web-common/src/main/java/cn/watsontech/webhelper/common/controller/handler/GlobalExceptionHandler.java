@@ -4,6 +4,8 @@ import cn.watsontech.webhelper.common.result.Result;
 import cn.watsontech.webhelper.common.security.LoginUser;
 import cn.watsontech.webhelper.common.util.HttpUtils;
 import cn.watsontech.webhelper.utils.StringUtils;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.*;
@@ -19,15 +21,13 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import javax.persistence.PersistenceException;
 import javax.servlet.http.HttpServletRequest;
 import java.util.Map;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  * Created by Watson on 2019/12/25.
  */
 @RestControllerAdvice
 public class GlobalExceptionHandler {
-    Logger log = Logger.getLogger(getClass().getName());
+    protected static final Log log = LogFactory.getLog(GlobalExceptionHandler.class);
 
     public interface ErrorSaveService {
 
@@ -49,7 +49,7 @@ public class GlobalExceptionHandler {
     public Result illegalArgumentException(IllegalArgumentException exception, final HttpServletRequest request) {
         insertErrorLog(request, exception, "参数不合法异常，返回BAD_REQUEST");
 
-        if(log.isLoggable(Level.CONFIG)) {
+        if(log.isDebugEnabled()) {
             return Result.errorBadRequest(exception.getMessage());
         }else {
             return Result.errorBadRequest(exception.getMessage());
@@ -61,7 +61,7 @@ public class GlobalExceptionHandler {
     public Result requestParameterException(MissingServletRequestParameterException exception, final HttpServletRequest request) {
         insertErrorLog(request, exception, "请求缺少参数异常，返回BAD_REQUEST");
 
-        if(log.isLoggable(Level.CONFIG)) {
+        if(log.isDebugEnabled()) {
             return Result.errorBadRequest(exception.getMessage());
         }else {
             return Result.errorBadRequest(String.format("参数：%s必传", exception.getParameterName()));
@@ -81,7 +81,7 @@ public class GlobalExceptionHandler {
     public Result dbDataIntegrityViolationException(org.springframework.dao.DataIntegrityViolationException exception, final HttpServletRequest request) {
         insertErrorLog(request, exception, "数据库异常，返回BAD_REQUEST");
 
-        if(log.isLoggable(Level.CONFIG)) {
+        if(log.isDebugEnabled()) {
             return Result.errorInternal(exception.getMessage());
         }else {
             return Result.errorInternal("对不起，发现数据冲突，请稍后再试");
@@ -93,7 +93,7 @@ public class GlobalExceptionHandler {
     public Result dbViolationException(java.sql.SQLIntegrityConstraintViolationException exception, final HttpServletRequest request) {
         insertErrorLog(request, exception, "数据库验证异常，返回BAD_REQUEST");
 
-        if(log.isLoggable(Level.CONFIG)) {
+        if(log.isDebugEnabled()) {
             return Result.errorInternal(exception.getMessage());
         }else {
             return Result.errorInternal("对不起，外键约束失败导致插入或更新数据出错，请稍后再试");
@@ -105,7 +105,7 @@ public class GlobalExceptionHandler {
     public Result dbDuplicateKeyException(org.springframework.dao.DuplicateKeyException exception, final HttpServletRequest request) {
         insertErrorLog(request, exception, "数据库冲突异常，返回BAD_REQUEST");
 
-        if(log.isLoggable(Level.CONFIG)) {
+        if(log.isDebugEnabled()) {
             return Result.errorInternal("对不起，发现数据冲突，请更换关键字后重试："+exception.getMessage());
         }else {
             return Result.errorInternal("对不起，发现数据冲突，请更换关键字后重试");
@@ -125,7 +125,7 @@ public class GlobalExceptionHandler {
     public Result persistenceException(PersistenceException exception, final HttpServletRequest request) {
         insertErrorLog(request, exception, "数据库存储异常，返回INTERNAL_SERVER_ERROR");
 
-        if(log.isLoggable(Level.CONFIG)) {
+        if(log.isDebugEnabled()) {
             return Result.errorInternal(exception.getMessage());
         }else {
             return Result.errorInternal("对不起，服务器(数据访问)出错，请稍后再试");
@@ -162,7 +162,7 @@ public class GlobalExceptionHandler {
     public Result otherException(Exception exception, final HttpServletRequest request) {
         insertErrorLog(request, exception, "未知异常，返回INTERNAL_SERVER_ERROR");
 
-        if(log.isLoggable(Level.CONFIG)) {
+        if(log.isDebugEnabled()) {
             return Result.errorInternal(exception.getMessage());
         }else {
             return Result.errorInternal("对不起，服务器出错，请稍后再试");
@@ -194,7 +194,7 @@ public class GlobalExceptionHandler {
                 fillRequestParams(request, args);
                 jdbcTemplate.saveError(args);
             }catch (Exception e) {
-                log.log(Level.SEVERE, String.format("打印报错日志：%s 发生错误：%s", ex, e));
+                log.error(String.format("打印报错日志：%s 发生错误：%s", ex, e));
             }
         }
     }

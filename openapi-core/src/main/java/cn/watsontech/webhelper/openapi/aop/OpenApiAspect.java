@@ -8,6 +8,8 @@ import cn.watsontech.webhelper.openapi.params.base.PublicApiParams;
 import cn.watsontech.webhelper.openapi.service.AppInfoService;
 import cn.watsontech.webhelper.utils.Md5Util;
 import org.apache.commons.lang3.RandomStringUtils;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.annotation.*;
 import org.aspectj.lang.reflect.MethodSignature;
@@ -20,7 +22,6 @@ import org.springframework.web.context.request.ServletRequestAttributes;
 import javax.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.logging.Logger;
 
 /**
  * Created by Watson on 2019/12/11.
@@ -28,7 +29,7 @@ import java.util.logging.Logger;
 @Aspect
 @Component
 public class OpenApiAspect {
-    Logger log = Logger.getLogger(getClass().getName());
+    protected static final Log log = LogFactory.getLog(OpenApiAspect.class);
 
     @Autowired
     AppInfoService openAppInfoService;

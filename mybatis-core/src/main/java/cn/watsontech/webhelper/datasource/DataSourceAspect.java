@@ -1,5 +1,7 @@
 package cn.watsontech.webhelper.datasource;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Before;
@@ -7,15 +9,13 @@ import org.aspectj.lang.annotation.Pointcut;
 import org.aspectj.lang.reflect.MethodSignature;
 import org.springframework.core.Ordered;
 
-import java.util.logging.Logger;
-
 /**
  * Copyright to watsontech
  * Created by Watson on 2019/12/24.
  */
 @Aspect
 public class DataSourceAspect implements Ordered {
-    Logger log = Logger.getLogger(getClass().getName());
+    Log log = LogFactory.getLog(DataSourceAspect.class);
 
     @Override
     public int getOrder() {

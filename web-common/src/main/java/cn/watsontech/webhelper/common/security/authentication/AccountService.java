@@ -6,6 +6,8 @@ import cn.watsontech.webhelper.common.security.IUserLoginService;
 import cn.watsontech.webhelper.common.security.IUserType;
 import cn.watsontech.webhelper.common.security.LoginUser;
 import cn.watsontech.webhelper.common.security.UserTypeFactory;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.*;
 import org.springframework.security.core.Authentication;
@@ -17,14 +19,12 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.util.logging.Logger;
-
 /**
  * Created by Watson on 2020/02/20.
  */
 @Service
 public class AccountService implements UserDetailsService {
-    Logger log = Logger.getLogger(getClass().getName());
+    protected static final Log log = LogFactory.getLog(AccountService.class);
 
     UserDetailsChecker preAuthenticationChecks = new DefaultPreAuthenticationChecks();
     UserDetailsChecker postAuthenticationChecks = new DefaultPostAuthenticationChecks();

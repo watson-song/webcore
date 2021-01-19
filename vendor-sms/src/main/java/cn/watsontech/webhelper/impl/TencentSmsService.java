@@ -8,6 +8,8 @@ import com.github.qcloudsms.SmsMultiSenderResult;
 import com.github.qcloudsms.SmsSingleSender;
 import com.github.qcloudsms.SmsSingleSenderResult;
 import com.github.qcloudsms.httpclient.HTTPException;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
@@ -16,8 +18,6 @@ import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
 /**
@@ -34,7 +34,7 @@ import java.util.stream.Collectors;
  */
 @ConditionalOnClass(SmsSingleSender.class)
 public class TencentSmsService extends SmsService {
-    Logger log = Logger.getLogger(getClass().getName());
+    protected static final Log log = LogFactory.getLog(TencentSmsService.class);
 
     class TencentSmsSender implements SmsSender {
 
@@ -82,14 +82,14 @@ public class TencentSmsService extends SmsService {
         } catch (HTTPException e) {
             // HTTP响应码错误
             errMsg = e.getMessage();
-            log.log(Level.WARNING, "发送短信失败", e);
+            log.error("发送短信失败", e);
         } catch (IOException e) {
             // 网络IO错误
             errMsg = e.getMessage();
-            log.log(Level.WARNING, "发送短信失败", e);
+            log.error("发送短信失败", e);
         }
 
-        log.log(Level.WARNING, String.format("发送短信(%s)失败, 短信参数：%s", mobile, StringUtils.arrayToCommaDelimitedString(templateDatas)));
+        log.error(String.format("发送短信(%s)失败, 短信参数：%s", mobile, StringUtils.arrayToCommaDelimitedString(templateDatas)));
         throw new IllegalArgumentException("发送短信失败："+errMsg);
     }
 
@@ -110,16 +110,16 @@ public class TencentSmsService extends SmsService {
                 return result.details;
             }
 
-            log.log(Level.WARNING, String.format("发送短信(%s)失败, 短信参数：%s", StringUtils.arrayToCommaDelimitedString(mobiles), StringUtils.arrayToCommaDelimitedString(templateDatas)));
+            log.error(String.format("发送短信(%s)失败, 短信参数：%s", StringUtils.arrayToCommaDelimitedString(mobiles), StringUtils.arrayToCommaDelimitedString(templateDatas)));
             throw new IllegalArgumentException("发送短信失败："+result.errMsg);
         } catch (HTTPException e) {
             // HTTP响应码错误
             e.printStackTrace();
-            log.log(Level.WARNING, "发送短信失败", e);
+            log.error("发送短信失败", e);
         } catch (IOException e) {
             // 网络IO错误
             e.printStackTrace();
-            log.log(Level.WARNING, "发送短信失败", e);
+            log.error("发送短信失败", e);
         }
 
         return Collections.emptyList();

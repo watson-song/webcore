@@ -8,6 +8,8 @@ import com.obs.services.model.*;
 import com.obs.services.model.fs.DropFolderRequest;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.time.DateFormatUtils;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
@@ -24,8 +26,6 @@ import java.net.URLEncoder;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
 /**
@@ -41,7 +41,7 @@ import java.util.stream.Collectors;
 @Service
 @ConditionalOnClass(ObsClient.class)
 public class HuaweiUploadServiceImpl extends UploadService {
-    Logger log = Logger.getLogger(getClass().getName());
+    Log log = LogFactory.getLog(HuaweiUploadServiceImpl.class);
 
     private ObsClient obsClient;
 
@@ -302,7 +302,7 @@ public class HuaweiUploadServiceImpl extends UploadService {
 
             @Override
             public void onException(ObsException exception, PutObjectBasicRequest singleRequest) {
-                log.log(Level.WARNING, String.format("文件上传失败：%s，错误：%s", singleRequest.getObjectKey(), exception.getMessage()));
+                log.info(String.format("文件上传失败：%s，错误：%s", singleRequest.getObjectKey(), exception.getMessage()));
             }
         });
         UploadProgressStatus uploadProgressStatus = obsClient.putObjects(request);
@@ -326,7 +326,7 @@ public class HuaweiUploadServiceImpl extends UploadService {
 
             @Override
             public void onException(ObsException exception, String singleRequest) {
-                log.log(Level.WARNING, String.format("删除文件夹失败：%s，错误：%s", singleRequest, exception.getMessage()));
+                log.info(String.format("删除文件夹失败：%s，错误：%s", singleRequest, exception.getMessage()));
             }
         });
 
