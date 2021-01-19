@@ -9,7 +9,7 @@ import io.swagger.annotations.ApiModelProperty;
 import javax.persistence.*;
 import java.util.Date;
 
-@ApiModel(value="cn.watsontech.webhelper.common.entity.User")
+@ApiModel
 @Table(name = "tb_user")
 public class User extends LoginUser implements CreatedEntity<User, Long, Long> {
     @Id

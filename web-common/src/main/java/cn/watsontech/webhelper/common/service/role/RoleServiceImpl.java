@@ -83,7 +83,11 @@ public class RoleServiceImpl extends BaseService<Role, Long> implements RoleServ
      */
     @Override
     public int addPermissions(long roleId, List<Long> permissionIds, LoginUser user) {
-        return roleVoMapper.addPermissionsToRole(permissionIds, roleId, user.getId(), user.getUsername());
+        if (!CollectionUtils.isEmpty(permissionIds)) {
+            return roleVoMapper.addPermissionsToRole(permissionIds, roleId, user.getId(), user.getUsername());
+        }
+
+        return 0;
     }
 
     /**
@@ -120,7 +124,9 @@ public class RoleServiceImpl extends BaseService<Role, Long> implements RoleServ
 
        //插入权限集合
        if (success>0) {
-           int permissionSuccess = addPermissions(role.getId(), form.getPermissions(), user);
+           if (CollectionUtils.isEmpty(form.getPermissions())) {
+               int permissionSuccess = addPermissions(role.getId(), form.getPermissions(), user);
+           }
        }
 
        return role;

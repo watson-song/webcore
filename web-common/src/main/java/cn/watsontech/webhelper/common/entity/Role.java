@@ -7,7 +7,7 @@ import io.swagger.annotations.ApiModelProperty;
 import javax.persistence.*;
 import java.util.Date;
 
-@ApiModel(value="cn.watsontech.webhelper.common.entity.Role")
+@ApiModel
 @Table(name = "tb_role")
 public class Role implements CreatedEntity<Role, Long, Long> {
     @Id
@@ -15,19 +15,19 @@ public class Role implements CreatedEntity<Role, Long, Long> {
     @ApiModelProperty(value="id")
     private Long id;
 
-    @ApiModelProperty(value="label")
+    @ApiModelProperty(value="角色名称")
     private String label;
 
-    @ApiModelProperty(value="name")
+    @ApiModelProperty(value="系统标识")
     private String name;
 
-    @ApiModelProperty(value="tag")
+    @ApiModelProperty(value="标签")
     private String tag;
 
     /**
-     * 0禁用，1可以
+     * 状态：0禁用，1可以
      */
-    @ApiModelProperty(value="status0禁用，1可以")
+    @ApiModelProperty(value="状态：0 禁用，1可以，也可以自定义")
     private Integer status;
 
     /**
@@ -43,20 +43,20 @@ public class Role implements CreatedEntity<Role, Long, Long> {
     private Boolean builtinType;
 
     @Column(name = "created_by")
-    @ApiModelProperty(value="createdBy")
+    @ApiModelProperty(value="创建人")
     private Long createdBy;
 
     /**
      * 创建时间
      */
     @Column(name = "created_time")
-    @ApiModelProperty(value="createdTime创建时间")
+    @ApiModelProperty(value="创建时间")
     private Date createdTime;
 
     /**
      * 版本号
      */
-    @ApiModelProperty(value="version版本号")
+    @ApiModelProperty(value="版本号")
 //    @tk.mybatis.mapper.annotation.Version
     private Integer version;
 
@@ -64,27 +64,27 @@ public class Role implements CreatedEntity<Role, Long, Long> {
      * 创建人名称
      */
     @Column(name = "created_by_name")
-    @ApiModelProperty(value="createdByName创建人名称")
+    @ApiModelProperty(value="创建人名称")
     private String createdByName;
 
     /**
      * 最后更新人ID
      */
     @Column(name = "modified_by")
-    @ApiModelProperty(value="modifiedBy最后更新人ID")
+    @ApiModelProperty(value="最后更新人ID")
     private Long modifiedBy;
 
     /**
      * 最后更新时间
      */
     @Column(name = "modified_time")
-    @ApiModelProperty(value="modifiedTime最后更新时间")
+    @ApiModelProperty(value="最后更新时间")
     private Date modifiedTime;
 
     /**
      * 是否已启用
      */
-    @ApiModelProperty(value="enabled是否已启用")
+    @ApiModelProperty(value="是否启用")
     private boolean enabled = true;
 
     /**

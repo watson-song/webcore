@@ -9,7 +9,7 @@ import io.swagger.annotations.ApiModelProperty;
 import javax.persistence.*;
 import java.util.Date;
 
-@ApiModel(value="cn.watsontech.webhelper.common.entity.UserMessage")
+@ApiModel
 @Table(name = "tb_user_message")
 public class UserMessage implements Message, CreatedEntity<UserMessage, Long, Long> {
     @Id

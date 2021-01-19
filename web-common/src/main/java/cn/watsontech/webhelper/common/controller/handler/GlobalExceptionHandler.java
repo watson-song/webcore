@@ -6,6 +6,7 @@ import cn.watsontech.webhelper.common.util.HttpUtils;
 import cn.watsontech.webhelper.utils.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.authentication.*;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -46,7 +47,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(IllegalArgumentException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public Result illegalArgumentException(IllegalArgumentException exception, final HttpServletRequest request) {
-        insertErrorLog(request, exception, "参数不合法异常illegalArgumentException，返回BAD_REQUEST");
+        insertErrorLog(request, exception, "参数不合法异常，返回BAD_REQUEST");
 
         if(log.isLoggable(Level.CONFIG)) {
             return Result.errorBadRequest(exception.getMessage());
@@ -58,7 +59,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(MissingServletRequestParameterException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public Result requestParameterException(MissingServletRequestParameterException exception, final HttpServletRequest request) {
-        insertErrorLog(request, exception, "请求缺少参数异常MissingServletRequestParameterException，返回BAD_REQUEST");
+        insertErrorLog(request, exception, "请求缺少参数异常，返回BAD_REQUEST");
 
         if(log.isLoggable(Level.CONFIG)) {
             return Result.errorBadRequest(exception.getMessage());
@@ -70,7 +71,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(BindException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public Result bindException(BindException exception, final HttpServletRequest request) {
-        insertErrorLog(request, exception, "参数绑定异常BindException，返回BAD_REQUEST");
+        insertErrorLog(request, exception, "参数绑定异常，返回BAD_REQUEST");
 
         return Result.errorBindErrors(exception.getFieldErrors());
     }
@@ -78,7 +79,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(org.springframework.dao.DataIntegrityViolationException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public Result dbDataIntegrityViolationException(org.springframework.dao.DataIntegrityViolationException exception, final HttpServletRequest request) {
-        insertErrorLog(request, exception, "数据库异常DataIntegrityViolationException，返回BAD_REQUEST");
+        insertErrorLog(request, exception, "数据库异常，返回BAD_REQUEST");
 
         if(log.isLoggable(Level.CONFIG)) {
             return Result.errorInternal(exception.getMessage());
@@ -90,7 +91,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(java.sql.SQLIntegrityConstraintViolationException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public Result dbViolationException(java.sql.SQLIntegrityConstraintViolationException exception, final HttpServletRequest request) {
-        insertErrorLog(request, exception, "数据库验证异常SQLIntegrityConstraintViolationException，返回BAD_REQUEST");
+        insertErrorLog(request, exception, "数据库验证异常，返回BAD_REQUEST");
 
         if(log.isLoggable(Level.CONFIG)) {
             return Result.errorInternal(exception.getMessage());
@@ -102,7 +103,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(org.springframework.dao.DuplicateKeyException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public Result dbDuplicateKeyException(org.springframework.dao.DuplicateKeyException exception, final HttpServletRequest request) {
-        insertErrorLog(request, exception, "数据库冲突异常DuplicateKeyException，返回BAD_REQUEST");
+        insertErrorLog(request, exception, "数据库冲突异常，返回BAD_REQUEST");
 
         if(log.isLoggable(Level.CONFIG)) {
             return Result.errorInternal("对不起，发现数据冲突，请更换关键字后重试："+exception.getMessage());
@@ -114,7 +115,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(org.springframework.web.bind.MethodArgumentNotValidException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public Result methodArgumentNotValidException(org.springframework.web.bind.MethodArgumentNotValidException exception, final HttpServletRequest request) {
-        insertErrorLog(request, exception, "方法参数验证异常MethodArgumentNotValidException，返回BAD_REQUEST");
+        insertErrorLog(request, exception, "方法参数验证异常，返回BAD_REQUEST");
 
         return Result.errorBindErrors(exception.getBindingResult().getFieldErrors());
     }
@@ -122,7 +123,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(PersistenceException.class)
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     public Result persistenceException(PersistenceException exception, final HttpServletRequest request) {
-        insertErrorLog(request, exception, "数据库存储异常PersistenceException，返回INTERNAL_SERVER_ERROR");
+        insertErrorLog(request, exception, "数据库存储异常，返回INTERNAL_SERVER_ERROR");
 
         if(log.isLoggable(Level.CONFIG)) {
             return Result.errorInternal(exception.getMessage());
@@ -132,16 +133,34 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(AuthenticationException.class)
-    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+    @ResponseStatus(HttpStatus.UNAUTHORIZED)
     public Result authenticationException(AuthenticationException exception, final HttpServletRequest request) {
-        insertErrorLog(request, exception, "授权失败异常AuthenticationException，返回INTERNAL_SERVER_ERROR");
-        return Result.errorInternal(exception.getMessage());
+        insertErrorLog(request, exception, "授权验证异常，返回UNAUTHORIZED");
+        return Result.errorResult(401, exception.getMessage());
+    }
+
+    @ExceptionHandler({AccountStatusException.class})
+    @ResponseStatus(HttpStatus.FORBIDDEN)
+    public Result authenticationExceptionCredentialsExpired(AccountStatusException exception, final HttpServletRequest request) {
+        int errorCode = 4031;
+        if (exception instanceof LockedException) {
+            errorCode = 4031;
+        }else if (exception instanceof CredentialsExpiredException) {
+            errorCode = 4032;
+        }else if (exception instanceof AccountExpiredException) {
+            errorCode = 4033;
+        }else if (exception instanceof DisabledException) {
+            errorCode = 4034;
+        }
+
+        insertErrorLog(request, exception, String.format("账户状态异常(%s)，返回码:%s", errorCode, "FORBIDDEN"));
+        return Result.errorResult(errorCode, exception.getMessage());
     }
 
     @ExceptionHandler(Exception.class)
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     public Result otherException(Exception exception, final HttpServletRequest request) {
-        insertErrorLog(request, exception, "未知异常Exception，返回INTERNAL_SERVER_ERROR");
+        insertErrorLog(request, exception, "未知异常，返回INTERNAL_SERVER_ERROR");
 
         if(log.isLoggable(Level.CONFIG)) {
             return Result.errorInternal(exception.getMessage());

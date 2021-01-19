@@ -7,7 +7,7 @@ import io.swagger.annotations.ApiModelProperty;
 import javax.persistence.*;
 import java.util.Date;
 
-@ApiModel(value="cn.watsontech.webhelper.common.entity.SiteOption")
+@ApiModel
 @Table(name = "tb_site_option")
 public class SiteOption implements CreatedEntity<SiteOption, Long, Long> {
     @Id

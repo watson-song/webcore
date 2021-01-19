@@ -9,7 +9,7 @@ import io.swagger.annotations.ApiModelProperty;
 import javax.persistence.*;
 import java.util.Date;
 
-@ApiModel(value="cn.watsontech.webhelper.common.entity.Admin")
+@ApiModel
 @Table(name = "tb_admin")
 public class Admin extends LoginUser implements CreatedEntity<Admin, Long, Long> {
     @Id
@@ -20,14 +20,14 @@ public class Admin extends LoginUser implements CreatedEntity<Admin, Long, Long>
     /**
      * 用户名
      */
-    @ApiModelProperty(value="username用户名")
+    @ApiModelProperty(value="用户名")
     private String username;
 
     /**
      * 昵称
      */
     @Column(name = "nick_name")
-    @ApiModelProperty(value="nickName昵称")
+    @ApiModelProperty(value="昵称")
     private String nickName;
 
     /**
@@ -45,19 +45,19 @@ public class Admin extends LoginUser implements CreatedEntity<Admin, Long, Long>
     /**
      * 性别，0未知，1男，2女
      */
-    @ApiModelProperty(value="gender性别，0未知，1男，2女")
+    @ApiModelProperty(value="性别，0未知，1男，2女")
     private String gender;
 
     /**
      * 账号类型：1管理员，2运营
      */
-    @ApiModelProperty(value="type账号类型：1管理员，2运营")
+    @ApiModelProperty(value="账号类型：1管理员，2运营，支持自定义")
     private Integer type;
 
     /**
      * 版本号
      */
-    @ApiModelProperty(value="version版本号")
+    @ApiModelProperty(value="版本号")
 //    @tk.mybatis.mapper.annotation.Version
     private Integer version;
 
@@ -65,14 +65,14 @@ public class Admin extends LoginUser implements CreatedEntity<Admin, Long, Long>
      * 创建人ID
      */
     @Column(name = "created_by")
-    @ApiModelProperty(value="createdBy创建人ID")
+    @ApiModelProperty(value="创建人ID")
     private Long createdBy;
 
     /**
      * 创建人名称
      */
     @Column(name = "created_by_name")
-    @ApiModelProperty(value="createdByName创建人名称")
+    @ApiModelProperty(value="创建人名称")
     private String createdByName;
 
 
@@ -80,81 +80,81 @@ public class Admin extends LoginUser implements CreatedEntity<Admin, Long, Long>
      * 最后更新人ID
      */
     @Column(name = "modified_by")
-    @ApiModelProperty(value="modifiedBy最后更新人ID")
+    @ApiModelProperty(value="最后更新人ID")
     private Long modifiedBy;
 
     /**
      * 最后更新时间
      */
     @Column(name = "modified_time")
-    @ApiModelProperty(value="modifiedTime最后更新时间")
+    @ApiModelProperty(value="最后更新时间")
     private Date modifiedTime;
 
     @Column(name = "created_time")
-    @ApiModelProperty(value="createdTime")
+    @ApiModelProperty(value="创建时间")
     private Date createdTime;
 
     /**
      * 头像
      */
     @Column(name = "avatar_url")
-    @ApiModelProperty(value="avatarUrl头像")
+    @ApiModelProperty(value="头像")
     private String avatarUrl;
 
     /**
      * 手机号码
      */
-    @ApiModelProperty(value="mobile手机号码")
+    @ApiModelProperty(value="手机号码")
     private String mobile;
 
     /**
      * 邮箱
      */
-    @ApiModelProperty(value="email邮箱")
+    @ApiModelProperty(value="邮箱")
     private String email;
 
     /**
      * 地址
      */
-    @ApiModelProperty(value="address地址")
+    @ApiModelProperty(value="联系地址")
     private String address;
 
     /**
      * 是否启用web登录
      */
     @Column(name = "is_weblogin_active")
-    @ApiModelProperty(value="isWebloginActive是否启用web登录")
+    @ApiModelProperty(value="是否启用web登录")
     private Boolean isWebloginActive;
 
     /**
      * 加密密码
      */
-    @ApiModelProperty(value="password加密密码")
+    @ApiModelProperty(value="加密密码")
     private String password;
 
     /**
      * 是否已过期
      */
-    @ApiModelProperty(value="expired是否已过期")
+    @ApiModelProperty(value="是否已过期")
     private Boolean expired;
 
     /**
      * 是否已锁定
      */
-    @ApiModelProperty(value="locked是否已锁定")
+    @ApiModelProperty(value="是否已锁定")
     private Boolean locked;
 
     /**
      * 密码是否已过期
      */
     @Column(name = "credentials_expired")
-    @ApiModelProperty(value="credentialsExpired密码是否已过期")
+    @ApiModelProperty(value="密码是否已过期")
     private Boolean credentialsExpired;
 
     /**
      * 是否已启用
      */
-    @ApiModelProperty(value="enabled是否已启用")
+    @ApiModelProperty(value="是否启用")
     @Column(name = "enabled")
     private Boolean isEnabled;
 
@@ -162,35 +162,35 @@ public class Admin extends LoginUser implements CreatedEntity<Admin, Long, Long>
      * 最后登录ip
      */
     @Column(name = "login_ip")
-    @ApiModelProperty(value="loginIp最后登录ip")
+    @ApiModelProperty(value="最后登录ip")
     private String loginIp;
 
     /**
      * 最后登录时间
      */
     @Column(name = "login_date")
-    @ApiModelProperty(value="loginDate最后登录时间")
+    @ApiModelProperty(value="最后登录时间")
     private Date loginDate;
 
     /**
      * 上次登录ip
      */
     @Column(name = "last_login_ip")
-    @ApiModelProperty(value="lastLoginIp上次登录ip")
+    @ApiModelProperty(value="上次登录ip")
     private String lastLoginIp;
 
     /**
      * 上次登录日期
      */
     @Column(name = "last_login_date")
-    @ApiModelProperty(value="lastLoginDate上次登录日期")
+    @ApiModelProperty(value="上次登录日期")
     private Date lastLoginDate;
 
     /**
      * 微信额外信息
      */
     @Column(name = "extra_data")
-    @ApiModelProperty(value="extraData微信额外信息")
+    @ApiModelProperty(value="额外JSON信息")
     private JSONObject extraData;
 
     /**

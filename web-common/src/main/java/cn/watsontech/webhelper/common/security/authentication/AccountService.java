@@ -143,11 +143,13 @@ public class AccountService implements UserDetailsService {
         String[] withPasswordProperties = fillArray(selectProperties, "password");//添加密码字段
         LoginUser loadedUser = loadAccountInfo("username", username, userType, withPasswordProperties, false);
 
-        preAuthenticationChecks.check(loadedUser);
-//        Assert.isTrue(passwordEncoder.matches(password, loadedUser.getPassword()), "密码不正确");
+        //检查密码是否匹配
         if (!passwordEncoder.matches(password, loadedUser.getPassword())) {
             throw new BadCredentialsException("登录账号或密码不正确");
         }
+        //检查是否锁定、禁用或过期
+        preAuthenticationChecks.check(loadedUser);
+        //检查是否密码已过期
         postAuthenticationChecks.check(loadedUser);
 
         //更新登录时间

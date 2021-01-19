@@ -9,7 +9,7 @@ import io.swagger.annotations.ApiModelProperty;
 import javax.persistence.*;
 import java.util.Date;
 
-@ApiModel(value="cn.watsontech.webhelper.common.entity.AdminMessage")
+@ApiModel
 @Table(name = "tb_admin_message")
 public class AdminMessage implements Message, CreatedEntity<AdminMessage, Long, Long> {
     @Id
@@ -21,50 +21,50 @@ public class AdminMessage implements Message, CreatedEntity<AdminMessage, Long, 
      * 管理员id
      */
     @Column(name = "user_id")
-    @ApiModelProperty(value="userId管理员id")
+    @ApiModelProperty(value="管理员id")
     private Long userId;
 
     /**
      * 消息类型
      */
-    @ApiModelProperty(value="type消息类型")
+    @ApiModelProperty(value="消息类型")
     private String type;
 
     /**
      * 标题
      */
-    @ApiModelProperty(value="title标题")
+    @ApiModelProperty(value="标题")
     private String title;
 
     /**
      * 内容
      */
-    @ApiModelProperty(value="content内容")
+    @ApiModelProperty(value="内容")
     private String content;
 
     /**
      * 状态
      */
-    @ApiModelProperty(value="state状态")
+    @ApiModelProperty(value="状态")
     private String state;
 
     /**
      * 状态名称
      */
     @Column(name = "state_desc")
-    @ApiModelProperty(value="stateDesc状态名称")
+    @ApiModelProperty(value="状态名称")
     private String stateDesc;
 
     /**
      * 是否启用
      */
-    @ApiModelProperty(value="enabled是否启用")
+    @ApiModelProperty(value="是否启用")
     private Boolean enabled;
 
     /**
      * 版本号
      */
-    @ApiModelProperty(value="version版本号")
+    @ApiModelProperty(value="版本号")
 //    @tk.mybatis.mapper.annotation.Version
     private Integer version;
 
@@ -72,39 +72,39 @@ public class AdminMessage implements Message, CreatedEntity<AdminMessage, Long, 
      * 创建人ID
      */
     @Column(name = "created_by")
-    @ApiModelProperty(value="createdBy创建人ID")
+    @ApiModelProperty(value="创建人ID")
     private Long createdBy;
 
     /**
      * 创建人名称
      */
     @Column(name = "created_by_name")
-    @ApiModelProperty(value="createdByName创建人名称")
+    @ApiModelProperty(value="创建人名称")
     private String createdByName;
 
     @Column(name = "created_time")
-    @ApiModelProperty(value="createdTime")
+    @ApiModelProperty(value="创建时间")
     private Date createdTime;
 
     /**
      * 最后更新人ID
      */
     @Column(name = "modified_by")
-    @ApiModelProperty(value="modifiedBy最后更新人ID")
+    @ApiModelProperty(value="最后更新人ID")
     private Long modifiedBy;
 
     /**
      * 最后更新时间
      */
     @Column(name = "modified_time")
-    @ApiModelProperty(value="modifiedTime最后更新时间")
+    @ApiModelProperty(value="最后更新时间")
     private Date modifiedTime;
 
     /**
      * 额外数据
      */
     @Column(name = "extra_data")
-    @ApiModelProperty(value="extraData额外数据")
+    @ApiModelProperty(value="额外数据")
     private JSONObject extraData;
 
     /**

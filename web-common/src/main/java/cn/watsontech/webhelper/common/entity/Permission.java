@@ -7,7 +7,7 @@ import io.swagger.annotations.ApiModelProperty;
 import javax.persistence.*;
 import java.util.Date;
 
-@ApiModel(value="cn.watsontech.webhelper.common.entity.Permission")
+@ApiModel
 @Table(name = "tb_permission")
 public class Permission implements CreatedEntity<Permission, Long, Long> {
     @Id
@@ -15,39 +15,39 @@ public class Permission implements CreatedEntity<Permission, Long, Long> {
     @ApiModelProperty(value="id")
     private Long id;
 
-    @ApiModelProperty(value="label")
+    @ApiModelProperty(value="权限名称")
     private String label;
 
-    @ApiModelProperty(value="name")
+    @ApiModelProperty(value="系统标识")
     private String name;
 
     @Column(name = "parent_id")
-    @ApiModelProperty(value="parentId")
+    @ApiModelProperty(value="父亲ID")
     private Long parentId;
 
-    @ApiModelProperty(value="weight")
+    @ApiModelProperty(value="权重")
     private Integer weight;
 
     @ApiModelProperty(value="是否启用")
     private Boolean enabled;
 
-    @ApiModelProperty(value="version")
+    @ApiModelProperty(value="版本号")
 //    @tk.mybatis.mapper.annotation.Version
     private Integer version;
 
     @Column(name = "created_by")
-    @ApiModelProperty(value="createdBy")
+    @ApiModelProperty(value="创建人ID")
     private Long createdBy;
 
     @Column(name = "created_by_name")
-    @ApiModelProperty(value="createdByName")
+    @ApiModelProperty(value="创建人名称")
     private String createdByName;
 
     /**
      * 创建时间
      */
     @Column(name = "created_time")
-    @ApiModelProperty(value="createdTime创建时间")
+    @ApiModelProperty(value="创建时间")
     private Date createdTime;
 
     /**

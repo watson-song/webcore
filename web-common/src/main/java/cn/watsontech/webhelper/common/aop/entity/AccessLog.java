@@ -7,7 +7,7 @@ import io.swagger.annotations.ApiModelProperty;
 import javax.persistence.*;
 import java.util.Date;
 
-@ApiModel(value="cn.watsontech.webhelper.common.aop.entity.Access")
+@ApiModel
 @Table(name = "tb_access_log")
 public class AccessLog implements CreatedEntity<AccessLog, Long, Long> {
     @Id

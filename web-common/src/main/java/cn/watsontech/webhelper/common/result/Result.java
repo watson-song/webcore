@@ -29,7 +29,7 @@ public class Result<T> {
 //    Object error;
 
     @ApiModelProperty(notes = "仅当有多条错误提示时有此值")
-    List errors;
+    List<Object> errors;
 
     public Result() {}
 

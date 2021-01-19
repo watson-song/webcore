@@ -7,7 +7,7 @@ import io.swagger.annotations.ApiModelProperty;
 import javax.persistence.*;
 import java.util.Date;
 
-@ApiModel(value="cn.watsontech.webhelper.common.entity.RefreshToken")
+@ApiModel
 @Table(name = "tb_refreshtoken")
 public class RefreshToken implements CreatedEntity<RefreshToken, Long, Long> {
     @Id
