@@ -1,6 +1,9 @@
 ## WebCore project:: useful helpers for spring web project [![Maven Central](https://maven-badges.herokuapp.com/maven-central/cn.watsontech/web-core/badge.svg)](https://maven-badges.herokuapp.com/maven-central/cn.watsontech/web-core)
 
 You can use the this project for your spring web project to 
+V0.2.1.6更新
+1) 添加角色与权限关联绑定
+   完善角色与权限方法
 
 V0.2.1更新
 1) 分离各模块，使使用者可以按需加载，具体模块有
