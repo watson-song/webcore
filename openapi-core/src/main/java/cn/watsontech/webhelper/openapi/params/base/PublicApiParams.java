@@ -1,5 +1,6 @@
 package cn.watsontech.webhelper.openapi.params.base;
 
+import java.util.Collection;
 import java.util.List;
 
 /**
@@ -54,7 +55,7 @@ public interface PublicApiParams {
      * @param extraApiParams 需要参与签名的额外参数对象
      * 返回按参数名字母升序排列的非空请求参数拼接字符串
      */
-    String getNeedSignParamString(List<OpenApiParams> extraApiParams);
+    String getNeedSignParamString(Collection<OpenApiParams> extraApiParams);
 
     /**
      * 请求id

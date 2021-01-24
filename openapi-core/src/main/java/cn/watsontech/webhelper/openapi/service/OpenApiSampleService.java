@@ -7,7 +7,7 @@ import org.springframework.stereotype.Service;
  * Created by Watson on 2020/02/09.
  */
 @Service
-public class OpenApiService {
+public class OpenApiSampleService {
 
     /**
      * 发送邮件

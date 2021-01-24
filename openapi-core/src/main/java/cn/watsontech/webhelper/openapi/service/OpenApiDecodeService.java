@@ -3,8 +3,11 @@ package cn.watsontech.webhelper.openapi.service;
 import cn.watsontech.webhelper.common.result.Result;
 import cn.watsontech.webhelper.common.vo.WxAuthorizeUserVo;
 import cn.watsontech.webhelper.openapi.error.OpenApiResponseErrorHandler;
-import cn.watsontech.webhelper.utils.MapBuilder;
-import cn.watsontech.webhelper.utils.MapUrlParamsUtils;
+import cn.watsontech.webhelper.openapi.form.wx.WxMaSubscribeMsgForm;
+import cn.watsontech.webhelper.openapi.form.wx.WxMessageData;
+import cn.watsontech.webhelper.openapi.form.wx.WxMpSubscribeMsgForm;
+import cn.watsontech.webhelper.openapi.params.base.MapOpenApiParams;
+import cn.watsontech.webhelper.openapi.params.base.OpenApiParamsVo;
 import cn.watsontech.webhelper.utils.Md5Util;
 import org.apache.commons.beanutils.ConvertUtils;
 import org.apache.commons.beanutils.locale.converters.DateLocaleConverter;
@@ -31,12 +34,14 @@ public class OpenApiDecodeService {
     static final String WXAPP_LOGIN_URL = "/api/open/v1/%s/wxapp/login";
     static final String WXAPP_PARSE_USERINFO_URL = "/api/open/v1/%s/wxapp/parseWxUserInfo";
     static final String WXAPP_SECCHECK_TEXT_URL = "/api/open/v1/%s/secCheck/text";
+    static final String WXAPP_SEND_SUBSCRIBE_MESSAGE = "/api/open/v1/%s/wxapp/sendMaSubscribeMsg";//POST 发送小程序订阅消息
 
     static final String FILE_BATCH_UPLOAD_URL = "/api/open/v1/%s/files/batch";
 
     static final String WXPUB_AUTHORIZATION_URL = "/api/open/v1/%s/wxpub/buildAuthorizationUrl";//获取授权验证url
     static final String WXPUB_JSTICKETS_URL = "/api/open/v1/%s/wxpub/jsTickets";//获取jsticket
     static final String WXPUB_AUTHCODE_TO_USERINFO_URL = "/api/open/v1/%s/wxpub/getWxAuthorizeUserInfo";//authCode换取userInf
+    static final String WXPUB_SEND_SUBSCRIBE_MESSAGE = "/api/open/v1/%s/wxpub/sendMpSubscribeMsg";//POST 发送公众号订阅消息
 
 
     public OpenApiDecodeService(RestTemplate restTemplate, String host) {
@@ -128,7 +133,7 @@ public class OpenApiDecodeService {
     public WxAppLoginResponse wxAppLogin(String appid, String appSecret, String wxAppId, String code) {
         String requestUrl = String.format(WXAPP_LOGIN_URL, appid);
         WxAppLoginForm form = new WxAppLoginForm(wxAppId, code);
-        String query = MapUrlParamsUtils.getUrlParamsByMap(openApiParams(appid, appSecret, objectToMap(form), requestUrl));
+        String query = openApiParams(appid, appSecret, objectToMap(form), requestUrl).toUrl();
         return postForResult(requestUrl, query, form, WxAppLoginResponse.class);
     }
 
@@ -248,7 +253,7 @@ public class OpenApiDecodeService {
     public WxPubSuccessResponse wxpubBuildAuthorizationUrl(String appid, String appSecret, String wxAppId, String redirectURI, String scope, String state) {
         String requestUrl = String.format(WXPUB_AUTHORIZATION_URL, appid);
         WxPubBuildAuthorizationUrlForm form = new WxPubBuildAuthorizationUrlForm(wxAppId, redirectURI, scope, state);
-        String query = MapUrlParamsUtils.getUrlParamsByMap(openApiParams(appid, appSecret, objectToMap(form), requestUrl));
+        String query = openApiParams(appid, appSecret, objectToMap(form), requestUrl).toUrl();
         return postForResult(requestUrl, query, form, WxPubSuccessResponse.class);
     }
 
@@ -258,7 +263,7 @@ public class OpenApiDecodeService {
     public Map wxpubGetJsTickets(String appid, String appSecret, String wxAppId, String url) {
         String requestUrl = String.format(WXPUB_JSTICKETS_URL, appid);
         WxPubGetJsTicketForm form = new WxPubGetJsTicketForm(wxAppId, url);
-        String query = MapUrlParamsUtils.getUrlParamsByMap(openApiParams(appid, appSecret, objectToMap(form), requestUrl));
+        String query = openApiParams(appid, appSecret, objectToMap(form), requestUrl).toUrl();
         return postForResult(requestUrl, query, form, Map.class);
     }
 
@@ -268,8 +273,43 @@ public class OpenApiDecodeService {
     public WxAuthorizeUserVo wxpubExchangeAuthCodeToUserInfo(String appid, String appSecret, String wxAppId, String code) {
         String requestUrl = String.format(WXPUB_AUTHCODE_TO_USERINFO_URL, appid);
         WxPubExchangeAuthCodeToUserForm form = new WxPubExchangeAuthCodeToUserForm(wxAppId, code);
-        String query = MapUrlParamsUtils.getUrlParamsByMap(openApiParams(appid, appSecret, objectToMap(form), requestUrl));
+        String query = openApiParams(appid, appSecret, objectToMap(form), requestUrl).toUrl();
         return postForResult(requestUrl, query, form, WxAuthorizeUserVo.class);
+    }
+
+    public static class BaseSuccessResponse<T> {
+        T success;
+
+        public T getSuccess() {
+            return success;
+        }
+
+        public void setSuccess(T success) {
+            this.success = success;
+        }
+    }
+
+    /**
+     * 发送小程序订阅消息
+     */
+    public BaseSuccessResponse<Integer> sendWxMaSubscribeMessage(String appid, String appSecret, String wxAppId, String templateId, String toUser, String page, List<WxMessageData> data) {
+        String requestUrl = String.format(WXAPP_SEND_SUBSCRIBE_MESSAGE, appid);
+        //String wxAppid, String templateId, String toUser, String page, List<WxMessageData> data
+        WxMaSubscribeMsgForm form = new WxMaSubscribeMsgForm(wxAppId, templateId, toUser, page, data);
+        String query = openApiParams(appid, appSecret, objectToMap(form), requestUrl).toUrl();
+        return postForResult(requestUrl, query, form, BaseSuccessResponse.class);
+    }
+
+    /**
+     * 发送公众号订阅消息
+     */
+    public BaseSuccessResponse<Boolean> sendWxMpSubscribeMessage(String appid, String appSecret, String wxAppId, String templateId, String toUser, String url, String scene, String title, String contentValue, String contentColor, WxMpSubscribeMsgForm.MiniApp miniProgram) {
+        String requestUrl = String.format(WXPUB_SEND_SUBSCRIBE_MESSAGE, appid);
+        //String wxAppid, String templateId, String toUser, String url, String scene, String title, String contentValue, String contentColor
+        WxMpSubscribeMsgForm form = new WxMpSubscribeMsgForm(wxAppId, templateId, toUser, url, scene, title, contentValue, contentColor);
+        form.setMiniProgram(miniProgram);
+        String query = openApiParams(appid, appSecret, objectToMap(form), requestUrl).toUrl();
+        return postForResult(requestUrl, query, form, BaseSuccessResponse.class);
     }
 
     protected <T> T postFilesForResult(String requestUrl, String query, Object requestData, Class<T> responseType) {
@@ -407,19 +447,25 @@ public class OpenApiDecodeService {
         return host + url + "?" + query;
     }
 
-    protected Map<String, Object> openApiParams(String appid, String appSecret, Map<String, Object> queryParams, String requestUrl) {
-        Map<String, Object> willSignParams = MapBuilder.builder().putNext("appid", appid).putNext("timestamp", System.currentTimeMillis()).putNext("nonce", RandomStringUtils.randomAlphabetic(5));
-        if (queryParams==null) {
-            queryParams = new HashMap<>();
-        }
-        queryParams.putAll(willSignParams);
+    protected OpenApiParamsVo openApiParams(String appid, String appSecret, MapOpenApiParams<String, Object> queryParams, String requestUrl) {
+        OpenApiParamsVo openApiParamsVo = new OpenApiParamsVo();
+        openApiParamsVo.setAppid(appid);
+        openApiParamsVo.setTimestamp(System.currentTimeMillis());
+        openApiParamsVo.setNonce(RandomStringUtils.randomAlphabetic(5));
 
-        willSignParams.put("sign", signParams(queryParams, requestUrl, appSecret));
-        return willSignParams;
+//        Map<String, Object> willSignParams = MapBuilder.builder().putNext("appid", appid).putNext("timestamp", System.currentTimeMillis()).putNext("nonce", RandomStringUtils.randomAlphabetic(5));
+//        if (queryParams==null) {
+//            queryParams = new HashMap<>();
+//        }
+//        queryParams.putAll(willSignParams);
+        String needSignParamString = openApiParamsVo.getNeedSignParamString(Arrays.asList(queryParams));
+
+        openApiParamsVo.setSign(signParams(needSignParamString, requestUrl, appSecret));
+        return openApiParamsVo;
     }
 
-    protected String signParams(Map<String, Object> apiParams, String requestUrl, String appSecret) {
-        String needSignParamString = getNeedSignParamString(apiParams);
+    protected String signParams(String needSignParamString, String requestUrl, String appSecret) {
+//        String needSignParamString = getNeedSignParamString(apiParams);
         Assert.isTrue(needSignParamString!=null&&!needSignParamString.equals(""), "请求签名参数列表为空");
 
         return Md5Util.MD5Encode(String.format("%s&appSecret=%s&url=%s", needSignParamString, appSecret, requestUrl)).toUpperCase();
@@ -464,12 +510,12 @@ public class OpenApiDecodeService {
         return obj;
     }
 
-    protected Map<String, Object> objectToMap(Object obj) {
+    protected MapOpenApiParams<String, Object> objectToMap(Object obj) {
         if(obj == null)
             return null;
 
         Map<Object, Object> beanMap= new org.apache.commons.beanutils.BeanMap(obj);
-        Map<String, Object> result = new HashMap<>();
+        MapOpenApiParams<String, Object> result = new MapOpenApiParams<>();
         //移除class并重新装map，beanmap不能put
         for (Object keyObject:beanMap.keySet()) {
             String key = keyObject.toString();

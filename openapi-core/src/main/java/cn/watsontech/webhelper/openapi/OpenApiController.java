@@ -4,7 +4,7 @@ import cn.watsontech.webhelper.common.result.Result;
 import cn.watsontech.webhelper.openapi.aop.annotation.OpenApi;
 import cn.watsontech.webhelper.openapi.params.OpenApiLoginUser;
 import cn.watsontech.webhelper.openapi.params.base.OpenApiParamsVo;
-import cn.watsontech.webhelper.openapi.service.OpenApiService;
+import cn.watsontech.webhelper.openapi.service.OpenApiSampleService;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -19,7 +19,7 @@ import java.util.Map;
 @RequestMapping("/api/open/v1/{appid}")
 public class OpenApiController {
     @Autowired
-    OpenApiService service;
+    OpenApiSampleService service;
 
     @ApiOperation(value = "发送邮件")
     @PostMapping("/mail/send")

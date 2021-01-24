@@ -1,11 +1,14 @@
 package cn.watsontech.webhelper.openapi.params.base;
 
+import com.alibaba.fastjson.JSON;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import io.swagger.annotations.ApiModelProperty;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.springframework.util.CollectionUtils;
-import org.springframework.util.StringUtils;
 
 import javax.validation.constraints.NotNull;
-import java.lang.reflect.Array;
 import java.lang.reflect.Field;
 import java.util.*;
 
@@ -14,6 +17,8 @@ import java.util.*;
  * Created by Watson on 2020/02/09.
  */
 public class OpenApiParamsVo implements PublicApiParams {
+    @IgnoreField
+    static final Log log = LogFactory.getLog(OpenApiParamsVo.class);
 
     @ApiModelProperty(name = "appid")
     @NotNull(message = "appid不能为空")
@@ -36,8 +41,8 @@ public class OpenApiParamsVo implements PublicApiParams {
     String requestId;
 
     @Override
-    public String getNeedSignParamString(List<OpenApiParams> extraApiParams) {
-        Map<Field, Object> fieldMap = new HashMap<>();
+    public String getNeedSignParamString(Collection<OpenApiParams> extraApiParams) {
+        Map<String, String> fieldMap = new HashMap<>();
 
         //1、首先获取本类和子类下的所有fields
         try {
@@ -46,53 +51,45 @@ public class OpenApiParamsVo implements PublicApiParams {
             addAllFieldToMap(fields, this, fieldMap);
         } catch (IllegalAccessException e) {
             e.printStackTrace();
+            log.error("加密字符串，field不能访问："+e.getMessage(), e);
         }
 
         //2、其次获取extraApiParams下的所有fields
         if(!CollectionUtils.isEmpty(extraApiParams)) {
-            Map<Field, Object> extraFieldMap = new HashMap<>();
             extraApiParams.forEach(extraApiParam -> {
-                try {
-                    List<Field> extraFields = getChildNotNullFields(extraApiParam.getClass(), extraApiParam);
-                    //添加所有fields到map中
-                    addAllFieldToMap(extraFields, extraApiParam, extraFieldMap);
-                } catch (IllegalAccessException e) {
-                    e.printStackTrace();
-                }
-            });
-
-            if(!CollectionUtils.isEmpty(extraFieldMap)) {
-                fieldMap.putAll(extraFieldMap);
-            }
-        }
-
-        List<Field> fields = new ArrayList<>(fieldMap.keySet());
-        fields.sort(new Comparator<Field>() {
-            @Override
-            public int compare(Field o1, Field o2) {
-                return o1.getName().compareToIgnoreCase(o2.getName());
-            }
-        });
-
-        StringBuilder sb = new StringBuilder();
-        if (!CollectionUtils.isEmpty(fields)) {
-            Field field;
-            Object fieldValue;
-            for (int i = 0; i < fields.size(); i++) {
-                field = fields.get(i);
-                Object object = fieldMap.get(field);
-                if (object!=null) {
+                if (extraApiParam instanceof MapOpenApiParams) {
+                    //map参数不能有重复，重复会覆盖
+                    ((MapOpenApiParams<String, Object>)extraApiParam).forEach((extraApiParamKey, extraApiParamValue) -> {
+                        fieldMap.put(extraApiParamKey, parseObject(extraApiParamValue));
+                    });
+                }else {
                     try {
-                        fieldValue = getFieldValue(field, object);
-                        if (i>0) {
-                            sb.append("&");
-                        }
-                        sb.append(field.getName()).append("=").append(fieldValue);
+                        List<Field> extraFields = getChildNotNullFields(extraApiParam.getClass(), extraApiParam);
+                        //添加所有fields到map中
+                        addAllFieldToMap(extraFields, extraApiParam, fieldMap);
                     } catch (IllegalAccessException e) {
                         e.printStackTrace();
+                        log.error("加密字符串序列化extraFields，转换额外参数parseObject失败："+extraApiParam.getClass(), e);
                     }
                 }
+            });
+        }
+
+        List<String> keys = new ArrayList<>(fieldMap.keySet());
+        keys.sort((k1, k2) -> k1.compareToIgnoreCase(k2));
+
+        StringBuilder sb = new StringBuilder();
+        if (!CollectionUtils.isEmpty(keys)) {
+            String field;
+            for (String key:keys) {
+                field = fieldMap.get(key);
+                if (field!=null) {
+                    sb.append(key).append("=").append(field).append("&");
+                }
             }
+
+            //删除末尾的 &
+            sb.setLength(sb.length()-1);
         }
 
         return sb.toString();
@@ -102,22 +99,21 @@ public class OpenApiParamsVo implements PublicApiParams {
         field.setAccessible(true);
         Object fieldValue = field.get(object);
 
-        if (fieldValue!=null) {
-            if(fieldValue.getClass().isArray()) {
-                int length = Array.getLength(fieldValue);
-                StringJoiner sj = new StringJoiner(",");
-                for (int i = 0; i < length; i++) {
-                    Object o = Array.get(fieldValue, i);
-                    sj.add(String.valueOf(o));
-                }
+        return parseObject(fieldValue);
+    }
 
-                return sj.toString();
-            }else if(fieldValue instanceof List) {
-                return StringUtils.collectionToCommaDelimitedString((List)fieldValue);
-            }
+    private String parseObject(Object value) {
+        if (value==null) return "";
+
+        if (value instanceof CharSequence) {
+            return value.toString();
+        }else if (value instanceof Boolean) {
+            return value.toString();
+        }else if (value instanceof Number) {
+            return value.toString();
         }
 
-        return String.valueOf(fieldValue);
+        return JSON.toJSONString(value);
     }
 
     List<Field> getChildNotNullFields(Class claz, Object object) throws IllegalAccessException {
@@ -151,10 +147,11 @@ public class OpenApiParamsVo implements PublicApiParams {
         return fields;
     }
 
-    private void addAllFieldToMap(List<Field> fields, Object object, Map<Field, Object> map) {
+    private void addAllFieldToMap(List<Field> fields, Object object, Map<String, String> map) throws IllegalAccessException {
         if (fields!=null) {
             for (int i = 0; i < fields.size(); i++) {
-                map.put(fields.get(i), object);
+                Field field = fields.get(i);
+                map.put(field.getName(), getFieldValue(field, object));
             }
         }
     }
@@ -203,5 +200,12 @@ public class OpenApiParamsVo implements PublicApiParams {
     @Override
     public void setRequestId(String requestId) {
         this.requestId = requestId;
+    }
+
+    /**
+     * 根据内容生成openapi签名链接
+     */
+    public String toUrl() {
+        return String.format("appid=%s&sign=%s&nonce=%s&timestamp=%s", appid, sign, nonce, timestamp);
     }
 }

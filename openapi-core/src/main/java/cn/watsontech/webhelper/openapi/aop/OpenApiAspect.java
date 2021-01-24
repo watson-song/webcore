@@ -5,7 +5,7 @@ import cn.watsontech.webhelper.openapi.aop.annotation.OpenApi;
 import cn.watsontech.webhelper.openapi.entity.AppInfo;
 import cn.watsontech.webhelper.openapi.params.base.OpenApiParams;
 import cn.watsontech.webhelper.openapi.params.base.PublicApiParams;
-import cn.watsontech.webhelper.openapi.service.AppInfoService;
+import cn.watsontech.webhelper.openapi.service.OpenAppInfoService;
 import cn.watsontech.webhelper.utils.Md5Util;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.commons.logging.Log;
@@ -32,7 +32,7 @@ public class OpenApiAspect {
     protected static final Log log = LogFactory.getLog(OpenApiAspect.class);
 
     @Autowired
-    AppInfoService openAppInfoService;
+    OpenAppInfoService openAppInfoService;
 
     //	ThreadLocal是什么
 //	早在JDK 1.2的版本中就提供Java.lang.ThreadLocal，ThreadLocal为解决多线程程序的并发问题提供了一种新的思路。使用这个工具类可以很简洁地编写出优美的多线程程序。
@@ -51,7 +51,7 @@ public class OpenApiAspect {
     /**
      * 定义一个切入点.
      */
-    @Pointcut("@annotation(cn.watsontech.webhelper.web.spring.aop.annotation.OpenApi)")
+    @Pointcut("@annotation(cn.watsontech.webhelper.openapi.aop.annotation.OpenApi)")
     public void openApi() {}
 
     /**
