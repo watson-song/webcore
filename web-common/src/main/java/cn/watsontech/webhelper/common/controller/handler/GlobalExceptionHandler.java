@@ -13,13 +13,17 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.validation.BindException;
+import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 
 import javax.persistence.PersistenceException;
 import javax.servlet.http.HttpServletRequest;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -54,6 +58,15 @@ public class GlobalExceptionHandler {
         }else {
             return Result.errorBadRequest(exception.getMessage());
         }
+    }
+
+    @ExceptionHandler(MethodArgumentTypeMismatchException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public Result typeMismatchException(MethodArgumentTypeMismatchException exception, final HttpServletRequest request) {
+        insertErrorLog(request, exception, String.format("参数%s(%s)不合法异常，返回BAD_REQUEST", exception.getName(), exception.getValue()));
+
+        List<FieldError> fieldErrors = Arrays.asList(new FieldError(exception.getRequiredType().getName(), exception.getName(), String.valueOf(exception.getValue()), false, null, null, String.format("参数%s类型不匹配，当前值为：%s", exception.getName(), exception.getValue())));
+        return Result.errorBindErrors(fieldErrors);
     }
 
     @ExceptionHandler(MissingServletRequestParameterException.class)
