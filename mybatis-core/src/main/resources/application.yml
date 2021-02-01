@@ -1,4 +1,9 @@
 
+loginService:
+  defaultLoginSelectProperties: #登录默认加载属性列表
+    user: id,username,password,nickName,gender,email,avatarUrl,mobile,lastLoginDate,lastLoginIp,isEnabled,isVip,expired,locked,credentialsExpired,extraData,openid,email,logged,version
+    admin: id,username,password,nickName,gender,email,avatarUrl,mobile,lastLoginDate,lastLoginIp,isEnabled,expired,locked,credentialsExpired,extraData,type,department,title,version
+
 #日志访问参数配置
 access: #日志
   loginByUsername:

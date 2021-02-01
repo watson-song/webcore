@@ -7,6 +7,7 @@ import cn.watsontech.webhelper.common.service.mapper.user.manually.UserManuallyM
 import cn.watsontech.webhelper.common.vo.PrinciplePermissionVo;
 import cn.watsontech.webhelper.mybatis.intf.BaseService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import tk.mybatis.mapper.entity.Condition;
@@ -79,8 +80,12 @@ public class UserServiceImpl extends BaseService<User, Long> implements UserServ
         return manuallyMapper.updateLastLoginDate(userId, loginIp);
     }
 
+    @Value("${loginService.defaultLoginSelectProperties.user:id,username,password,nickName,gender,email,avatarUrl,mobile,lastLoginDate,lastLoginIp,isEnabled,isVip,expired,locked,credentialsExpired,extraData,openid,email,logged,version}")
+    private String[] defaultLoginSelectProperties;
+
     @Override
     public String[] defaultLoginSelectProperties() {
-        return new String[]{"id", "username", "password", "nickName", "gender", "email", "avatarUrl", "mobile", "lastLoginDate", "lastLoginIp", "isEnabled", "expired", "locked", "credentialsExpired", "extraData", "openid", "email", "logged", "version"};
+        //new String[]{"id", "username", "password", "nickName", "gender", "email", "avatarUrl", "mobile", "lastLoginDate", "lastLoginIp", "isEnabled", "expired", "locked", "credentialsExpired", "extraData", "openid", "email", "logged", "version"};
+        return defaultLoginSelectProperties;
     }
 }

@@ -10,6 +10,7 @@ import cn.watsontech.webhelper.mybatis.intf.BaseService;
 import cn.watsontech.webhelper.mybatis.param.PageParams;
 import com.github.pagehelper.PageRowBounds;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import tk.mybatis.mapper.entity.Condition;
@@ -97,13 +98,15 @@ public class AdminServiceImpl extends BaseService<Admin, Long> implements AdminS
      */
     @Override
     public List<AdminListVo> listAdminInfos(String keywords, PageParams pageParams) {
-        PageRowBounds rowBounds = new PageRowBounds(pageParams.getOffset()!=null?pageParams.getOffset():0, pageParams.getLimit()!=null?pageParams.getLimit():20);
-        rowBounds.setCount(true);
-        return manuallyMapper.listAdminInfos(keywords!=null?("%"+keywords+"%"):keywords, rowBounds);
+        return manuallyMapper.listAdminInfos(keywords!=null?("%"+keywords+"%"):keywords, wrapPageRowBounds(pageParams, true));
     }
+
+    @Value("${loginService.defaultLoginSelectProperties.admin:id,username,password,nickName,gender,email,avatarUrl,mobile,lastLoginDate,lastLoginIp,isEnabled,expired,locked,credentialsExpired,extraData,type,department,title,version}")
+    private String[] defaultLoginSelectProperties;
 
     @Override
     public String[] defaultLoginSelectProperties() {
-        return new String[]{"id", "username", "password", "nickName", "gender", "email", "avatarUrl", "mobile", "lastLoginDate", "lastLoginIp", "isEnabled", "expired", "locked", "credentialsExpired", "extraData", "type", "department", "title", "version"};
+        //new String[]{"id", "username", "password", "nickName", "gender", "email", "avatarUrl", "mobile", "lastLoginDate", "lastLoginIp", "isEnabled", "expired", "locked", "credentialsExpired", "extraData", "type", "department", "title", "version"};
+        return defaultLoginSelectProperties;
     }
 }
