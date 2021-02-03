@@ -3,7 +3,9 @@ package cn.watsontech.webhelper.openapi.params;
 
 import cn.watsontech.webhelper.common.security.IUserType;
 import cn.watsontech.webhelper.common.security.LoginUser;
+import cn.watsontech.webhelper.common.security.UserTypeFactory;
 import cn.watsontech.webhelper.openapi.params.base.OpenApiParams;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.validation.constraints.NotNull;
 
@@ -16,9 +18,12 @@ public class OpenApiLoginUser extends LoginUser implements OpenApiParams {
     @NotNull(message = "用户id不能为空")
     Long userId;
     @NotNull(message = "用户类型不能为空")
-    IUserType userType;
+    String userType;
     @NotNull(message = "用户名不能为空")
     String userName;
+
+    @Autowired
+    UserTypeFactory userTypeFactory;
 
     @Override
     public Long getId() {
@@ -27,7 +32,13 @@ public class OpenApiLoginUser extends LoginUser implements OpenApiParams {
 
     @Override
     public IUserType getUserType() {
-        return userType;
+        if (userTypeFactory==null||userType==null) return Type.unknow;
+
+        return userTypeFactory.valueOf(userType);
+    }
+
+    public void setUserType(String userType) {
+        this.userType = userType;
     }
 
     @Override
