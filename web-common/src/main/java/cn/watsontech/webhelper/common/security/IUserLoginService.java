@@ -58,6 +58,7 @@ public interface IUserLoginService<T> {
 
     /**
      * 登录查询属性列表 默认登录查询参数：id,username,nickName,gender,avatarUrl,mobile,lastLoginDate,lastLoginIp,enabled,expired,locked,credentialsExpired,extraData,createdTime
+     * 注意：此处可通过修改属性来修改该方法返回值：loginService.defaultLoginSelectProperties.[userType]，比如：admin,user
      */
     String[] defaultLoginSelectProperties();
 }
