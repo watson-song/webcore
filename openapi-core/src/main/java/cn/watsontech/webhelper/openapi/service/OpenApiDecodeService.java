@@ -7,6 +7,7 @@ import cn.watsontech.webhelper.openapi.form.wx.WxMaSubscribeMsgForm;
 import cn.watsontech.webhelper.openapi.form.wx.WxMessageData;
 import cn.watsontech.webhelper.openapi.form.wx.WxMpSubscribeMsgForm;
 import cn.watsontech.webhelper.openapi.params.base.MapOpenApiParams;
+import cn.watsontech.webhelper.openapi.params.base.OpenApiParams;
 import cn.watsontech.webhelper.openapi.params.base.OpenApiParamsVo;
 import cn.watsontech.webhelper.utils.Md5Util;
 import org.apache.commons.beanutils.ConvertUtils;
@@ -447,18 +448,16 @@ public class OpenApiDecodeService {
         return host + url + "?" + query;
     }
 
-    protected OpenApiParamsVo openApiParams(String appid, String appSecret, MapOpenApiParams<String, Object> queryParams, String requestUrl) {
+    protected OpenApiParamsVo openApiParams(String appid, String appSecret, OpenApiParams queryParam, String requestUrl) {
+        return openApiParams(appid, appSecret, Arrays.asList(queryParam), requestUrl);
+    }
+
+    protected OpenApiParamsVo openApiParams(String appid, String appSecret, List<OpenApiParams> queryParams, String requestUrl) {
         OpenApiParamsVo openApiParamsVo = new OpenApiParamsVo();
         openApiParamsVo.setAppid(appid);
         openApiParamsVo.setTimestamp(System.currentTimeMillis());
         openApiParamsVo.setNonce(RandomStringUtils.randomAlphabetic(5));
-
-//        Map<String, Object> willSignParams = MapBuilder.builder().putNext("appid", appid).putNext("timestamp", System.currentTimeMillis()).putNext("nonce", RandomStringUtils.randomAlphabetic(5));
-//        if (queryParams==null) {
-//            queryParams = new HashMap<>();
-//        }
-//        queryParams.putAll(willSignParams);
-        String needSignParamString = openApiParamsVo.getNeedSignParamString(Arrays.asList(queryParams));
+        String needSignParamString = openApiParamsVo.getNeedSignParamString(queryParams);
 
         openApiParamsVo.setSign(signParams(needSignParamString, requestUrl, appSecret));
         return openApiParamsVo;

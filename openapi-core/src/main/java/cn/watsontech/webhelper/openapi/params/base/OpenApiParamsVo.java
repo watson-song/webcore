@@ -1,8 +1,6 @@
 package cn.watsontech.webhelper.openapi.params.base;
 
 import com.alibaba.fastjson.JSON;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import io.swagger.annotations.ApiModelProperty;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -206,6 +204,13 @@ public class OpenApiParamsVo implements PublicApiParams {
      * 根据内容生成openapi签名链接
      */
     public String toUrl() {
+        return String.format("appid=%s&sign=%s&nonce=%s&timestamp=%s", appid, sign, nonce, timestamp);
+    }
+
+    /**
+     * 根据内容生成openapi签名链接
+     */
+    public String toGetUrl() {
         return String.format("appid=%s&sign=%s&nonce=%s&timestamp=%s", appid, sign, nonce, timestamp);
     }
 }
