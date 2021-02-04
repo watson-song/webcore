@@ -4,10 +4,17 @@ package cn.watsontech.webhelper.openapi.params;
 import cn.watsontech.webhelper.common.security.IUserType;
 import cn.watsontech.webhelper.common.security.LoginUser;
 import cn.watsontech.webhelper.common.security.UserTypeFactory;
+import cn.watsontech.webhelper.common.vo.PrinciplePermissionVo;
 import cn.watsontech.webhelper.openapi.params.base.OpenApiParams;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.GrantedAuthority;
 
+import javax.persistence.Transient;
 import javax.validation.constraints.NotNull;
+import java.util.Collection;
+import java.util.List;
+import java.util.Map;
 
 /**
  * 主要给openapi 确认当前操作用户信息
@@ -23,6 +30,8 @@ public class OpenApiLoginUser extends LoginUser implements OpenApiParams {
     String userName;
 
     @Autowired
+    @Transient
+    @JsonIgnore
     UserTypeFactory userTypeFactory;
 
     @Override
@@ -39,16 +48,6 @@ public class OpenApiLoginUser extends LoginUser implements OpenApiParams {
 
     public void setUserType(String userType) {
         this.userType = userType;
-    }
-
-    @Override
-    public String getMobile() {
-        return null;
-    }
-
-    @Override
-    public String getUsername() {
-        return userName;
     }
 
     public Long getUserId() {
@@ -68,38 +67,93 @@ public class OpenApiLoginUser extends LoginUser implements OpenApiParams {
     }
 
     @Override
+    @Transient
+    @JsonIgnore
+    public String getMobile() {
+        return null;
+    }
+
+    @Override
+    @Transient
+    @JsonIgnore
+    public String getUsername() {
+        return userName;
+    }
+
+    @Override
+    @Transient
+    @JsonIgnore
     public Boolean getExpired() {
         return false;
     }
 
     @Override
+    @Transient
+    @JsonIgnore
     public Boolean getLocked() {
         return false;
     }
 
     @Override
+    @Transient
+    @JsonIgnore
     public Boolean getCredentialsExpired() {
         return false;
     }
 
     @Override
+    @Transient
+    @JsonIgnore
     public Boolean getEnabled() {
         return true;
     }
 
     @Override
+    @Transient
+    @JsonIgnore
     public String getNickName() {
         return null;
     }
 
     @Override
+    @Transient
+    @JsonIgnore
     public String getAvatarUrl() {
         return null;
     }
 
     @Override
+    @Transient
+    @JsonIgnore
     public String getPassword() {
         return null;
     }
 
+    @Override
+    @Transient
+    @JsonIgnore
+    public int getUnreadMessages() {
+        return 0;
+    }
+
+    @Override
+    @Transient
+    @JsonIgnore
+    public List<Map<String, Object>> getRoles() {
+        return null;
+    }
+
+    @Override
+    @Transient
+    @JsonIgnore
+    public List<PrinciplePermissionVo> getPermissions() {
+        return null;
+    }
+
+    @Override
+    @Transient
+    @JsonIgnore
+    public Collection<? extends GrantedAuthority> getAuthorities() {
+        return null;
+    }
 }

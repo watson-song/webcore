@@ -6,6 +6,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.util.CollectionUtils;
 
+import javax.persistence.Transient;
 import javax.validation.constraints.NotNull;
 import java.lang.reflect.Field;
 import java.util.*;
@@ -37,6 +38,9 @@ public class OpenApiParamsVo implements PublicApiParams {
 
     @IgnoreField
     String requestId;
+
+    @IgnoreField
+    String needSignParamString;
 
     @Override
     public String getNeedSignParamString(Collection<OpenApiParams> extraApiParams) {
@@ -90,7 +94,8 @@ public class OpenApiParamsVo implements PublicApiParams {
             sb.setLength(sb.length()-1);
         }
 
-        return sb.toString();
+        needSignParamString = sb.toString();
+        return needSignParamString;
     }
 
     private String getFieldValue(Field field, Object object) throws IllegalAccessException {
@@ -133,7 +138,8 @@ public class OpenApiParamsVo implements PublicApiParams {
         for (Field field:allFields) {
 
             IgnoreField ignoreField = field.getAnnotation(IgnoreField.class);
-            if (ignoreField==null) {
+            Transient transientField = field.getAnnotation(Transient.class);
+            if (ignoreField==null&&transientField==null) {
                 //Bugfix for cannot access with modifiers ""
                 field.setAccessible(true);
                 if(field.get(object)!=null) {
@@ -211,6 +217,6 @@ public class OpenApiParamsVo implements PublicApiParams {
      * 根据内容生成openapi签名链接
      */
     public String toGetUrl() {
-        return String.format("appid=%s&sign=%s&nonce=%s&timestamp=%s", appid, sign, nonce, timestamp);
+        return String.format("%s&sign=%s", needSignParamString, sign);
     }
 }

@@ -1,6 +1,7 @@
 package cn.watsontech.webhelper;
 
 import cn.watsontech.webhelper.param.FileRefFormParams;
+import cn.watsontech.webhelper.vo.UploadFile;
 import org.springframework.util.Assert;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -14,82 +15,6 @@ import java.util.*;
  */
 public abstract class UploadService {
     public enum UploadVendor {aliyun, tencent, huaweicloud, local}
-
-    public class UploadFile {
-
-        private String name;
-        private String path;
-        private UploadVendor vendor;
-        private long size;
-        private String bucket;
-        private String type;
-        private String tags;
-        private String url;
-
-        public void setName(String name) {
-            this.name = name;
-        }
-
-        public String getName() {
-            return name;
-        }
-
-        public void setPath(String path) {
-            this.path = path;
-        }
-
-        public String getPath() {
-            return path;
-        }
-
-        public void setSize(long size) {
-            this.size = size;
-        }
-
-        public long getSize() {
-            return size;
-        }
-
-        public UploadVendor getVendor() {
-            return vendor;
-        }
-
-        public void setVendor(UploadVendor vendor) {
-            this.vendor = vendor;
-        }
-
-        public void setBucket(String bucket) {
-            this.bucket = bucket;
-        }
-
-        public String getBucket() {
-            return bucket;
-        }
-
-        public void setType(String type) {
-            this.type = type;
-        }
-
-        public String getType() {
-            return type;
-        }
-
-        public void setTags(String tags) {
-            this.tags = tags;
-        }
-
-        public String getTags() {
-            return tags;
-        }
-
-        public void setUrl(String url) {
-            this.url = url;
-        }
-
-        public String getUrl() {
-            return url;
-        }
-    }
 
     protected UploadProperties properties;
 

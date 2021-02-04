@@ -2,6 +2,7 @@ package cn.watsontech.webhelper.impl;
 
 import cn.watsontech.webhelper.UploadProperties;
 import cn.watsontech.webhelper.UploadService;
+import cn.watsontech.webhelper.vo.UploadFile;
 import com.qcloud.cos.COSClient;
 import com.qcloud.cos.ClientConfig;
 import com.qcloud.cos.auth.BasicCOSCredentials;

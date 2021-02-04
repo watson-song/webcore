@@ -10,9 +10,9 @@ import cn.watsontech.webhelper.openapi.params.base.MapOpenApiParams;
 import cn.watsontech.webhelper.openapi.params.base.OpenApiParams;
 import cn.watsontech.webhelper.openapi.params.base.OpenApiParamsVo;
 import cn.watsontech.webhelper.utils.Md5Util;
+import com.alibaba.fastjson.JSONObject;
 import org.apache.commons.beanutils.ConvertUtils;
 import org.apache.commons.beanutils.locale.converters.DateLocaleConverter;
-import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -43,7 +43,6 @@ public class OpenApiDecodeService {
     static final String WXPUB_JSTICKETS_URL = "/api/open/v1/%s/wxpub/jsTickets";//获取jsticket
     static final String WXPUB_AUTHCODE_TO_USERINFO_URL = "/api/open/v1/%s/wxpub/getWxAuthorizeUserInfo";//authCode换取userInf
     static final String WXPUB_SEND_SUBSCRIBE_MESSAGE = "/api/open/v1/%s/wxpub/sendMpSubscribeMsg";//POST 发送公众号订阅消息
-
 
     public OpenApiDecodeService(RestTemplate restTemplate, String host) {
         ConvertUtils.register(new DateLocaleConverter(), Date.class);
@@ -336,12 +335,6 @@ public class OpenApiDecodeService {
         }catch (RestClientException ex) {
             ex.printStackTrace();
             message = ex.getMessage();
-        } catch (IllegalAccessException ex) {
-            ex.printStackTrace();
-            message = ex.getMessage();
-        } catch (InstantiationException ex) {
-            ex.printStackTrace();
-            message = ex.getMessage();
         } catch (Exception e) {
             e.printStackTrace();
             message = e.getMessage();
@@ -366,12 +359,6 @@ public class OpenApiDecodeService {
         }catch (RestClientException ex) {
             ex.printStackTrace();
             message = ex.getMessage();
-        } catch (IllegalAccessException ex) {
-            ex.printStackTrace();
-            message = ex.getMessage();
-        } catch (InstantiationException ex) {
-            ex.printStackTrace();
-            message = ex.getMessage();
         } catch (Exception e) {
             e.printStackTrace();
             message = e.getMessage();
@@ -394,12 +381,6 @@ public class OpenApiDecodeService {
                 }
             }
         }catch (RestClientException ex) {
-            ex.printStackTrace();
-            message = ex.getMessage();
-        } catch (IllegalAccessException ex) {
-            ex.printStackTrace();
-            message = ex.getMessage();
-        } catch (InstantiationException ex) {
             ex.printStackTrace();
             message = ex.getMessage();
         } catch (Exception e) {
@@ -470,43 +451,40 @@ public class OpenApiDecodeService {
         return Md5Util.MD5Encode(String.format("%s&appSecret=%s&url=%s", needSignParamString, appSecret, requestUrl)).toUpperCase();
     }
 
-    protected String getNeedSignParamString(Map<String, ?> paramMap) {
+//    protected String getNeedSignParamString(Map<String, ?> paramMap) {
+//
+//        List<String> fields = new ArrayList<>(paramMap.keySet());
+//        fields.sort(new Comparator<Object>() {
+//            @Override
+//            public int compare(Object o1, Object o2) {
+//                return o1.toString().compareToIgnoreCase(o2.toString());
+//            }
+//        });
+//
+//        StringBuilder sb = new StringBuilder();
+//        if (!CollectionUtils.isEmpty(fields)) {
+//            String field;
+//            Object fieldValue;
+//            for (int i = 0; i < fields.size(); i++) {
+//                field = fields.get(i);
+//                fieldValue = paramMap.get(field);
+//                if (fieldValue!=null) {
+//                    if (i>0) {
+//                        sb.append("&");
+//                    }
+//                    sb.append(field).append("=").append(fieldValue);
+//                }
+//            }
+//        }
+//
+//        return sb.toString();
+//    }
 
-        List<String> fields = new ArrayList<>(paramMap.keySet());
-        fields.sort(new Comparator<Object>() {
-            @Override
-            public int compare(Object o1, Object o2) {
-                return o1.toString().compareToIgnoreCase(o2.toString());
-            }
-        });
-
-        StringBuilder sb = new StringBuilder();
-        if (!CollectionUtils.isEmpty(fields)) {
-            String field;
-            Object fieldValue;
-            for (int i = 0; i < fields.size(); i++) {
-                field = fields.get(i);
-                fieldValue = paramMap.get(field);
-                if (fieldValue!=null) {
-                    if (i>0) {
-                        sb.append("&");
-                    }
-                    sb.append(field).append("=").append(fieldValue);
-                }
-            }
-        }
-
-        return sb.toString();
-    }
-
-    protected <E> E mapToObject(Map<String, Object> map, Class<E> beanClass) throws Exception {
+    protected <E> E mapToObject(Map<String, Object> map, Class<E> beanClass) {
         if (map == null) return null;
         if (beanClass == Map.class) return (E)map;
 
-        E obj = beanClass.newInstance();
-        org.apache.commons.beanutils.BeanUtils.populate(obj, map);
-
-        return obj;
+        return new JSONObject(map).toJavaObject(beanClass);
     }
 
     protected MapOpenApiParams<String, Object> objectToMap(Object obj) {

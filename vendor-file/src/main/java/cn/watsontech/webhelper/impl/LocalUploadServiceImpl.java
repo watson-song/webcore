@@ -2,6 +2,7 @@ package cn.watsontech.webhelper.impl;
 
 import cn.watsontech.webhelper.UploadProperties;
 import cn.watsontech.webhelper.UploadService;
+import cn.watsontech.webhelper.vo.UploadFile;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.time.DateFormatUtils;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingClass;
