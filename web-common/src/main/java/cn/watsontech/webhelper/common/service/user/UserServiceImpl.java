@@ -13,8 +13,8 @@ import org.springframework.transaction.annotation.Transactional;
 import tk.mybatis.mapper.entity.Condition;
 import tk.mybatis.mapper.entity.Example;
 
-import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 
 /**
@@ -66,12 +66,12 @@ public class UserServiceImpl extends BaseService<User, Long> implements UserServ
     }
 
     @Override
-    public List<Map<String, Object>> loadUserRoles(Long userId) {
+    public Set<Map<String, Object>> loadUserRoles(Long userId) {
         return null;
     }
 
     @Override
-    public List<PrinciplePermissionVo> loadUserPermissions(Long userId) {
+    public Set<PrinciplePermissionVo> loadUserPermissions(Long userId) {
         return null;
     }
 

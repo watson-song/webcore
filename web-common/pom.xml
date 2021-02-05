@@ -11,7 +11,7 @@
 
     <groupId>cn.watsontech.webhelper</groupId>
     <artifactId>web-common</artifactId>
-    <version>0.2.1.20</version>
+    <version>0.2.1.21</version>
 
     <properties>
         <watsontech.webcore>0.2.1.5</watsontech.webcore>

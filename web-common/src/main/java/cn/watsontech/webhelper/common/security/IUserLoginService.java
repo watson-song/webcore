@@ -2,8 +2,8 @@ package cn.watsontech.webhelper.common.security;
 
 import cn.watsontech.webhelper.common.vo.PrinciplePermissionVo;
 
-import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * Created by Watson on 2020/8/12.
@@ -43,12 +43,12 @@ public interface IUserLoginService<T> {
     /**
      * 加载用户角色
      */
-    List<Map<String, Object>> loadUserRoles(T userId);
+    Set<Map<String, Object>> loadUserRoles(T userId);
 
     /**
      * 加载用户权限
      */
-    List<PrinciplePermissionVo> loadUserPermissions(T userId);
+    Set<PrinciplePermissionVo> loadUserPermissions(T userId);
 
     /**
      * 更新最后登录时间

@@ -133,6 +133,33 @@ public class PrinciplePermissionVo {
         return super.equals(obj);
     }
 
+    @Override
+    public int hashCode() {
+        return toString().hashCode();
+    }
+
+    @Override
+    public String toString() {
+        String hashCodeValue = getId()+":"+getName();
+
+        if (getChildren()!=null) {
+            Iterator<PrinciplePermissionVo> iterator = getChildren().iterator();
+            StringBuilder childHashCodeValueBuilder = new StringBuilder();
+            while (iterator.hasNext()) {
+                PrinciplePermissionVo principlePermissionVo = iterator.next();
+                childHashCodeValueBuilder.append(principlePermissionVo.toString()).append("|");
+            }
+
+            int childHashCodeValueLength = childHashCodeValueBuilder.length();
+            if (childHashCodeValueLength>0) {
+                childHashCodeValueBuilder.deleteCharAt(childHashCodeValueLength-1);
+                hashCodeValue += ">" + childHashCodeValueBuilder.toString();
+            }
+        }
+
+        return hashCodeValue;
+    }
+
     private int sizeOfCollection(Collection objs) {
         if (CollectionUtils.isEmpty(objs)) return 0;
         return objs.size();
@@ -180,5 +207,19 @@ public class PrinciplePermissionVo {
         a = new PrinciplePermissionVo(1l, "a", "大人", new HashSet<>(Arrays.asList(c)));
         b = new PrinciplePermissionVo(1l, "a1", "大人2", new HashSet<>(Arrays.asList(d)));
         System.out.println("id相同，children相同："+a.equals(b));
+
+        a = new PrinciplePermissionVo(1l, "a", "大人");
+        c = new PrinciplePermissionVo(19l, "a19", "大人19");
+        b = new PrinciplePermissionVo(1l, "a", "大人2", new HashSet(Arrays.asList(c)));
+        d = new PrinciplePermissionVo(null, "a19", "大人20");
+
+        List<PrinciplePermissionVo> permissionVos = Arrays.asList(a, b, c, d);
+        Set<PrinciplePermissionVo> permissionVoSet = new HashSet<>(permissionVos);
+        Iterator<PrinciplePermissionVo> perIterator = permissionVoSet.iterator();
+        int i = 0;
+        while(perIterator.hasNext()) {
+            PrinciplePermissionVo permissionVo = perIterator.next();
+            System.out.println((i++)+":"+permissionVo.toString());
+        }
     }
 }
