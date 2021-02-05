@@ -135,28 +135,28 @@ public abstract class LoginUser implements UserDetails {
 
     //用户角色
     @Transient
-    List<Map<String, Object>> roles = new ArrayList<>();
+    Set<Map<String, Object>> roles = new HashSet<>();
 
     //用户权限
     @Transient
-    List<PrinciplePermissionVo> permissions = new ArrayList<>();
+    Set<PrinciplePermissionVo> permissions = new HashSet<>();
 
 //    @JsonIgnore
     @ApiModelProperty(value = "用户角色")
-    public List<Map<String, Object>> getRoles() {
+    public Set<Map<String, Object>> getRoles() {
         return roles;
     }
 
-    public void setRoles(List<Map<String, Object>> roles) {
+    public void setRoles(Set<Map<String, Object>> roles) {
         this.roles = roles;
     }
 
     @ApiModelProperty(value = "用户权限集合")
-    public List<PrinciplePermissionVo> getPermissions() {
+    public Set<PrinciplePermissionVo> getPermissions() {
         return permissions;
     }
 
-    public void setPermissions(List<PrinciplePermissionVo> permissions) {
+    public void setPermissions(Set<PrinciplePermissionVo> permissions) {
         this.permissions = permissions;
     }
 

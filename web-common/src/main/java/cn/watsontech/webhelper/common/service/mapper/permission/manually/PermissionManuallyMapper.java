@@ -26,7 +26,7 @@ public interface PermissionManuallyMapper {
 	 * 获取所有某角色的权限列表
 	 * @return
 	 */
-	@Select(" select b.id, b.name, b.label, b.weight from ref_role_permission a left join tb_permission b on a.permission_id=b.id where b.parent_id is null and a.role_id=#{roleId} and b.enabled = true")
+	@Select("select b.id, b.name, b.label, b.weight from ref_role_permission a left join tb_permission b on a.permission_id=b.id where b.parent_id is null and a.role_id=#{roleId} and b.enabled = true group by b.id")
 	@Results({
 			@Result(property = "id", column = "id"),
 			@Result(property = "children", javaType=List.class, column="id", many = @Many(select = "selectAllChildPermissions")),
