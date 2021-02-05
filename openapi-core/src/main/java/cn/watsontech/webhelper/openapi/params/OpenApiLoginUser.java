@@ -13,8 +13,8 @@ import org.springframework.security.core.GrantedAuthority;
 import javax.persistence.Transient;
 import javax.validation.constraints.NotNull;
 import java.util.Collection;
-import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * 主要给openapi 确认当前操作用户信息
@@ -139,14 +139,14 @@ public class OpenApiLoginUser extends LoginUser implements OpenApiParams {
     @Override
     @Transient
     @JsonIgnore
-    public List<Map<String, Object>> getRoles() {
+    public Set<Map<String, Object>> getRoles() {
         return null;
     }
 
     @Override
     @Transient
     @JsonIgnore
-    public List<PrinciplePermissionVo> getPermissions() {
+    public Set<PrinciplePermissionVo> getPermissions() {
         return null;
     }
 
