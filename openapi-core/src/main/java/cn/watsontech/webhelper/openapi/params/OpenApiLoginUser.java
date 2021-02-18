@@ -5,6 +5,7 @@ import cn.watsontech.webhelper.common.security.IUserType;
 import cn.watsontech.webhelper.common.security.LoginUser;
 import cn.watsontech.webhelper.common.security.UserTypeFactory;
 import cn.watsontech.webhelper.common.vo.PrinciplePermissionVo;
+import cn.watsontech.webhelper.common.vo.PrincipleRoleVo;
 import cn.watsontech.webhelper.openapi.params.base.OpenApiParams;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -139,7 +140,7 @@ public class OpenApiLoginUser extends LoginUser implements OpenApiParams {
     @Override
     @Transient
     @JsonIgnore
-    public Set<Map<String, Object>> getRoles() {
+    public Set<PrincipleRoleVo> getRoles() {
         return null;
     }
 
