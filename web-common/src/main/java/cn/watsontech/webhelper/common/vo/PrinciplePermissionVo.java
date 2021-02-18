@@ -222,4 +222,33 @@ public class PrinciplePermissionVo {
             System.out.println((i++)+":"+permissionVo.toString());
         }
     }
+
+    /**
+     * 检查是否有权限，注意：先检查当前权限，如未找到会继续检查所有children
+     * @param permission 目标权限
+     * @return 如检查到了某权限则返回true，否则返回false
+     */
+    public boolean check(PrinciplePermissionVo permission) {
+        boolean isValid = false;
+        if (permission!=null) {
+
+            //先比较id，然后name
+            if (getId()!=null&&permission.getId()!=null) {
+                isValid = getId().equals(permission.getId());
+            }else if (getName()!=null) {
+                isValid = getName().equalsIgnoreCase(permission.getName());
+            }
+
+            //name或id不相等，继续比较children
+            if (!isValid) {
+
+                //若还有children则遍历所有child查看是否包含当前permission
+                if (!CollectionUtils.isEmpty(getChildren())) {
+                    isValid = getChildren().stream().anyMatch(child -> child.check(permission));
+                }
+            }
+        }
+
+        return isValid;
+    }
 }

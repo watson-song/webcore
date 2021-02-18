@@ -3,6 +3,7 @@ package cn.watsontech.webhelper.common.security;
 import cn.watsontech.webhelper.common.entity.Admin;
 import cn.watsontech.webhelper.common.entity.User;
 import cn.watsontech.webhelper.common.vo.PrinciplePermissionVo;
+import cn.watsontech.webhelper.common.vo.PrincipleRoleVo;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import io.swagger.annotations.ApiModelProperty;
 import org.springframework.security.core.GrantedAuthority;
@@ -11,7 +12,10 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.util.CollectionUtils;
 
 import javax.persistence.Transient;
-import java.util.*;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 /**
@@ -135,7 +139,7 @@ public abstract class LoginUser implements UserDetails {
 
     //用户角色
     @Transient
-    Set<Map<String, Object>> roles = new HashSet<>();
+    Set<PrincipleRoleVo> roles = new HashSet<>();
 
     //用户权限
     @Transient
@@ -143,11 +147,11 @@ public abstract class LoginUser implements UserDetails {
 
 //    @JsonIgnore
     @ApiModelProperty(value = "用户角色")
-    public Set<Map<String, Object>> getRoles() {
+    public Set<PrincipleRoleVo> getRoles() {
         return roles;
     }
 
-    public void setRoles(Set<Map<String, Object>> roles) {
+    public void setRoles(Set<PrincipleRoleVo> roles) {
         this.roles = roles;
     }
 
@@ -167,10 +171,108 @@ public abstract class LoginUser implements UserDetails {
         roleList.add(getUserType().name());
 
         if (!CollectionUtils.isEmpty(roles)) {
-            roleList.addAll(roles.stream().filter(role -> role!=null&&role.containsKey("name")).map(role -> String.valueOf(role.getOrDefault("name", "NOBODY"))).collect(Collectors.toSet()));
+            roleList.addAll(roles.stream().filter(role -> role!=null&&role.getName()!=null).map(role -> role.getName()).collect(Collectors.toSet()));
         }
 
         return roleList.stream().map(role -> new SimpleGrantedAuthority("ROLE_"+role)).collect(Collectors.toList());
+    }
+
+    /**
+     * 检查是否有权限，注意：先检查当前权限，如未找到会继续检查所有children
+     * @param permissionName 目标权限
+     * @return 如检查到了某权限则返回true，否则返回false
+     */
+    public boolean hasPermission(String permissionName) {
+        PrinciplePermissionVo permission = new PrinciplePermissionVo(null, permissionName, null);
+        return hasPermission(permission);
+    }
+    public boolean hasPermission(PrinciplePermissionVo permission) {
+        Set<PrinciplePermissionVo> permissions = getPermissions();
+        if (!CollectionUtils.isEmpty(permissions)) {
+            return permissions.stream().anyMatch((permissionVo -> permissionVo!=null&&permissionVo.check(permission)));
+        }
+
+        return false;
+    }
+    /**
+     * 是否包含任意一个目标权限
+     * @param anyPermissions 目标权限列表
+     * @return 包含则返回true，否则返回false
+     */
+    public boolean hasAnyPermission(List<PrinciplePermissionVo> anyPermissions) {
+        if (!CollectionUtils.isEmpty(anyPermissions)) {
+            Set<PrinciplePermissionVo> permissions = getPermissions();
+            if (!CollectionUtils.isEmpty(permissions)) {
+                return anyPermissions.stream().anyMatch(anyPermission -> permissions.stream().anyMatch(permissionVo -> permissionVo!=null&&permissionVo.check(anyPermission)));
+            }
+        }
+
+        return false;
+    }
+    /**
+     * 是否包含所有目标权限
+     * @param allPermissions 目标权限列表
+     * @return 包含则返回true，否则返回false
+     */
+    public boolean hasAllPermissions(List<PrinciplePermissionVo> allPermissions) {
+        if (!CollectionUtils.isEmpty(allPermissions)) {
+            Set<PrinciplePermissionVo> permissions = getPermissions();
+            if (!CollectionUtils.isEmpty(allPermissions)) {
+                return allPermissions.stream().allMatch(anyPermission -> permissions.stream().anyMatch(permissionVo -> permissionVo!=null&&permissionVo.check(anyPermission)));
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * 检查是否有角色，注意：检查当前角色是否与目标角色相同
+     * @param roleName 目标角色
+     * @return 如检查到了某角色则返回true，否则返回false
+     */
+    public boolean hasRole(String roleName) {
+        PrincipleRoleVo role = new PrincipleRoleVo(null, roleName, null);
+        return hasRole(role);
+    }
+    public boolean hasRole(PrincipleRoleVo role) {
+        if (role!=null) {
+            Set<PrincipleRoleVo> roles = getRoles();
+            if (!CollectionUtils.isEmpty(roles)) {
+                return roles.stream().anyMatch((roleVo -> roleVo!=null&&roleVo.check(role)));
+            }
+        }
+
+        return false;
+    }
+    /**
+     * 是否包含任意一个目标角色
+     * @param anyRoles 目标角色列表
+     * @return 包含则返回true，否则返回false
+     */
+    public boolean hasAnyRole(List<PrincipleRoleVo> anyRoles) {
+        if (!CollectionUtils.isEmpty(anyRoles)) {
+            Set<PrincipleRoleVo> roles = getRoles();
+            if (!CollectionUtils.isEmpty(roles)) {
+                return anyRoles.stream().anyMatch(anyRole -> roles.stream().anyMatch(roleVo -> roleVo!=null&&roleVo.check(anyRole)));
+            }
+        }
+
+        return false;
+    }
+    /**
+     * 是否包含所有目标角色
+     * @param allRoles 目标角色列表
+     * @return 包含则返回true，否则返回false
+     */
+    public boolean hasAllRoles(List<PrincipleRoleVo> allRoles) {
+        if (!CollectionUtils.isEmpty(allRoles)) {
+            Set<PrincipleRoleVo> roles = getRoles();
+            if (!CollectionUtils.isEmpty(roles)) {
+                return allRoles.stream().allMatch(anyRole -> roles.stream().anyMatch(roleVo -> roleVo!=null&&roleVo.check(anyRole)));
+            }
+        }
+
+        return false;
     }
 
     @Override

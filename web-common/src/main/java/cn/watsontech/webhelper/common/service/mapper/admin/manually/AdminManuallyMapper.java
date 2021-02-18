@@ -5,11 +5,12 @@ package cn.watsontech.webhelper.common.service.mapper.admin.manually;
 import cn.watsontech.webhelper.common.entity.Admin;
 import cn.watsontech.webhelper.common.vo.AdminListVo;
 import cn.watsontech.webhelper.common.vo.PrinciplePermissionVo;
+import cn.watsontech.webhelper.common.vo.PrincipleRoleVo;
 import org.apache.ibatis.annotations.*;
 import org.apache.ibatis.session.RowBounds;
 
 import java.util.List;
-import java.util.Map;
+import java.util.Set;
 
 @Mapper
 public interface AdminManuallyMapper {
@@ -45,7 +46,7 @@ public interface AdminManuallyMapper {
      * @param adminId 管理员Id
      */
 	@Select("select b.id,b.name,b.label from tb_role b left join ref_admin_role a on a.role_id=b.id and b.enabled = 1 where a.admin_id =#{adminId} group by b.id")
-    List<Map<String, Object>> selectAllRolesByAdminId(@Param("adminId") Long adminId);
+	Set<PrincipleRoleVo> selectAllRolesByAdminId(@Param("adminId") Long adminId);
 
 	/**
 	 * 获取本账户下的所有权限列表
@@ -54,9 +55,9 @@ public interface AdminManuallyMapper {
 	@Select("select c.id,c.name from tb_permission c left join ref_role_permission b on b.permission_id=c.id left join ref_admin_role a on a.role_id=b.role_id and c.enabled = true where a.admin_id =#{adminId} group by c.id")
 	@Results({
 			@Result(column = "id", property = "id"),
-			@Result(property = "children", javaType=List.class, column="id", many = @Many(select = "cn.watsontech.webhelper.common.service.mapper.permission.manually.PermissionManuallyMapper.selectAllChildPrinciplePermissions")),
+			@Result(property = "children", javaType=Set.class, column="id", many = @Many(select = "cn.watsontech.webhelper.common.service.mapper.permission.manually.PermissionManuallyMapper.selectAllChildPrinciplePermissions")),
 	})
-	List<PrinciplePermissionVo> selectAllPermissionsByAdminId(@Param("adminId") Long adminId);
+	Set<PrinciplePermissionVo> selectAllPermissionsByAdminId(@Param("adminId") Long adminId);
 
 	/**
 	 * 更新最后登录时间

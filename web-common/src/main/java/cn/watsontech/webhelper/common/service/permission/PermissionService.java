@@ -7,6 +7,7 @@ import cn.watsontech.webhelper.common.vo.PrinciplePermissionVo;
 import cn.watsontech.webhelper.mybatis.intf.Service;
 
 import java.util.List;
+import java.util.Set;
 
 /**
 * Created by Watson Song on 2020/03/05.
@@ -40,5 +41,5 @@ public interface PermissionService extends Service<Permission, Long> {
      * 加载当前权限所有子权限集合
      * @param parentId
      */
-    List<PrinciplePermissionVo> loadAllPrincipleChild(long parentId);
+    Set<PrinciplePermissionVo> loadAllPrincipleChild(long parentId);
 }

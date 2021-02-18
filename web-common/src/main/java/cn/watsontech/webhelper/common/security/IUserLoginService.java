@@ -1,8 +1,8 @@
 package cn.watsontech.webhelper.common.security;
 
 import cn.watsontech.webhelper.common.vo.PrinciplePermissionVo;
+import cn.watsontech.webhelper.common.vo.PrincipleRoleVo;
 
-import java.util.Map;
 import java.util.Set;
 
 /**
@@ -43,7 +43,7 @@ public interface IUserLoginService<T> {
     /**
      * 加载用户角色
      */
-    Set<Map<String, Object>> loadUserRoles(T userId);
+    Set<PrincipleRoleVo> loadUserRoles(T userId);
 
     /**
      * 加载用户权限

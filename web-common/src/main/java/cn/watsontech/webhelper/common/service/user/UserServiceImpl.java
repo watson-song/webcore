@@ -5,6 +5,7 @@ import cn.watsontech.webhelper.common.security.LoginUser;
 import cn.watsontech.webhelper.common.service.mapper.user.UserMapper;
 import cn.watsontech.webhelper.common.service.mapper.user.manually.UserManuallyMapper;
 import cn.watsontech.webhelper.common.vo.PrinciplePermissionVo;
+import cn.watsontech.webhelper.common.vo.PrincipleRoleVo;
 import cn.watsontech.webhelper.mybatis.intf.BaseService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -13,7 +14,6 @@ import org.springframework.transaction.annotation.Transactional;
 import tk.mybatis.mapper.entity.Condition;
 import tk.mybatis.mapper.entity.Example;
 
-import java.util.Map;
 import java.util.Set;
 
 
@@ -66,7 +66,7 @@ public class UserServiceImpl extends BaseService<User, Long> implements UserServ
     }
 
     @Override
-    public Set<Map<String, Object>> loadUserRoles(Long userId) {
+    public Set<PrincipleRoleVo> loadUserRoles(Long userId) {
         return null;
     }
 

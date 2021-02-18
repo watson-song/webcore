@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Set;
 
 
 /**
@@ -68,7 +69,7 @@ public class PermissionServiceImpl extends BaseService<Permission, Long> impleme
      * @param parentId
      */
     @Override
-    public List<PrinciplePermissionVo> loadAllPrincipleChild(long parentId) {
+    public Set<PrinciplePermissionVo> loadAllPrincipleChild(long parentId) {
         return voMapper.selectAllChildPrinciplePermissions(parentId);
     }
 

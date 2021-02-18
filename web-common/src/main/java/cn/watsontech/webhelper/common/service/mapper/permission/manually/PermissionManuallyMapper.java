@@ -7,6 +7,7 @@ import cn.watsontech.webhelper.common.vo.PrinciplePermissionVo;
 import org.apache.ibatis.annotations.*;
 
 import java.util.List;
+import java.util.Set;
 
 @Mapper
 public interface PermissionManuallyMapper {
@@ -64,8 +65,8 @@ public interface PermissionManuallyMapper {
 	@Select("select id, name, label from tb_permission where parent_id =#{parentId} and enabled = true")
 	@Results({
 		@Result(property = "id", column = "id"),
-		@Result(property = "children", javaType=List.class, column="id", many = @Many(select = "selectAllChildPrinciplePermissions")),
+		@Result(property = "children", javaType=Set.class, column="id", many = @Many(select = "selectAllChildPrinciplePermissions")),
 	})
-    List<PrinciplePermissionVo> selectAllChildPrinciplePermissions(@Param("parentId") Long parentId);
+    Set<PrinciplePermissionVo> selectAllChildPrinciplePermissions(@Param("parentId") Long parentId);
 
 }

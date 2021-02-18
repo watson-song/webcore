@@ -6,6 +6,7 @@ import cn.watsontech.webhelper.common.service.mapper.admin.AdminMapper;
 import cn.watsontech.webhelper.common.service.mapper.admin.manually.AdminManuallyMapper;
 import cn.watsontech.webhelper.common.vo.AdminListVo;
 import cn.watsontech.webhelper.common.vo.PrinciplePermissionVo;
+import cn.watsontech.webhelper.common.vo.PrincipleRoleVo;
 import cn.watsontech.webhelper.mybatis.intf.BaseService;
 import cn.watsontech.webhelper.mybatis.param.PageParams;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,9 +16,7 @@ import org.springframework.transaction.annotation.Transactional;
 import tk.mybatis.mapper.entity.Condition;
 import tk.mybatis.mapper.entity.Example;
 
-import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 
@@ -70,18 +69,13 @@ public class AdminServiceImpl extends BaseService<Admin, Long> implements AdminS
     }
 
     @Override
-    public Set<Map<String, Object>> loadUserRoles(Long adminId) {
-        return wrapToSet(manuallyMapper.selectAllRolesByAdminId(adminId));
-    }
-
-    private <T> Set<T> wrapToSet(List<T> values) {
-        if (values!=null) return new HashSet<T>(values);
-        return null;
+    public Set<PrincipleRoleVo> loadUserRoles(Long adminId) {
+        return manuallyMapper.selectAllRolesByAdminId(adminId);
     }
 
     @Override
     public Set<PrinciplePermissionVo> loadUserPermissions(Long adminId) {
-        return wrapToSet(manuallyMapper.selectAllPermissionsByAdminId(adminId));
+        return manuallyMapper.selectAllPermissionsByAdminId(adminId);
     }
 
     @Override
