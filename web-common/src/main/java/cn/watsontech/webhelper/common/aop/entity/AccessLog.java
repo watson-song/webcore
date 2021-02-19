@@ -23,6 +23,13 @@ public class AccessLog implements CreatedEntity<AccessLog, Long, Long> {
     private String groupId;
 
     /**
+     * 组字段
+     */
+    @ApiModelProperty(value="分组字段")
+    @Column(name = "group_field")
+    private String groupField;
+
+    /**
      * 日志级别
      */
     @ApiModelProperty(value="level日志级别")
@@ -419,6 +426,14 @@ public class AccessLog implements CreatedEntity<AccessLog, Long, Long> {
 
     public void setGroupId(String groupId) {
         this.groupId = groupId;
+    }
+
+    public String getGroupField() {
+        return groupField;
+    }
+
+    public void setGroupField(String groupField) {
+        this.groupField = groupField;
     }
 
     @Override

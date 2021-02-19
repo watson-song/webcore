@@ -211,7 +211,7 @@ public class AccessLogAspect implements EmbeddedValueResolverAware {
             accessParamValue = getControllerMethodDescription(signatureMethod, joinPoint.getArgs(), accessAnnotation);
         } catch (Exception e) {
             e.printStackTrace();
-            accessParamValue = new AccessParamValue("未知",null);
+            accessParamValue = new AccessParamValue("未知",null, null);
         }
 
         AccessLog testLog = new AccessLog();
@@ -222,6 +222,7 @@ public class AccessLogAspect implements EmbeddedValueResolverAware {
         if (accessParamValue!=null) {
             testLog.setTitle(accessParamValue.getDescription());
             testLog.setGroupId(accessParamValue.getGroupId());
+            testLog.setGroupField(accessParamValue.getGroupField());
         }
         testLog.setVersion(1);
         testLog.setParams(StringUtils.getMapToParams(params));
@@ -304,10 +305,12 @@ public class AccessLogAspect implements EmbeddedValueResolverAware {
     static class AccessParamValue {
         String description;
         String groupId;
+        String groupField;
 
-        public AccessParamValue(String description, String groupId) {
+        public AccessParamValue(String description, String groupId, String groupField) {
             this.description = description;
             this.groupId = groupId;
+            this.groupField = groupField;
         }
 
         public String getDescription() {
@@ -325,17 +328,27 @@ public class AccessLogAspect implements EmbeddedValueResolverAware {
         public void setGroupId(String groupId) {
             this.groupId = groupId;
         }
+
+        public String getGroupField() {
+            return groupField;
+        }
+
+        public void setGroupField(String groupField) {
+            this.groupField = groupField;
+        }
     }
 
     /**
      * 获取注解中对方法的描述信息 用于Controller层注解
      *
+     * 注意：如果有多个参数被标记为groupId但话，groupField和groupId为最后一个生效
      * @param method 方法
      * @return 方法描述
      */
     private AccessParamValue getControllerMethodDescription(Method method, Object[] joinPointArgs, Access logAnnotation) {
         String description = method.getName();
         Object logGroupId = null;
+        String logGroupField = null;
         Object[] descriptionParams = new Object[]{};
         if (logAnnotation !=null) {
             description = logAnnotation.description();
@@ -370,7 +383,9 @@ public class AccessLogAspect implements EmbeddedValueResolverAware {
                                 tempDescParams.add(logParamValue);
 
                                 if (groupField!=null&&groupField.equalsIgnoreCase(logParamFieldes[j])) {
+                                    //更新groupId和groupField
                                     logGroupId = logParamValue;
+                                    logGroupField = groupField;
                                 }
                             }
                         }else {
@@ -378,6 +393,7 @@ public class AccessLogAspect implements EmbeddedValueResolverAware {
                             if (logParam.isGroupId()) {
                                 //若是组id，则设置logGroupId
                                 logGroupId = logArg;
+                                logGroupField = logParam.groupIdField();
                             }
                         }
                     }
@@ -390,7 +406,7 @@ public class AccessLogAspect implements EmbeddedValueResolverAware {
             }
         }
 
-        return new AccessParamValue(descriptionParams!=null&&descriptionParams.length>0?String.format(description, descriptionParams):description, logGroupId!=null?logGroupId.toString():null);
+        return new AccessParamValue(descriptionParams!=null&&descriptionParams.length>0?String.format(description, descriptionParams):description, logGroupId!=null?logGroupId.toString():null, logGroupField);
     }
 
     private Access getAccessAnnotation(JoinPoint joinPoint) {

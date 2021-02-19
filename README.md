@@ -1,6 +1,9 @@
 ## WebCore project:: useful helpers for spring web project [![Maven Central](https://maven-badges.herokuapp.com/maven-central/cn.watsontech/web-core/badge.svg)](https://maven-badges.herokuapp.com/maven-central/cn.watsontech/web-core)
 
 You can use the this project for your spring web project to 
+V0.2.1.23 web-common更新
+1) 添加accessLog参数的groupField支持，通过groupField来支持自定义多个groupId
+
 V0.2.1.22 web-common更新
 1) 添加loginUser到权限和角色检查hasPermission和hasRole
 
