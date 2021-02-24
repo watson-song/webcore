@@ -41,10 +41,10 @@ public interface RoleManuallyMapper {
 	 * @param userId 创建人ID
 	 * @param userName 创建人名称
 	 */
-	@Insert(value = "insert ignore into ref_role_permission(role_id, permission_id, created_by, created_by_name) values " +
+	@Insert(value = "<script>insert ignore into ref_role_permission(role_id, permission_id, created_by, created_by_name) values " +
 			" <foreach collection=\"permissionIds\" separator=\",\" item=\"item\"> " +
 			" (#{roleId}, #{item}, #{createdBy}, #{createdByName}) " +
-			"</foreach>")
+			"</foreach></script>")
 	int addPermissionsToRole(@Param("permissionIds") List<Long> permission, @Param("roleId") Long roleId, @Param("createdBy") Long userId, @Param("createdByName") String userName);
 
 	/**
