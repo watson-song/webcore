@@ -27,6 +27,14 @@ public class PrinciplePermissionVo {
     @JsonIgnore
     private String label;
 
+    @Transient
+    @JsonIgnore
+    private String parentId;
+
+    @Transient
+    @JsonIgnore
+    private Long adminId;
+
     @ApiModelProperty(value = "子权限列表")
     private Set<PrinciplePermissionVo> children;
 
@@ -83,6 +91,22 @@ public class PrinciplePermissionVo {
 
     public void setChildren(Set<PrinciplePermissionVo> children) {
         this.children = children;
+    }
+
+    public String getParentId() {
+        return parentId;
+    }
+
+    public void setParentId(String parentId) {
+        this.parentId = parentId;
+    }
+
+    public Long getAdminId() {
+        return adminId;
+    }
+
+    public void setAdminId(Long adminId) {
+        this.adminId = adminId;
     }
 
     @Override

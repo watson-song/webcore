@@ -62,11 +62,11 @@ public interface PermissionManuallyMapper {
      * 获取本权限下的所有子权限列表
      * @param parentId 父亲谦虚Id
      */
-	@Select("select id, name, label from tb_permission where parent_id =#{parentId} and enabled = true")
+	@Select("select c.id, c.name, c.label, c.parent_id parentId, a.admin_id adminId from tb_permission c left join ref_role_permission b on b.permission_id=c.id left join ref_admin_role a on a.role_id=b.role_id left join tb_role d on a.role_id=d.id where c.parent_id =#{parentId} and a.admin_id=#{mallId} and c.enabled = true and d.enabled = true")
 	@Results({
 		@Result(property = "id", column = "id"),
-		@Result(property = "children", javaType=Set.class, column="id", many = @Many(select = "selectAllChildPrinciplePermissions")),
+		@Result(property = "children", javaType=Set.class, column = "{parentId=parentId,adminId=adminId}", many = @Many(select = "selectAllChildPrinciplePermissions")),
 	})
-    Set<PrinciplePermissionVo> selectAllChildPrinciplePermissions(@Param("parentId") Long parentId);
+    Set<PrinciplePermissionVo> selectAllChildPrinciplePermissions(@Param("adminId") Long adminId, @Param("parentId") Long parentId);
 
 }

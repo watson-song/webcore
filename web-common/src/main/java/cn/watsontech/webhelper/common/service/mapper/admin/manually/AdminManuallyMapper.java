@@ -52,7 +52,7 @@ public interface AdminManuallyMapper {
 	 * 获取本账户下的所有权限列表
 	 * @param adminId 管理员Id
 	 */
-	@Select("select c.id,c.name from tb_permission c left join ref_role_permission b on b.permission_id=c.id left join ref_admin_role a on a.role_id=b.role_id and c.enabled = true where a.admin_id =#{adminId} group by c.id")
+	@Select("select c.id,c.name from tb_permission c left join ref_role_permission b on b.permission_id=c.id left join ref_admin_role a on a.role_id=b.role_id left join tb_role d on a.role_id=d.id where a.admin_id =#{adminId} and c.enabled = true and d.enabled = true group by c.id")
 	@Results({
 			@Result(column = "id", property = "id"),
 			@Result(property = "children", javaType=Set.class, column="id", many = @Many(select = "cn.watsontech.webhelper.common.service.mapper.permission.manually.PermissionManuallyMapper.selectAllChildPrinciplePermissions")),
