@@ -12,18 +12,13 @@ import java.util.Set;
  * Created by Watson on 2019/12/18.
  */
 public class PageParams {
+    enum Order{desc,asc}
 
     public PageParams() {}
     public PageParams(Integer offset, Integer limit) {
         this.offset = offset;
         this.limit = limit;
     }
-
-//    @ApiModelProperty(value = "分页码", example="1")
-//    protected Integer p = 1;  //page 默认第一页
-//
-//    @ApiModelProperty(value = "页面大小，默认20", example="20")
-//    protected Integer ps = 20; //pageSize 默认每页10条
 
     @ApiModelProperty(value = "分页码", example="0")
     protected Integer offset;  //从0开始，默认为空，若传该参数则使用该值，若未传则使用p，默认offset为0，p为1
@@ -35,7 +30,7 @@ public class PageParams {
     protected String sby;  //sortBy
 
     @ApiModelProperty(value = "升降序", example="desc")
-    protected String ord; //order
+    protected Order ord; //order
 
     /**
      * 提供前端支持 p和ps参数
@@ -73,7 +68,19 @@ public class PageParams {
      */
     @ApiModelProperty(value = "排序合计", example="desc", hidden = true)
     public String getOrderByClause() {
-        return null;
+        String sby = getSby();
+        if (!StringUtils.isEmpty(sby)) {
+            //禁止包含空格的sby，防止sql注入攻击
+            if (!sby.contains(" ")) {
+                return sby +" "+ getStringValue(getOrd());
+            }
+        }
+        return "";
+    }
+
+    private String getStringValue(Object value) {
+        if (value==null) return "";
+        return  value.toString();
     }
 
     public String getOrderByClause(Class entityClass) {
@@ -89,9 +96,9 @@ public class PageParams {
             }
 
             String column = getColumn(entityClass, property);
-            if (!StringUtils.isEmpty(getOrd())) {
+            if (getOrd()!=null) {
                 if (column!=null) {
-                    return prefix + column +" "+ getOrd();
+                    return prefix + column +" "+ getOrd().name();
                 }
             }
 
@@ -112,22 +119,6 @@ public class PageParams {
         return null;
     }
 
-//    public Integer getP() {
-//        return p;
-//    }
-//
-//    public void setP(Integer p) {
-//        this.p = p;
-//    }
-//
-//    public Integer getPs() {
-//        return ps;
-//    }
-//
-//    public void setPs(Integer ps) {
-//        this.ps = ps;
-//    }
-
     public void setOffset(Integer offset) {
         this.offset = offset;
     }
@@ -144,11 +135,11 @@ public class PageParams {
         this.sby = sby;
     }
 
-    public String getOrd() {
+    public Order getOrd() {
         return ord;
     }
 
-    public void setOrd(String ord) {
+    public void setOrd(Order ord) {
         this.ord = ord;
     }
 }

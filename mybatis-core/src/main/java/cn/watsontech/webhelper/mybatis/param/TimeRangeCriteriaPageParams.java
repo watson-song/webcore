@@ -11,7 +11,7 @@ import javax.validation.constraints.Pattern;
  * 带日期搜索条件的分页参数
  * Created by Watson on 2020/03/06.
  */
-public class TimeRangeCriteriaPageParams extends CriteriaPageParams {
+public class TimeRangeCriteriaPageParams extends CriteriaPageParams implements TimeRangePageParams {
 
     /**
      * 开始时间
