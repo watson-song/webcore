@@ -6,7 +6,6 @@ import cn.watsontech.webhelper.common.security.IUserLoginService;
 import cn.watsontech.webhelper.common.vo.AdminListVo;
 import cn.watsontech.webhelper.mybatis.intf.Service;
 import cn.watsontech.webhelper.mybatis.param.PageParams;
-import com.github.pagehelper.PageRowBounds;
 
 import java.util.List;
 

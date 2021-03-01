@@ -11,10 +11,10 @@
 
     <groupId>cn.watsontech.webhelper</groupId>
     <artifactId>web-common</artifactId>
-    <version>0.2.1.25</version>
+    <version>0.2.1.28</version>
 
     <properties>
-        <watsontech.webcore>0.2.1.5</watsontech.webcore>
+        <watsontech.webcore>0.2.1.9</watsontech.webcore>
     </properties>
 
     <dependencies>
@@ -38,11 +38,6 @@
             <groupId>com.alibaba</groupId>
             <artifactId>fastjson</artifactId>
             <version>1.2.75</version>
-        </dependency>
-        <dependency>
-            <groupId>jakarta.validation</groupId>
-            <artifactId>jakarta.validation-api</artifactId>
-            <version>2.0.2</version>
         </dependency>
         <dependency>
             <groupId>org.hibernate.validator</groupId>
@@ -79,11 +74,6 @@
             <artifactId>spring-tx</artifactId>
             <version>5.3.1</version>
         </dependency>
-        <!--<dependency>-->
-            <!--<groupId>org.springframework.boot</groupId>-->
-            <!--<artifactId>spring-boot</artifactId>-->
-            <!--<version>2.4.0</version>-->
-        <!--</dependency>-->
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-api</artifactId>
@@ -128,6 +118,11 @@
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-autoconfigure</artifactId>
             <version>2.4.0</version>
+        </dependency>
+        <dependency>
+            <groupId>eu.bitwalker</groupId>
+            <artifactId>UserAgentUtils</artifactId>
+            <version>1.21</version>
         </dependency>
     </dependencies>
 

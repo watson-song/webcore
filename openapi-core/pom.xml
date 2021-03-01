@@ -11,10 +11,10 @@
 
     <groupId>cn.watsontech.webhelper</groupId>
     <artifactId>openapi-core</artifactId>
-    <version>0.2.1.15</version>
+    <version>0.2.1.18</version>
 
     <properties>
-        <watsontech.webcore>0.2.1.25</watsontech.webcore>
+        <watsontech.webcore>0.2.1.28</watsontech.webcore>
     </properties>
 
     <dependencies>
@@ -32,11 +32,6 @@
             <groupId>com.fasterxml.jackson.core</groupId>
             <artifactId>jackson-databind</artifactId>
             <version>2.11.3</version>
-        </dependency>
-        <dependency>
-            <groupId>jakarta.validation</groupId>
-            <artifactId>jakarta.validation-api</artifactId>
-            <version>2.0.2</version>
         </dependency>
         <dependency>
             <groupId>io.swagger</groupId>

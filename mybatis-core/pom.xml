@@ -11,7 +11,7 @@
 
     <groupId>cn.watsontech.webhelper</groupId>
     <artifactId>mybatis-core</artifactId>
-    <version>0.2.1.6</version>
+    <version>0.2.1.9</version>
 
     <properties>
         <watsontech.webcore>0.2.1.2</watsontech.webcore>
@@ -88,7 +88,7 @@
         <dependency>
             <groupId>javax.validation</groupId>
             <artifactId>validation-api</artifactId>
-            <version>1.1.0.Final</version>
+            <version>2.0.1.Final</version>
         </dependency>
         <dependency>
             <groupId>org.aspectj</groupId>
