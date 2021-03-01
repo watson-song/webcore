@@ -2,7 +2,7 @@ package cn.watsontech.webhelper.common.controller.handler;
 
 import cn.watsontech.webhelper.common.result.Result;
 import cn.watsontech.webhelper.common.security.LoginUser;
-import cn.watsontech.webhelper.common.util.HttpUtils;
+import cn.watsontech.webhelper.common.util.RequestUtils;
 import cn.watsontech.webhelper.utils.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -203,7 +203,7 @@ public class GlobalExceptionHandler {
                     }
                 }
 
-                Object[] args = new Object[]{"error", message, "ip", "method", userId, userName, "url", "params", ex.getMessage(), 0, 0};
+                Object[] args = new Object[]{"error", message, "ip", "method", userId, userName, "url", "params", ex.getMessage(), 0, 0, "browser"};
                 fillRequestParams(request, args);
                 jdbcTemplate.saveError(args);
             }catch (Exception e) {
@@ -214,8 +214,9 @@ public class GlobalExceptionHandler {
 
     private void fillRequestParams(HttpServletRequest request, Object[] args) {
         if (request!=null) {
-            String remoteAddr = HttpUtils.getRealIp(request);// 请求的IP
+            String remoteAddr = RequestUtils.getIpAddress(request);// 请求的IP
             String requestUri = request.getRequestURI();// 请求的Uri
+            String requestBrowser = RequestUtils.getBrowser(request);// 请求的浏览器
             String method = request.getMethod(); // 请求的方法类型(post/get)
             Map<String, String[]> params = request.getParameterMap(); // 请求提交的参数
 
@@ -223,6 +224,7 @@ public class GlobalExceptionHandler {
             args[3] = method;
             args[6] = requestUri;
             args[7] = StringUtils.getMapToParams(params);
+            args[11] = requestBrowser;
         }
     }
 }

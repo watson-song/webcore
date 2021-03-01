@@ -7,6 +7,7 @@ import cn.watsontech.webhelper.common.security.UserTypeFactory;
 import cn.watsontech.webhelper.common.vo.PrinciplePermissionVo;
 import cn.watsontech.webhelper.common.vo.PrincipleRoleVo;
 import cn.watsontech.webhelper.openapi.params.base.OpenApiParams;
+import com.alibaba.fastjson.annotation.JSONField;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.GrantedAuthority;
@@ -33,6 +34,7 @@ public class OpenApiLoginUser extends LoginUser implements OpenApiParams {
     @Autowired
     @Transient
     @JsonIgnore
+    @JSONField(serialize = false)
     UserTypeFactory userTypeFactory;
 
     @Override
@@ -70,6 +72,7 @@ public class OpenApiLoginUser extends LoginUser implements OpenApiParams {
     @Override
     @Transient
     @JsonIgnore
+    @JSONField(serialize = false)
     public String getMobile() {
         return null;
     }
@@ -77,6 +80,7 @@ public class OpenApiLoginUser extends LoginUser implements OpenApiParams {
     @Override
     @Transient
     @JsonIgnore
+    @JSONField(serialize = false)
     public String getUsername() {
         return userName;
     }
@@ -84,6 +88,7 @@ public class OpenApiLoginUser extends LoginUser implements OpenApiParams {
     @Override
     @Transient
     @JsonIgnore
+    @JSONField(serialize = false)
     public Boolean getExpired() {
         return false;
     }
@@ -91,6 +96,7 @@ public class OpenApiLoginUser extends LoginUser implements OpenApiParams {
     @Override
     @Transient
     @JsonIgnore
+    @JSONField(serialize = false)
     public Boolean getLocked() {
         return false;
     }
@@ -98,6 +104,7 @@ public class OpenApiLoginUser extends LoginUser implements OpenApiParams {
     @Override
     @Transient
     @JsonIgnore
+    @JSONField(serialize = false)
     public Boolean getCredentialsExpired() {
         return false;
     }
@@ -105,6 +112,7 @@ public class OpenApiLoginUser extends LoginUser implements OpenApiParams {
     @Override
     @Transient
     @JsonIgnore
+    @JSONField(serialize = false)
     public Boolean getEnabled() {
         return true;
     }
@@ -112,6 +120,7 @@ public class OpenApiLoginUser extends LoginUser implements OpenApiParams {
     @Override
     @Transient
     @JsonIgnore
+    @JSONField(serialize = false)
     public String getNickName() {
         return null;
     }
@@ -119,6 +128,7 @@ public class OpenApiLoginUser extends LoginUser implements OpenApiParams {
     @Override
     @Transient
     @JsonIgnore
+    @JSONField(serialize = false)
     public String getAvatarUrl() {
         return null;
     }
@@ -126,6 +136,7 @@ public class OpenApiLoginUser extends LoginUser implements OpenApiParams {
     @Override
     @Transient
     @JsonIgnore
+    @JSONField(serialize = false)
     public String getPassword() {
         return null;
     }
@@ -133,6 +144,7 @@ public class OpenApiLoginUser extends LoginUser implements OpenApiParams {
     @Override
     @Transient
     @JsonIgnore
+    @JSONField(serialize = false)
     public int getUnreadMessages() {
         return 0;
     }
@@ -140,6 +152,7 @@ public class OpenApiLoginUser extends LoginUser implements OpenApiParams {
     @Override
     @Transient
     @JsonIgnore
+    @JSONField(serialize = false)
     public Set<PrincipleRoleVo> getRoles() {
         return null;
     }
@@ -147,6 +160,7 @@ public class OpenApiLoginUser extends LoginUser implements OpenApiParams {
     @Override
     @Transient
     @JsonIgnore
+    @JSONField(serialize = false)
     public Set<PrinciplePermissionVo> getPermissions() {
         return null;
     }
@@ -154,6 +168,7 @@ public class OpenApiLoginUser extends LoginUser implements OpenApiParams {
     @Override
     @Transient
     @JsonIgnore
+    @JSONField(serialize = false)
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return null;
     }

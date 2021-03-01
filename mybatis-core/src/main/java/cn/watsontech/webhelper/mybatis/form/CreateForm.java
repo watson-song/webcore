@@ -1,6 +1,7 @@
 package cn.watsontech.webhelper.mybatis.form;
 
 import cn.watsontech.webhelper.utils.mybatis.CreatedEntity;
+import com.alibaba.fastjson.annotation.JSONField;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import io.swagger.annotations.ApiModelProperty;
 import org.springframework.beans.BeanUtils;
@@ -21,6 +22,7 @@ public abstract class CreateForm<T extends CreatedEntity> {
      */
     @ApiModelProperty(hidden = true)
     @JsonIgnore
+    @JSONField(serialize = false)
     public T getObject() {
         T object = newObject();
         BeanUtils.copyProperties(this, object);

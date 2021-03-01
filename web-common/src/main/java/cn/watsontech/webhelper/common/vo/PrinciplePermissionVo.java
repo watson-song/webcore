@@ -1,6 +1,7 @@
 package cn.watsontech.webhelper.common.vo;
 
 import cn.watsontech.webhelper.common.entity.Permission;
+import com.alibaba.fastjson.annotation.JSONField;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import io.swagger.annotations.ApiModelProperty;
 import org.springframework.util.CollectionUtils;
@@ -17,6 +18,7 @@ public class PrinciplePermissionVo {
     @ApiModelProperty(value="id")
     @JsonIgnore
     @Transient
+    @JSONField(serialize = false)
     private Long id;
 
     @ApiModelProperty(value="系统标识")
@@ -25,14 +27,17 @@ public class PrinciplePermissionVo {
     @ApiModelProperty(value="名称")
     @Transient
     @JsonIgnore
+    @JSONField(serialize = false)
     private String label;
 
     @Transient
     @JsonIgnore
+    @JSONField(serialize = false)
     private String parentId;
 
     @Transient
     @JsonIgnore
+    @JSONField(serialize = false)
     private Long adminId;
 
     @ApiModelProperty(value = "子权限列表")

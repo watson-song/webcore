@@ -5,12 +5,13 @@ import cn.watsontech.webhelper.common.aop.annotation.AccessParam;
 import cn.watsontech.webhelper.common.aop.entity.AccessLog;
 import cn.watsontech.webhelper.common.security.LoginUser;
 import cn.watsontech.webhelper.common.security.authentication.AccountService;
-import cn.watsontech.webhelper.common.util.HttpUtils;
-import cn.watsontech.webhelper.utils.MapBuilder;
+import cn.watsontech.webhelper.common.util.RequestUtils;
 import cn.watsontech.webhelper.utils.StringUtils;
+import com.alibaba.fastjson.JSON;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.aspectj.lang.JoinPoint;
+import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.*;
 import org.aspectj.lang.reflect.MethodSignature;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,9 +23,10 @@ import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
+import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringValueResolver;
-import org.springframework.web.context.request.RequestAttributes;
-import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import javax.servlet.http.HttpServletRequest;
 import java.lang.reflect.InvocationTargetException;
@@ -46,14 +48,7 @@ public class AccessLogAspect implements EmbeddedValueResolverAware {
     /**
      * 本地线程日志
      */
-    private static final ThreadLocal<Map<JoinPoint, AccessLog>> logThreadLocal = new NamedThreadLocal("AccessLogAspectThreadLocal");
-    private static final ThreadLocal<LoginUser> authenticalThreadLocal = new NamedThreadLocal("AccessLogAspectAuthenticalThreadLocal");
-
-    /**
-     * 全局变量，同一个请求
-     */
-    @Autowired(required = false)
-    private HttpServletRequest request;
+    private static final ThreadLocal<Long> logThreadLocal = new NamedThreadLocal("AccessLogAspectThreadLocal");
 
     /**
      * 线程池任务执行程序
@@ -79,78 +74,59 @@ public class AccessLogAspect implements EmbeddedValueResolverAware {
     }
 
     /**
-     * 前置通知 用于拦截Controller层记录用户的操作的开始时间
-     *
-     * @param joinPoint 切点
-     * @throws InterruptedException
-     */
-    @Before("accessLogPointCut()")
-    public void doBefore(JoinPoint joinPoint) throws InterruptedException {
-
-        //注意：清空threadlocal变量，因为大部分web服务器使用线程池，会导致不释放authenticationUser
-        logThreadLocal.set(null);
-        authenticalThreadLocal.set(null);
-
-        // debug模式下 显式打印开始时间用于调试
-        // 在log4j中开启本类的debug
-
-        if (log.isDebugEnabled()) {
-            log.info(String.format("开始计时: %s  URI: %s", new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS").format(new Date()), request.getRequestURI()));
-        }
-
-        LoginUser user = getCurrentLoginUser();
-        AccessLog testLog = wrapAccessLog(joinPoint, request, user);
-
-        putIntoThreadLocal(logThreadLocal, joinPoint, testLog);
-    }
-
-    /**
-     * 后置通知 用于拦截Controller层记录用户的操作
+     * 环绕通知 用于拦截Controller层记录用户的操作的开始时间
      *
      * @param joinPoint 切点
      */
-    @After("accessLogPointCut()")
-    public void doAfter(JoinPoint joinPoint) {
+    @Around("accessLogPointCut()")
+    public Object doAround(ProceedingJoinPoint joinPoint) throws Throwable {
+        Object result = null;
+        logThreadLocal.set(System.currentTimeMillis());
+        result = joinPoint.proceed();
 
         LoginUser user = getCurrentLoginUser();
-        AccessLog testLog = getThreadLocalObject(joinPoint, null, request, user);
-        if (testLog!=null) {
-            // 1.直接执行保存操作
-            // this.logService.createSystemLog(log);
-
-            // 2.优化:异步保存日志
-            // new SaveLogThread(log, logService).start();
-
-            // 3.再优化:通过线程池来执行日志保存
-            Access access = getAccessAnnotation(joinPoint);
-            threadPoolTaskExecutor.execute(new SaveLogThread(testLog, isAccessShouldSave(access)));
-            putIntoThreadLocal(logThreadLocal, joinPoint, testLog);
+        if (user==null) {
+            org.aspectj.lang.Signature signature = joinPoint.getSignature();
+            //检查是否是登陆接口
+            if (signature.getDeclaringType()==AccountService.class) {
+                if (signature.getName().startsWith("loginBy")) {
+                    if (result instanceof LoginUser) {
+                        user = (LoginUser) result;
+                    }
+                }
+            }
         }
+
+        saveLog(joinPoint, null, user);
+        return result;
     }
 
-    private void putIntoThreadLocal(ThreadLocal<Map<JoinPoint, AccessLog>> logThreadLocal, JoinPoint joinPoint, AccessLog log) {
-        Map<JoinPoint,AccessLog> cachedMap = logThreadLocal.get();
-        if (cachedMap==null) {
-            logThreadLocal.set(MapBuilder.builder().putNext(joinPoint,log));
-        }else {
-            cachedMap.put(joinPoint, log);
-        }
+    private void saveLog(JoinPoint joinPoint, Throwable exception, LoginUser user) {
+        MethodSignature signature = (MethodSignature) joinPoint.getSignature();
+        Method method = signature.getMethod();
+        Access access = AnnotationUtils.findAnnotation(method, Access.class);
+        AccessLog testLog = wrapAccessLog(method, joinPoint.getArgs(), access, exception, user);
+        logThreadLocal.remove();
+
+        // 1.直接执行保存操作
+        // this.logService.createSystemLog(log);
+
+        // 2.优化:异步保存日志
+        // new SaveLogThread(log, logService).start();
+
+        // 3.再优化:通过线程池来执行日志保存
+        threadPoolTaskExecutor.execute(new SaveLogThread(testLog, isAccessShouldSave(access)));
     }
 
     // 读取session中的用户
     private LoginUser getCurrentLoginUser() {
-        LoginUser user = authenticalThreadLocal.get();
-        if(user==null) {
-            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-            if (authentication!=null) {
-                Object principal = authentication.getPrincipal();
-                if (principal!=null) {
-                    if (principal instanceof LoginUser) {
-                        user = (LoginUser) principal;
-
-                        //setLocalUser
-                        authenticalThreadLocal.set(user);
-                    }
+        LoginUser user = null;
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication!=null) {
+            Object principal = authentication.getPrincipal();
+            if (principal!=null) {
+                if (principal instanceof LoginUser) {
+                    user = (LoginUser) principal;
                 }
             }
         }
@@ -158,57 +134,30 @@ public class AccessLogAspect implements EmbeddedValueResolverAware {
         return user;
     }
 
-    private AccessLog getThreadLocalObject(JoinPoint joinPoint, String levelType, HttpServletRequest request, LoginUser user) {
-        Map<JoinPoint, AccessLog> testLogMap = logThreadLocal.get();
-        if (testLogMap == null) {
-            testLogMap = MapBuilder.builder().putNext(joinPoint, wrapAccessLog(joinPoint, levelType, request, user));
-        }
+    private AccessLog wrapAccessLog(Method signatureMethod, Object[] methodArgs, Access accessAnnotation, Throwable exception, LoginUser user) {
+        HttpServletRequest request = RequestUtils.getHttpServletRequest();
+        String remoteAddr = RequestUtils.getIpAddress(request);// 请求的IP
+        String requestBrowser = RequestUtils.getBrowser(request);// 请求的浏览器类型
+        String requestUri = request.getRequestURI();// 请求的Uri
+        String method = request.getMethod(); // 请求的方法类型(post/get)
 
-        AccessLog testLog = testLogMap.get(joinPoint);
-        if (testLog!=null) {
-            long beginTime = testLog.getCreatedTime().getTime();
-            testLog.setTotalTimes(System.currentTimeMillis() - beginTime);
-
-            if (testLog.getCreatedBy()==null&&user!=null) {
-                testLog.setCreatedBy(user.getId());
-                testLog.setCreatedByName(user.getFullName());
+        AccessParamValue accessParamValue = null;
+        String levelType = accessAnnotation.level();
+        String exMessage = null;
+        if (exception!=null) {
+            levelType = "error";
+            exMessage = exception.getMessage();
+            if (exMessage==null) {
+                exMessage = exception.toString();
             }
         }
 
-        return testLog;
-    }
-
-    private AccessLog wrapAccessLog(JoinPoint joinPoint, HttpServletRequest request, LoginUser user) {
-        return wrapAccessLog(joinPoint, null, request, user);
-    }
-
-    private AccessLog wrapAccessLog(JoinPoint joinPoint, String levelType, HttpServletRequest request, LoginUser user) {
-        RequestAttributes requestAttributes = RequestContextHolder.getRequestAttributes();
-        Map<String, String[]> params = new HashMap<>();
-        String method = "GET";
-        String requestUri = "/未知路径";
-        String remoteAddr = "未知ip地址";
-        if (requestAttributes!=null) {
-
-            remoteAddr = HttpUtils.getRealIp(request);// 请求的IP
-            requestUri = request.getRequestURI();// 请求的Uri
-            method = request.getMethod(); // 请求的方法类型(post/get)
-            params = request.getParameterMap(); // 请求提交的参数
-        }
-
-        AccessParamValue accessParamValue = null;
-
-        MethodSignature signature = (MethodSignature) joinPoint.getSignature();
-        Method signatureMethod = signature.getMethod();
-
-        Access accessAnnotation = AnnotationUtils.findAnnotation(signatureMethod, Access.class);
-        levelType = accessAnnotation.level();
         if (levelType!=null&&embeddedValueResolver!=null) {
             levelType = embeddedValueResolver.resolveStringValue(levelType);
         }
 
         try {
-            accessParamValue = getControllerMethodDescription(signatureMethod, joinPoint.getArgs(), accessAnnotation);
+            accessParamValue = getControllerMethodDescription(signatureMethod, methodArgs, accessAnnotation);
         } catch (Exception e) {
             e.printStackTrace();
             accessParamValue = new AccessParamValue("未知",null, null);
@@ -218,68 +167,68 @@ public class AccessLogAspect implements EmbeddedValueResolverAware {
         testLog.setLevel(levelType);
         testLog.setIp(remoteAddr);
         testLog.setUrl(requestUri);
+        testLog.setBrowser(requestBrowser);
         testLog.setMethod(method);
+        testLog.setException(exMessage);
         if (accessParamValue!=null) {
             testLog.setTitle(accessParamValue.getDescription());
             testLog.setGroupId(accessParamValue.getGroupId());
             testLog.setGroupField(accessParamValue.getGroupField());
         }
         testLog.setVersion(1);
-        testLog.setParams(StringUtils.getMapToParams(params));
+        testLog.setParams(getParameters(signatureMethod, methodArgs));
         if (user!=null) {
             testLog.setCreatedBy(user.getId());
             testLog.setCreatedByName(user.getFullName());
         }
         testLog.setCreatedTime(new Date());
-        testLog.setTotalTimes(0l);
+        testLog.setTotalTimes(System.currentTimeMillis()-logThreadLocal.get());
         return testLog;
     }
 
-    @AfterReturning(pointcut="accessLogPointCut()", returning="returnValue")
-    public void doAfterRturning(JoinPoint joinPoint, Object returnValue) {
-
-        LoginUser user = getCurrentLoginUser();
-
-        if (user==null) {
-            org.aspectj.lang.Signature signature = joinPoint.getSignature();
-            if (signature.getDeclaringType()==AccountService.class) {
-                if (signature.getName().startsWith("loginBy")) {
-                    if (returnValue instanceof LoginUser) {
-                        user = (LoginUser) returnValue;
-
-                        //setLocalUser
-                        authenticalThreadLocal.set(user);
-                    }
+    /**
+     * 根据方法和传入的参数获取请求参数
+     */
+    private String getParameters(Method method, Object[] args) {
+        List<Object> argList = new ArrayList<>();
+        Parameter[] parameters = method.getParameters();
+        for (int i = 0; i < parameters.length; i++) {
+            //将RequestBody注解修饰的参数作为请求参数
+            RequestBody requestBody = parameters[i].getAnnotation(RequestBody.class);
+            if (requestBody != null) {
+                argList.add(args[i]);
+            }
+            //将RequestParam注解修饰的参数作为请求参数
+            RequestParam requestParam = parameters[i].getAnnotation(RequestParam.class);
+            if (requestParam != null) {
+                Map<String, Object> map = new HashMap<>();
+                String key = parameters[i].getName();
+                if (!StringUtils.isEmpty(requestParam.value())) {
+                    key = requestParam.value();
                 }
+                map.put(key, args[i]);
+                argList.add(map);
             }
         }
 
-        AccessLog testLog = wrapAccessLog(joinPoint, request, user);
-        putIntoThreadLocal(logThreadLocal, joinPoint, testLog);
+        if (!CollectionUtils.isEmpty(argList)) {
+            if (argList.size()==1) {
+                return JSON.toJSONString(argList.get(0));
+            }
+
+            return JSON.toJSONString(argList);
+        }
+        return "";
     }
 
     /**
      * 异常通知
-     *
-     * @param joinPoint
-     * @param e
      */
     @AfterThrowing(pointcut = "accessLogPointCut()", throwing = "e")
     public void doAfterThrowing(JoinPoint joinPoint, Throwable e) {
         LoginUser user = getCurrentLoginUser();
-        AccessLog testLog = getThreadLocalObject(joinPoint, "error", request, user);
 
-        if (testLog != null) {
-            testLog.setLevel("error");
-            if (e.getMessage()!=null) {
-                testLog.setException(e.getMessage());
-            }else {
-                testLog.setException(e.toString());
-            }
-
-            Access access = getAccessAnnotation(joinPoint);
-            threadPoolTaskExecutor.execute(new SaveLogThread(testLog, isAccessShouldSave(access)));
-        }
+        saveLog(joinPoint, e, user);
     }
 
     private boolean isAccessShouldSave(Access access) {
@@ -409,16 +358,6 @@ public class AccessLogAspect implements EmbeddedValueResolverAware {
         return new AccessParamValue(descriptionParams!=null&&descriptionParams.length>0?String.format(description, descriptionParams):description, logGroupId!=null?logGroupId.toString():null, logGroupField);
     }
 
-    private Access getAccessAnnotation(JoinPoint joinPoint) {
-        /**
-         * Returns the signature at the join point. 返回连接点处的签名。
-         * getStaticPart().getSignature() returns the same object 返回相同的对象
-         */
-        MethodSignature signature = (MethodSignature) joinPoint.getSignature();
-        Method method = signature.getMethod();
-        return AnnotationUtils.findAnnotation(method, Access.class);
-    }
-
     @Override
     public void setEmbeddedValueResolver(StringValueResolver resolver) {
         this.embeddedValueResolver = resolver;
@@ -426,9 +365,6 @@ public class AccessLogAspect implements EmbeddedValueResolverAware {
 
     /**
      * 保存日志线程
-     *
-     * @author xuxiaowei
-     *
      */
     private class SaveLogThread implements Runnable {
         private final AccessLog testLog;

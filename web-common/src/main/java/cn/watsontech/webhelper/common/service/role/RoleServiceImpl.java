@@ -124,7 +124,7 @@ public class RoleServiceImpl extends BaseService<Role, Long> implements RoleServ
 
        //插入权限集合
        if (success>0) {
-           if (CollectionUtils.isEmpty(form.getPermissions())) {
+           if (!CollectionUtils.isEmpty(form.getPermissions())) {
                int permissionSuccess = addPermissions(role.getId(), form.getPermissions(), user);
            }
        }

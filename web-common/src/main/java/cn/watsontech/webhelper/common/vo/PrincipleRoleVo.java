@@ -1,6 +1,7 @@
 package cn.watsontech.webhelper.common.vo;
 
 import cn.watsontech.webhelper.common.entity.Role;
+import com.alibaba.fastjson.annotation.JSONField;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import io.swagger.annotations.ApiModelProperty;
 import org.springframework.util.StringUtils;
@@ -22,6 +23,7 @@ public class PrincipleRoleVo {
 
     @ApiModelProperty(value="名称")
     @JsonIgnore
+    @JSONField(serialize = false)
     private String label;
 
     public PrincipleRoleVo() {}

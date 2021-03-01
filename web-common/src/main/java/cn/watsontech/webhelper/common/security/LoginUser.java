@@ -4,6 +4,7 @@ import cn.watsontech.webhelper.common.entity.Admin;
 import cn.watsontech.webhelper.common.entity.User;
 import cn.watsontech.webhelper.common.vo.PrinciplePermissionVo;
 import cn.watsontech.webhelper.common.vo.PrincipleRoleVo;
+import com.alibaba.fastjson.annotation.JSONField;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import io.swagger.annotations.ApiModelProperty;
 import org.springframework.security.core.GrantedAuthority;
@@ -72,18 +73,22 @@ public abstract class LoginUser implements UserDetails {
     public abstract String getMobile();
 
     @JsonIgnore
+    @JSONField(serialize = false)
     @ApiModelProperty(value = "账户是否过期")
     public abstract Boolean getExpired();
 
     @JsonIgnore
+    @JSONField(serialize = false)
     @ApiModelProperty(value = "账户是否锁定")
     public abstract Boolean getLocked();
 
     @JsonIgnore
+    @JSONField(serialize = false)
     @ApiModelProperty(value = "账户密码是否过期")
     public abstract Boolean getCredentialsExpired();
 
     @JsonIgnore
+    @JSONField(serialize = false)
     public abstract String getPassword();
 
     @ApiModelProperty(value = "账户是否启用(替代 enabled，仅为enabled别名)")
@@ -96,6 +101,7 @@ public abstract class LoginUser implements UserDetails {
     public abstract String getAvatarUrl();
 
     @JsonIgnore
+    @JSONField(serialize = false)
     @ApiModelProperty(value = "账户数据版本号")
     public Integer getVersion() {
         return null;
@@ -111,6 +117,7 @@ public abstract class LoginUser implements UserDetails {
 
     @ApiModelProperty(value = "获取用户名（优先获取昵称，昵称为空则返回username）")
     @JsonIgnore
+    @JSONField(serialize = false)
     public String getName() {
         if (getNickName()!=null) return getNickName();
 
@@ -119,6 +126,7 @@ public abstract class LoginUser implements UserDetails {
 
     @ApiModelProperty(value = "获取昵称加用户名，nickName(username)")
     @JsonIgnore
+    @JSONField(serialize = false)
     public String getFullName() {
         if (getNickName()!=null) return String.format("%s(%s)", getNickName(), getUsername());
 
@@ -166,6 +174,7 @@ public abstract class LoginUser implements UserDetails {
 
     @Override
     @JsonIgnore
+    @JSONField(serialize = false)
     public Collection<? extends GrantedAuthority> getAuthorities() {
         Set<String> roleList = new HashSet<>();
         roleList.add(getUserType().name());
@@ -283,6 +292,7 @@ public abstract class LoginUser implements UserDetails {
 
     @Override
     @JsonIgnore
+    @JSONField(serialize = false)
     public boolean isAccountNonExpired() {
         Boolean value = getExpired();
         return value==null?false:!value;
@@ -290,6 +300,7 @@ public abstract class LoginUser implements UserDetails {
 
     @Override
     @JsonIgnore
+    @JSONField(serialize = false)
     public boolean isAccountNonLocked() {
         Boolean value = getLocked();
         return value==null?false:!value;
@@ -297,6 +308,7 @@ public abstract class LoginUser implements UserDetails {
 
     @Override
     @JsonIgnore
+    @JSONField(serialize = false)
     public boolean isCredentialsNonExpired() {
         Boolean value = getCredentialsExpired();
         return value==null?false:!value;

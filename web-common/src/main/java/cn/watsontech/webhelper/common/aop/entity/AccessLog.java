@@ -54,6 +54,12 @@ public class AccessLog implements CreatedEntity<AccessLog, Long, Long> {
     private String method;
 
     /**
+     * 浏览器
+     */
+    @ApiModelProperty(value="browser浏览器")
+    private String browser;
+
+    /**
      * 版本号
      */
     @ApiModelProperty(value="version版本号")
@@ -420,6 +426,14 @@ public class AccessLog implements CreatedEntity<AccessLog, Long, Long> {
         return this;
     }
 
+    public String getBrowser() {
+        return browser;
+    }
+
+    public void setBrowser(String browser) {
+        this.browser = browser;
+    }
+
     public String getGroupId() {
         return groupId;
     }
@@ -448,6 +462,7 @@ public class AccessLog implements CreatedEntity<AccessLog, Long, Long> {
                 ", exception='" + exception + '\'' +
                 ", totalTimes=" + totalTimes +
                 ", dbTimes=" + dbTimes +
+                ", browser=" + browser +
                 ", createdBy=" + createdBy +
                 ", createdByName='" + createdByName + '\'' +
                 ", createdTime=" + createdTime +

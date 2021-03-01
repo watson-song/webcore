@@ -2,7 +2,7 @@ package cn.watsontech.webhelper.common.security.authentication;
 
 import cn.watsontech.webhelper.common.result.Result;
 import cn.watsontech.webhelper.common.security.LoginUser;
-import cn.watsontech.webhelper.common.util.HttpUtils;
+import cn.watsontech.webhelper.common.util.RequestUtils;
 import cn.watsontech.webhelper.utils.StringUtils;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.slf4j.Logger;
@@ -136,7 +136,7 @@ public class AuthenticationFilter extends GenericFilterBean {
     public static void handleUnAuthentication(HttpServletRequest httpRequest, HttpServletResponse httpResponse, AuthenticationException authException) throws IOException {
         logger.error("handleUnAuthentication", authException);
 
-        if(HttpUtils.isAjaxRequest(httpRequest)) {
+        if(RequestUtils.isAjaxRequest(httpRequest)) {
             String tokenJsonResponse = new ObjectMapper().writeValueAsString(Result.errorResult(HttpResultInfoEnum.UNAUTHORIZED.getCode(), authException.getMessage()));
             httpResponse.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
             httpResponse.setCharacterEncoding("UTF-8");
@@ -153,7 +153,7 @@ public class AuthenticationFilter extends GenericFilterBean {
     public static void handleAuthenticationServiceException(HttpServletRequest httpRequest, HttpServletResponse httpResponse, AuthenticationServiceException exception) throws IOException {
         logger.error("Internal authentication service exception", exception);
 
-        if(HttpUtils.isAjaxRequest(httpRequest)) {
+        if(RequestUtils.isAjaxRequest(httpRequest)) {
             String tokenJsonResponse = new ObjectMapper().writeValueAsString(Result.errorResult(HttpResultInfoEnum.SERVER_ERROR.getCode(), HttpResultInfoEnum.SERVER_ERROR.getMessage()+"，"+exception.getMessage()));
             httpResponse.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
             httpResponse.setCharacterEncoding("UTF-8");
