@@ -163,6 +163,14 @@ public abstract class LoginUser implements UserDetails {
         this.roles = roles;
     }
 
+    @ApiModelProperty(value = "用户角色名称")
+    public String getRoleName() {
+        if (this.roles!=null) {
+            return this.roles.stream().findFirst().orElse(new PrincipleRoleVo()).getLabel();
+        }
+        return null;
+    }
+
     @ApiModelProperty(value = "用户权限集合")
     public Set<PrinciplePermissionVo> getPermissions() {
         return permissions;

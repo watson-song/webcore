@@ -24,4 +24,11 @@ public class RoleVo extends Role {
     @ApiModelProperty(value = "权限列表")
     private List<PermissionVo> permissions;
 
+    public List<PermissionVo> getPermissions() {
+        return permissions;
+    }
+
+    public void setPermissions(List<PermissionVo> permissions) {
+        this.permissions = permissions;
+    }
 }
