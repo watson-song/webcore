@@ -8,6 +8,7 @@ import cn.watsontech.webhelper.common.security.authentication.AccountService;
 import cn.watsontech.webhelper.common.util.RequestUtils;
 import cn.watsontech.webhelper.utils.StringUtils;
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.aspectj.lang.JoinPoint;
@@ -197,19 +198,29 @@ public class AccessLogAspect implements EmbeddedValueResolverAware {
         Parameter[] parameters = method.getParameters();
         for (int i = 0; i < parameters.length; i++) {
             //将RequestBody注解修饰的参数作为请求参数
-            RequestBody requestBody = parameters[i].getAnnotation(RequestBody.class);
-            if (requestBody != null) {
-                argList.add(args[i]);
+            Object argsI = args[i];
+            if (argsI!=null) {
+                //清楚记录里的password
+                try {
+                    argsI = JSON.toJSON(args[i]);
+                    if (argsI instanceof JSONObject) {
+                        ((JSONObject)argsI).replace("password", "*****");
+                    }
+                }catch (Exception ex) {ex.printStackTrace();}
             }
+
+            RequestBody requestBody = parameters[i].getAnnotation(RequestBody.class);
             //将RequestParam注解修饰的参数作为请求参数
             RequestParam requestParam = parameters[i].getAnnotation(RequestParam.class);
-            if (requestParam != null) {
+            if (requestBody != null) {
+                argList.add(argsI);
+            }else if (requestParam != null) {
                 Map<String, Object> map = new HashMap<>();
                 String key = parameters[i].getName();
                 if (!StringUtils.isEmpty(requestParam.value())) {
                     key = requestParam.value();
                 }
-                map.put(key, args[i]);
+                map.put(key, argsI);
                 argList.add(map);
             }
         }
