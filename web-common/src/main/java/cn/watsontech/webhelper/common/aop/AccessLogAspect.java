@@ -106,7 +106,6 @@ public class AccessLogAspect implements EmbeddedValueResolverAware {
         Method method = signature.getMethod();
         Access access = AnnotationUtils.findAnnotation(method, Access.class);
         AccessLog testLog = wrapAccessLog(method, joinPoint.getArgs(), access, exception, user);
-        logThreadLocal.remove();
 
         // 1.直接执行保存操作
         // this.logService.createSystemLog(log);
