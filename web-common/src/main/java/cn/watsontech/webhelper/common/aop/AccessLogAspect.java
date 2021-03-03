@@ -142,6 +142,7 @@ public class AccessLogAspect implements EmbeddedValueResolverAware {
 
         AccessParamValue accessParamValue = null;
         String levelType = accessAnnotation.level();
+        String tag = accessAnnotation.tag();
         String exMessage = null;
         if (exception!=null) {
             levelType = "error";
@@ -164,6 +165,7 @@ public class AccessLogAspect implements EmbeddedValueResolverAware {
 
         AccessLog testLog = new AccessLog();
         testLog.setLevel(levelType);
+        testLog.setTag(tag);
         testLog.setIp(remoteAddr);
         testLog.setUrl(requestUri);
         testLog.setBrowser(requestBrowser);
@@ -181,7 +183,9 @@ public class AccessLogAspect implements EmbeddedValueResolverAware {
             testLog.setCreatedByName(user.getFullName());
         }
         testLog.setCreatedTime(new Date());
-        testLog.setTotalTimes(System.currentTimeMillis()-logThreadLocal.get());
+        if (logThreadLocal.get()!=null) {
+            testLog.setTotalTimes(System.currentTimeMillis()-logThreadLocal.get());
+        }
         return testLog;
     }
 

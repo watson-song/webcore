@@ -36,6 +36,12 @@ public class AccessLog implements CreatedEntity<AccessLog, Long, Long> {
     private String level;
 
     /**
+     * 日志标签
+     */
+    @ApiModelProperty(value="level日志标签：登陆/修改账户信息/删除订单等日志分类")
+    private String tag;
+
+    /**
      * 日志标题
      */
     @ApiModelProperty(value="title日志标题")
@@ -448,6 +454,14 @@ public class AccessLog implements CreatedEntity<AccessLog, Long, Long> {
 
     public void setGroupField(String groupField) {
         this.groupField = groupField;
+    }
+
+    public String getTag() {
+        return tag;
+    }
+
+    public void setTag(String tag) {
+        this.tag = tag;
     }
 
     @Override

@@ -32,9 +32,13 @@ public @interface Access {
     String level() default "info";
 
     /**
+     * 日志标签
+     */
+    String tag() default "";
+
+    /**
      * 是否保存数据库， 默认为true
      * @return true 保存数据库， false只打log
      */
     String save() default "true";
-
 }
