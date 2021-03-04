@@ -205,6 +205,8 @@ public class AccessLogAspect implements EmbeddedValueResolverAware {
                     argsI = JSON.toJSON(args[i]);
                     if (argsI instanceof JSONObject) {
                         ((JSONObject)argsI).replace("password", "*****");
+                        ((JSONObject)argsI).replace("oldPassword", "*****");
+                        ((JSONObject)argsI).replace("confirmPassword", "*****");
                     }
                 }catch (Exception ex) {ex.printStackTrace();}
             }
