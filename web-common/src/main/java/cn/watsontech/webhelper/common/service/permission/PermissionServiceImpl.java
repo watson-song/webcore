@@ -88,7 +88,7 @@ public class PermissionServiceImpl extends BaseService<Permission, Long> impleme
      */
     @Override
     public Set<PrinciplePermissionVo> loadAllPrincipleChild(long adminId, long parentId) {
-        return voMapper.selectAllChildPrinciplePermissions(adminId, parentId);
+        return voMapper.selectAllChildPrinciplePermissionsByAdmin(adminId, parentId);
     }
 
     /**

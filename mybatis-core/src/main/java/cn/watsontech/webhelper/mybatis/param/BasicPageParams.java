@@ -58,7 +58,7 @@ public class BasicPageParams implements PageParams {
     @Override
     public String getOrderByClause() {
         String sby = getSby();
-        if (!StringUtils.isEmpty(sby)) {
+        if (StringUtils.hasLength(sby)) {
             //禁止包含空格的sby，防止sql注入攻击
             if (!sby.contains(" ")) {
                 return sby +" "+ getStringValue(getOrd());
@@ -75,7 +75,7 @@ public class BasicPageParams implements PageParams {
     @Override
     public String getOrderByClause(Class entityClass) {
         String property = getSby();
-        if (!StringUtils.isEmpty(property)) {
+        if (StringUtils.hasLength(property)) {
             //分割点好 a.createdTime
             String[] sbySplit = property.split("\\.");
             String prefix = "";
@@ -92,7 +92,7 @@ public class BasicPageParams implements PageParams {
                 }
             }
 
-            return column;
+            return prefix + column;
         }
 
         return null;

@@ -89,7 +89,7 @@ public interface PermissionManuallyMapper {
 		@Result(property = "id", column = "id"),
 		@Result(property = "children", javaType=Set.class, column = "{parentId=parentId,adminId=adminId}", many = @Many(select = "selectAllChildPrinciplePermissions")),
 	})
-    Set<PrinciplePermissionVo> selectAllChildPrinciplePermissions(@Param("adminId") Long adminId, @Param("parentId") Long parentId);
+    Set<PrinciplePermissionVo> selectAllChildPrinciplePermissionsByAdmin(@Param("adminId") Long adminId, @Param("parentId") Long parentId);
 
 	/**
 	 * 获取本角色下的所有权限集合
