@@ -7,7 +7,7 @@ import io.swagger.annotations.ApiModelProperty;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 
-import javax.persistence.Transient;
+import javax.persistence.*;
 import java.util.*;
 
 /**
@@ -160,6 +160,21 @@ public class PrinciplePermissionVo {
         }
 
         return super.equals(obj);
+    }
+
+    @ApiModelProperty(value="名称平铺列表（包含children的name）")
+    @Transient
+    @JsonIgnore
+    @JSONField(serialize = false)
+    public Set<String> toNames() {
+        Set<String> names = new HashSet<>();
+        if (getName()!=null) {
+            names.add(getName());
+        }
+        if (!CollectionUtils.isEmpty(getChildren())) {
+            getChildren().forEach(child -> {if(child!=null&&child.getName()!=null) {names.add(child.getName());}});
+        }
+        return names;
     }
 
     @Override

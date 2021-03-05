@@ -25,11 +25,15 @@ public interface PermissionService extends Service<Permission, Long> {
      */
     List<PermissionVo> loadAllByRoleId(long roleId);
 
+    List<PermissionVo> loadAllByRoleName(String roleName);
+
     /**
      * 加载当前角色详情
      * @param permissionId
      */
     PermissionVo loadInfoById(long permissionId);
+
+    PermissionVo loadInfoByName(String permissionName);
 
     /**
      * 加载当前权限所有子权限集合
@@ -42,4 +46,8 @@ public interface PermissionService extends Service<Permission, Long> {
      * @param parentId
      */
     Set<PrinciplePermissionVo> loadAllPrincipleChild(long adminId, long parentId);
+
+    Set<PrinciplePermissionVo> loadAllPrinciplePermissionsByRoleName(String roleName);
+
+    Set<PrinciplePermissionVo> loadAllPrinciplePermissionsByRoleId(long roleId);
 }

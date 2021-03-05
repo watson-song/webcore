@@ -47,12 +47,30 @@ public class PermissionServiceImpl extends BaseService<Permission, Long> impleme
     }
 
     /**
+     * 加载当前角色所有权限集合
+     * @param roleName
+     */
+    @Override
+    public List<PermissionVo> loadAllByRoleName(String roleName) {
+        return voMapper.selectAllByRoleName(roleName);
+    }
+
+    /**
      * 加载当前角色详情
      * @param permissionId
      */
     @Override
     public PermissionVo loadInfoById(long permissionId) {
         return voMapper.selectInfoById(permissionId);
+    }
+
+    /**
+     * 加载当前角色详情
+     * @param permissionName
+     */
+    @Override
+    public PermissionVo loadInfoByName(String permissionName) {
+        return voMapper.selectInfoByName(permissionName);
     }
 
     /**
@@ -71,6 +89,24 @@ public class PermissionServiceImpl extends BaseService<Permission, Long> impleme
     @Override
     public Set<PrinciplePermissionVo> loadAllPrincipleChild(long adminId, long parentId) {
         return voMapper.selectAllChildPrinciplePermissions(adminId, parentId);
+    }
+
+    /**
+     * 加载当前角色的所有权限和子权限集合
+     * @param roleName 角色名称
+     */
+    @Override
+    public Set<PrinciplePermissionVo> loadAllPrinciplePermissionsByRoleName(String roleName) {
+        return voMapper.selectAllPrinciplePermissionsByRoleName(roleName);
+    }
+
+    /**
+     * 加载当前角色的所有权限和子权限集合
+     * @param roleId 角色ID
+     */
+    @Override
+    public Set<PrinciplePermissionVo> loadAllPrinciplePermissionsByRoleId(long roleId) {
+        return voMapper.selectAllPrinciplePermissionsByRoleId(roleId);
     }
 
 }
