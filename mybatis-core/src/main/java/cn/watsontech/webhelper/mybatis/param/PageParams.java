@@ -25,7 +25,12 @@ public interface PageParams {
 
     @ApiModelProperty(value = "升降序", example="desc")
     Order getOrd();
-    default void setOrd(String ord) {}
+    default void setOrd(String ord) {
+        try {
+            setOrd(Order.valueOf(ord));
+        }catch (Exception ex) {}
+    }
+    default void setOrd(Order ord) {}
 
     @ApiModelProperty(value = "排序合计", example="desc", hidden = true)
     String getOrderByClause();
