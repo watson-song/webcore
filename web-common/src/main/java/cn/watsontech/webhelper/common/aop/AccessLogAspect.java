@@ -30,6 +30,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
@@ -200,6 +201,11 @@ public class AccessLogAspect implements EmbeddedValueResolverAware {
             //将RequestBody注解修饰的参数作为请求参数
             Object argsI = args[i];
             if (argsI!=null) {
+                //修复 序列化异常，过滤httpServletRequest和response参数
+                if (argsI instanceof HttpServletRequest || argsI instanceof HttpServletResponse) {
+                    continue;
+                }
+
                 //清楚记录里的password
                 try {
                     argsI = JSON.toJSON(args[i]);
