@@ -11,10 +11,7 @@
 
     <groupId>cn.watsontech.webhelper</groupId>
     <artifactId>vendor-file</artifactId>
-    <version>0.2.1.3</version>
-    <properties>
-        <watsontech.webcore>0.2.1.1</watsontech.webcore>
-    </properties>
+    <version>0.2.1.4</version>
 
     <dependencies>
         <dependency>

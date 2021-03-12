@@ -18,9 +18,7 @@ import org.springframework.util.Assert;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.annotation.PostConstruct;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.InputStream;
+import java.io.*;
 import java.net.URL;
 import java.net.URLEncoder;
 import java.text.SimpleDateFormat;
@@ -144,30 +142,8 @@ public class TencentUploadServiceImpl extends UploadService {
             if(isImage==null) isImage = false;
 
             try {
-                String realFileName = file.getOriginalFilename();
-                model.setName(realFileName);
-                SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyyMMdd");
-
-                String remoteFileDirectory = "/" + userId + "/" + simpleDateFormat.format(new Date()) + "/";
-                model.setPath(remoteFileDirectory + URLEncoder.encode(realFileName, "utf-8"));
-                model.setSize(file.getSize());
-                model.setType(file.getContentType());
-
-                model.setVendor(uploadProperties.getVendor());
-                model.setBucket(uploadProperties.getBucket());
-
-                switch (uploadProperties.getVendor()) {
-                    case tencent:
-                        ObjectMetadata uploadResult = uploadTencentFile(uploadProperties.getBucket(), file.getInputStream(), file.getContentType(), file.getSize(), remoteFileDirectory + realFileName, userMetadata, convertTencentStorageClass(storageLevel));
-                        model.setTags(uploadResult.getETag());
-                        break;
-                    default:
-                        throw new IllegalArgumentException("尚不支持的文件存储类型：" + uploadProperties.getVendor());
-                }
-
-                model.setUrl((isImage&&uploadProperties.getImageRootUrl()!=null ? uploadProperties.getImageRootUrl():uploadProperties.getWebRootUrl()) + model.getPath());
-                return model;
-            } catch (Exception e) {
+                return uploadInternal(model, file.getContentType(), uploadProperties, file.getInputStream(), file.getOriginalFilename(), file.getSize(), userId, userMetadata, storageLevel, isImage);
+            } catch (IOException e) {
                 e.printStackTrace();
             }
         }
@@ -183,35 +159,44 @@ public class TencentUploadServiceImpl extends UploadService {
             if(isImage==null) isImage = false;
 
             try {
-                String realFileName = tmpFile.getName();
-                model.setName(realFileName);
-
-                String remoteFileDirectory = File.separator + userId + File.separator + DateFormatUtils.format(new Date(), "yyyyMMdd");
-                model.setPath(remoteFileDirectory + File.separator + URLEncoder.encode(realFileName, "utf-8"));
-                model.setSize(tmpFile.length());
-                model.setVendor(uploadProperties.getVendor());
-                model.setBucket(uploadProperties.getBucket());
-                model.setType(contentType);
-
-                switch (uploadProperties.getVendor()) {
-                    case tencent:
-                        ObjectMetadata uploadResult = uploadTencentFile(uploadProperties.getBucket(), new FileInputStream(tmpFile), contentType, tmpFile.length(), remoteFileDirectory + File.separator + realFileName, userMetadata, convertTencentStorageClass(storageLevel));
-                        model.setTags(uploadResult.getETag());
-
-                        //删除本地临时文件
-                        tmpFile.delete();
-                        break;
-                    default:
-                        throw new IllegalArgumentException("尚不支持的文件存储类型："+uploadProperties.getVendor());
-                }
-                model.setUrl((isImage&&uploadProperties.getImageRootUrl()!=null?uploadProperties.getImageRootUrl():uploadProperties.getWebRootUrl()) + model.getPath());
-
-                return model;
-            } catch (Exception e) {
+                model = uploadInternal(model, contentType, uploadProperties, new FileInputStream(tmpFile), tmpFile.getName(), tmpFile.length(), userId, userMetadata, storageLevel, isImage);
+            } catch (FileNotFoundException e) {
                 e.printStackTrace();
             }
+            if (model!=null) {
+                //删除本地临时文件
+                tmpFile.delete();
+            }
+            return model;
         }
 
+        return null;
+    }
+
+    private UploadFile uploadInternal(UploadFile model, String contentType, UploadProperties uploadProperties, InputStream fileInputStream, String realFileName, long fileLength, Long userId, Map<String, Object> userMetadata, Integer storageLevel/*0 归档存储，1 低频存储，2 标准存储*/, Boolean isImage) {
+        try {
+            String remoteFileDirectory = "/" + userId + "/" + DateFormatUtils.format(new Date(), "yyyyMMdd")+"/";
+            model.setPath(remoteFileDirectory +  URLEncoder.encode(realFileName, "utf-8").replace("+", "%20"));//encode后替换%20解决空格问题
+            model.setName(realFileName);
+            model.setSize(fileLength);
+            model.setVendor(uploadProperties.getVendor());
+            model.setBucket(uploadProperties.getBucket());
+            model.setType(contentType);
+
+            switch (uploadProperties.getVendor()) {
+                case tencent:
+                    ObjectMetadata uploadResult = uploadTencentFile(uploadProperties.getBucket(), fileInputStream, contentType, fileLength, remoteFileDirectory + realFileName, userMetadata, convertTencentStorageClass(storageLevel));
+                    model.setTags(uploadResult.getETag());
+                    break;
+                default:
+                    throw new IllegalArgumentException("尚不支持的文件存储类型："+uploadProperties.getVendor());
+            }
+            model.setUrl((isImage&&uploadProperties.getImageRootUrl()!=null?uploadProperties.getImageRootUrl():uploadProperties.getWebRootUrl()) + model.getPath());
+
+            return model;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
         return null;
     }
 
