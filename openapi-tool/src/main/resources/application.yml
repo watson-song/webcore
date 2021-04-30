@@ -1,0 +1,12 @@
+
+#定义日志格式和路径
+logging:
+  file:
+    max-history: 30
+    name: logs/openapi-util.log
+    max-size: 100MB
+    total-size-cap: 50GB
+  level:
+    org.mybatis.spring: error
+    org.springframework.web: debug
+    cn.watsontech.openapi: debug

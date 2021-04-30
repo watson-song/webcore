@@ -21,6 +21,7 @@
 
         <!--模版web项目-->
         <module>vendor-sms</module>
+        <module>openapi-tool</module>
         <!--<module>web-template</module>-->
     </modules>
 
