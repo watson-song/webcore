@@ -327,6 +327,8 @@ public class OpenApiDecodeService {
                         }else {
                             return (T)result.getData();
                         }
+                    }else {
+                        message = result.getCode()+"，"+result.getMessage();
                     }
                 }
 
@@ -349,12 +351,15 @@ public class OpenApiDecodeService {
         try {
             restTemplate.setErrorHandler(new OpenApiResponseErrorHandler());
             Result result = restTemplate.postForObject(getHostRequestUrl(requestUrl, query), requestData, Result.class);
+            statusCode = HttpStatus.OK;
             if(result.getData()!=null) {
                 if (result.getData() instanceof Map) {
                     return mapToObject((Map<String, Object>)result.getData(), responseType);
                 }else {
                     return (T)result.getData();
                 }
+            }else {
+                message = result.getCode()+"，"+result.getMessage();
             }
         }catch (RestClientException ex) {
             ex.printStackTrace();
@@ -373,12 +378,15 @@ public class OpenApiDecodeService {
         try {
             restTemplate.setErrorHandler(new OpenApiResponseErrorHandler());
             Result result = restTemplate.getForObject(getHostRequestUrl(requestUrl, query), Result.class);
+            statusCode = HttpStatus.OK;
             if(result.getData()!=null) {
                 if (result.getData() instanceof Map) {
                     return mapToObject((Map<String, Object>)result.getData(), responseType);
                 }else {
                     return (T)result.getData();
                 }
+            }else {
+                message = result.getCode()+"，"+result.getMessage();
             }
         }catch (RestClientException ex) {
             ex.printStackTrace();
@@ -397,6 +405,7 @@ public class OpenApiDecodeService {
         try {
             restTemplate.setErrorHandler(new OpenApiResponseErrorHandler());
             restTemplate.put(getHostRequestUrl(requestUrl, query), requestData);
+            return;
         }catch (RestClientException ex) {
             ex.printStackTrace();
             message = ex.getMessage();
@@ -414,6 +423,7 @@ public class OpenApiDecodeService {
         try {
             restTemplate.setErrorHandler(new OpenApiResponseErrorHandler());
             restTemplate.delete(getHostRequestUrl(requestUrl, query));
+            return;
         }catch (RestClientException ex) {
             ex.printStackTrace();
             message = ex.getMessage();
@@ -451,35 +461,6 @@ public class OpenApiDecodeService {
         return Md5Util.MD5Encode(String.format("%s&appSecret=%s&url=%s", needSignParamString, appSecret, requestUrl)).toUpperCase();
     }
 
-//    protected String getNeedSignParamString(Map<String, ?> paramMap) {
-//
-//        List<String> fields = new ArrayList<>(paramMap.keySet());
-//        fields.sort(new Comparator<Object>() {
-//            @Override
-//            public int compare(Object o1, Object o2) {
-//                return o1.toString().compareToIgnoreCase(o2.toString());
-//            }
-//        });
-//
-//        StringBuilder sb = new StringBuilder();
-//        if (!CollectionUtils.isEmpty(fields)) {
-//            String field;
-//            Object fieldValue;
-//            for (int i = 0; i < fields.size(); i++) {
-//                field = fields.get(i);
-//                fieldValue = paramMap.get(field);
-//                if (fieldValue!=null) {
-//                    if (i>0) {
-//                        sb.append("&");
-//                    }
-//                    sb.append(field).append("=").append(fieldValue);
-//                }
-//            }
-//        }
-//
-//        return sb.toString();
-//    }
-
     protected <E> E mapToObject(Map<String, Object> map, Class<E> beanClass) {
         if (map == null) return null;
         if (beanClass == Map.class) return (E)map;
@@ -490,6 +471,10 @@ public class OpenApiDecodeService {
     protected MapOpenApiParams<String, Object> objectToMap(Object obj) {
         if(obj == null)
             return null;
+        if (obj instanceof Map)
+            return new MapOpenApiParams<>((Map)obj);
+        if (obj instanceof MapOpenApiParams)
+            return (MapOpenApiParams<String, Object>) obj;
 
         Map<Object, Object> beanMap= new org.apache.commons.beanutils.BeanMap(obj);
         MapOpenApiParams<String, Object> result = new MapOpenApiParams<>();
