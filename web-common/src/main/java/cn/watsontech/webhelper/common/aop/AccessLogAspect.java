@@ -28,6 +28,7 @@ import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringValueResolver;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -206,6 +207,10 @@ public class AccessLogAspect implements EmbeddedValueResolverAware {
                     continue;
                 }
 
+                if (args[i]==null) continue;
+                else if (args[i] instanceof Number||args[i] instanceof String||args[i] instanceof Boolean) argsI = args[i];
+                else if (args[i] instanceof MultipartFile) argsI = ((MultipartFile) args[i]).getName();
+                else
                 //清楚记录里的password
                 try {
                     argsI = JSON.toJSON(args[i]);
